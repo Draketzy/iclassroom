@@ -26,8 +26,7 @@ SECRET_KEY = 'django-insecure-ux#m2^19)%2%+h(m*vy2-qlw(fa(qwiez4gc!#02mimyzw_*6#
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
-
+AUTH_USER_MODEL = 'classroom.User'
 # Application definition
 
 INSTALLED_APPS = [
@@ -39,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "classroom"
 ]
-
+LOGIN_URL = '/'
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -78,13 +77,12 @@ DATABASES = {
      'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'iClassroom',
-        'USER': 'iclassroom_user',
-        'PASSWORD': 'password123',
+        'USER': 'postgres',
+        'PASSWORD': '123456',
         'HOST': 'localhost',
         'PORT': '5432',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -121,7 +119,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
-
+STATICFILES_DIRS = [
+    BASE_DIR / "classroom" / "static",
+]
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 

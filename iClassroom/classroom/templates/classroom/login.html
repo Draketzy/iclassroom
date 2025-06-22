@@ -1,0 +1,87 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iClassroom - Login</title>
+    <link rel="stylesheet" href="{% static 'classroom/css/login.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 3L1 9L12 15L21 12.09V17H23V9M5 13.18V17.18L12 21L19 17.18V13.18L12 17L5 13.18Z" fill="#6366f1"/>
+                </svg>
+            </div>
+            <h1 class="brand-name">iClassroom</h1>
+            <p class="tagline">Smart Attendance & Participation Tracking</p>
+        </div>
+
+        <div class="login-card">
+            <div class="card-header">
+                <h2>Welcome Back</h2>
+                <p>Sign in to your account to continue</p>
+            </div>
+
+            <div class="user-type-toggle">
+                <button type="button" class="toggle-btn active" data-type="teacher">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12ZM12 14C9.33 14 4 15.34 4 18V20H20V18C20 15.34 14.67 14 12 14Z" fill="currentColor"/>
+                    </svg>
+                    Teacher
+                </button>
+                <button type="button" class="toggle-btn" data-type="student">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 3L1 9L12 15L21 12.09V17H23V9M5 13.18V17.18L12 21L19 17.18V13.18L12 17L5 13.18Z" fill="currentColor"/>
+                    </svg>
+                    Student
+                </button>
+            </div>
+
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="message error">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="POST" class="login-form">
+                {% csrf_token %}
+                <input type="hidden" name="user_type" id="user_type" value="teacher">
+                
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" name="email" id="email" placeholder="Enter your email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" name="password" id="password" placeholder="Enter your password" required>
+                </div>
+
+                <button type="submit" class="signin-btn">Sign in</button>
+            </form>
+
+            <p class="register-link">
+                Not registered yet? <a href="{% url 'register' %}">Register</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Handle user type toggle
+        document.querySelectorAll('.toggle-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                document.getElementById('user_type').value = this.dataset.type;
+            });
+        });
+    </script>
+</body>
+</html>
