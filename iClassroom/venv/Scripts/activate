@@ -37,7 +37,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="C:\Users\Drake\Documents\3rd Year (2nd Sem)\Mobile Dev\iclassroom\iClassroom\venv"
+VIRTUAL_ENV="C:\xampp\htdocs\iclassroom\iclassroom\venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
