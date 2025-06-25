@@ -1,0 +1,248 @@
+{% load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iClassroom - Class Details</title>
+    <link rel="stylesheet" href="{% static 'classroom/css/teacher_deatils.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 3L1 9L12 15L21 12.09V17H23V9M5 13.18V17.18L12 21L19 17.18V13.18L12 17L5 13.18Z" fill="#6366f1"/>
+                    </svg>
+                    <div>
+                        <h1 class="brand-name">iClassroom</h1>
+                        <p class="tagline">Smart Attendance & Participation Tracking</p>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="user-profile">
+                    <span class="user-initial">{{ user.first_name.0 }}{{ user.last_name.0 }}</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Back Button and Header -->
+            <div class="details-header">
+                <button class="back-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19 12H5M12 19L5 12L12 5" stroke="#374151" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Back to Dashboard
+                </button>
+                <div class="class-title">
+                    <h2>Data Structures & Algorithms</h2>
+                    <p>CS79 • 1st Semester 2024</p>
+                </div>
+            </div>
+
+            <!-- Class Info Bar -->
+            <div class="class-info-bar">
+                <div class="class-schedule">
+                    <h3>Data Structures & Algorithms</h3>
+                    <p>MWF 9:00-10:00AM</p>
+                </div>
+                <div class="session-status">
+                    <span class="session-badge active">Active Session</span>
+                    <button class="qr-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 7V17C3 18.1046 3.89543 19 5 19H19C20.1046 19 21 18.1046 21 17V7C21 5.89543 20.1046 5 19 5H5C3.89543 5 3 5.89543 3 7Z" stroke="white" stroke-width="2"/>
+                            <path d="M8 9L10 11L16 5" stroke="white" stroke-width="2"/>
+                        </svg>
+                        QR Attendance
+                    </button>
+                </div>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-content">
+                        <div class="stat-info">
+                            <div class="stat-number">28</div>
+                            <h3>Total Students</h3>
+                        </div>
+                        <div class="stat-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21" stroke="#6366f1" stroke-width="2"/>
+                                <path d="M9 11C11.2091 11 13 9.20914 13 7C13 4.79086 11.2091 3 9 3C6.79086 3 5 4.79086 5 7C5 9.20914 6.79086 11 9 11Z" stroke="#6366f1" stroke-width="2"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-content">
+                        <div class="stat-info">
+                            <div class="stat-number">24</div>
+                            <h3>Present Today</h3>
+                        </div>
+                        <div class="stat-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#6366f1" stroke-width="2"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-content">
+                        <div class="stat-info">
+                            <div class="stat-number">87%</div>
+                            <h3>Avg Attendance</h3>
+                        </div>
+                        <div class="stat-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2L15.09 8.26L22 9L17 14L18.18 21L12 17.77L5.82 21L7 14L2 9L8.91 8.26L12 2Z" stroke="#6366f1" stroke-width="2"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-content">
+                        <div class="stat-info">
+                            <div class="stat-number">82%</div>
+                            <h3>Avg Participation</h3>
+                        </div>
+                        <div class="stat-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="#6366f1" stroke-width="2"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <div class="nav-tabs">
+                <button class="tab-btn active">Attendance</button>
+                <button class="tab-btn">Participation</button>
+                <button class="tab-btn">Analytics</button>
+                <button class="tab-btn">Reports</button>
+            </div>
+
+            <!-- Student Attendance Section -->
+            <div class="attendance-section">
+                <div class="section-header">
+                    <div>
+                        <h3>Student Attendance</h3>
+                        <p>Track and manage student attendance for today's session</p>
+                    </div>
+                    <div class="section-actions">
+                        <button class="export-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M21 15V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V15M7 10L12 15M12 15L17 10M12 15V3" stroke="#374151" stroke-width="2"/>
+                            </svg>
+                            Export
+                        </button>
+                        <button class="add-student-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 5V19M5 12H19" stroke="white" stroke-width="2"/>
+                            </svg>
+                            Add Student
+                        </button>
+                    </div>
+                </div>
+
+                <div class="search-filter">
+                    <div class="search-box">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 21L16.514 16.506L21 21ZM19 10.5C19 15.194 15.194 19 10.5 19C5.806 19 2 15.194 2 10.5C2 5.806 5.806 2 10.5 2C15.194 2 19 5.806 19 10.5Z" stroke="#9ca3af" stroke-width="2"/>
+                        </svg>
+                        <input type="text" placeholder="Search students by name, email, or ID...">
+                    </div>
+                    <select class="filter-select">
+                        <option>All Students</option>
+                        <option>Present</option>
+                        <option>Absent</option>
+                        <option>Late</option>
+                    </select>
+                </div>
+
+                <!-- Students Table -->
+                <div class="students-table">
+                    <div class="student-row">
+                        <div class="student-info">
+                            <div class="student-avatar">JD</div>
+                            <div class="student-details">
+                                <h4>Jake Donayre</h4>
+                                <p>jakedonayre@gmail.com</p>
+                                <span class="student-id">ID: 12345</span>
+                            </div>
+                        </div>
+                        <div class="attendance-stats">
+                            <div class="attendance-count">19/20 sessions</div>
+                            <div class="attendance-percentage">95% attendance</div>
+                        </div>
+                        <div class="status-indicator">
+                            <span class="status-badge present">Present</span>
+                        </div>
+                        <div class="attendance-actions">
+                            <button class="action-btn present active">Present</button>
+                            <button class="action-btn absent">Absent</button>
+                            <button class="action-btn late">Late</button>
+                        </div>
+                    </div>
+
+                    <div class="student-row">
+                        <div class="student-info">
+                            <div class="student-avatar">JD</div>
+                            <div class="student-details">
+                                <h4>Jake Donayre</h4>
+                                <p>jakedonayre@gmail.com</p>
+                                <span class="student-id">ID: 12345</span>
+                            </div>
+                        </div>
+                        <div class="attendance-stats">
+                            <div class="attendance-count">19/20 sessions</div>
+                            <div class="attendance-percentage">95% attendance</div>
+                        </div>
+                        <div class="status-indicator">
+                            <span class="status-badge present">Present</span>
+                        </div>
+                        <div class="attendance-actions">
+                            <button class="action-btn present active">Present</button>
+                            <button class="action-btn absent">Absent</button>
+                            <button class="action-btn late">Late</button>
+                        </div>
+                    </div>
+
+                    <div class="student-row">
+                        <div class="student-info">
+                            <div class="student-avatar">JD</div>
+                            <div class="student-details">
+                                <h4>Jake Donayre</h4>
+                                <p>jakedonayre@gmail.com</p>
+                                <span class="student-id">ID: 12345</span>
+                            </div>
+                        </div>
+                        <div class="attendance-stats">
+                            <div class="attendance-count">19/20 sessions</div>
+                            <div class="attendance-percentage">95% attendance</div>
+                        </div>
+                        <div class="status-indicator">
+                            <span class="status-badge present">Present</span>
+                        </div>
+                        <div class="attendance-actions">
+                            <button class="action-btn present active">Present</button>
+                            <button class="action-btn absent">Absent</button>
+                            <button class="action-btn late">Late</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

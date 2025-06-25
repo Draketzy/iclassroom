@@ -1,0 +1,322 @@
+/* Profile Dropdown Container */
+.profile-dropdown-container {
+    position: relative;
+}
+
+/* Profile Icon Button */
+.user-profile {
+    width: 40px;
+    height: 40px;
+    background: #6366f1;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+}
+
+.user-profile:hover {
+    background: #5856eb;
+    transform: scale(1.05);
+    border-color: #e5e7eb;
+}
+
+.user-initial {
+    pointer-events: none;
+}
+
+/* Profile Modal */
+.profile-modal {
+    position: fixed;
+    top: 70px;
+    right: 32px;
+    width: 320px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border: 1px solid #e5e7eb;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px) scale(0.95);
+    transition: all 0.2s ease;
+}
+
+.profile-modal.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+.profile-modal-content {
+    padding: 20px;
+}
+
+/* User Info Section */
+.profile-user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.profile-avatar {
+    width: 48px;
+    height: 48px;
+    background: #6366f1;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.profile-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.profile-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.profile-email {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.profile-role {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.profile-role.teacher {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.profile-role.student {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.profile-id {
+    font-size: 12px;
+    color: #9ca3af;
+    margin-top: 2px;
+}
+
+/* Divider */
+.profile-divider {
+    height: 1px;
+    background: #e5e7eb;
+    margin: 16px 0;
+}
+
+/* Menu Options */
+.profile-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.profile-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    color: #374151;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.profile-menu-item:hover {
+    background: #f3f4f6;
+    color: #1f2937;
+}
+
+.profile-menu-item svg {
+    flex-shrink: 0;
+    color: #6b7280;
+}
+
+.profile-menu-item:hover svg {
+    color: #374151;
+}
+
+/* Logout Form and Button */
+.profile-logout-form {
+    margin: 0;
+}
+
+.profile-logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: none;
+    border: none;
+    color: #dc2626;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+    text-align: left;
+}
+
+.profile-logout-btn:hover {
+    background: #fef2f2;
+    color: #991b1b;
+}
+
+.profile-logout-btn svg {
+    flex-shrink: 0;
+    color: #dc2626;
+}
+
+.profile-logout-btn:hover svg {
+    color: #991b1b;
+}
+
+/* Modal Backdrop */
+.profile-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.1);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+}
+
+.profile-modal-backdrop.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .profile-modal {
+        right: 16px;
+        top: 60px;
+        width: 280px;
+    }
+    
+    .profile-modal-content {
+        padding: 16px;
+    }
+    
+    .profile-name {
+        font-size: 15px;
+    }
+    
+    .profile-email {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-modal {
+        right: 12px;
+        left: 12px;
+        width: auto;
+        top: 55px;
+    }
+    
+    .profile-user-info {
+        flex-direction: column;
+        text-align: center;
+        gap: 8px;
+    }
+    
+    .profile-details {
+        text-align: center;
+    }
+}
+
+/* Animation for smooth transitions */
+@keyframes profileModalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes profileModalSlideOut {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+    }
+}
+
+/* Focus styles for accessibility */
+.user-profile:focus {
+    outline: 2px solid #6366f1;
+    outline-offset: 2px;
+}
+
+.profile-menu-item:focus,
+.profile-logout-btn:focus {
+    outline: 2px solid #6366f1;
+    outline-offset: -2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .profile-modal {
+        border: 2px solid #000;
+    }
+    
+    .profile-divider {
+        background: #000;
+        height: 2px;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .profile-modal,
+    .profile-modal-backdrop,
+    .user-profile {
+        transition: none;
+    }
+}
