@@ -1,0 +1,574 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f8fafc;
+    color: #1f2937;
+    line-height: 1.6;
+}
+
+.dashboard-container {
+    min-height: 100vh;
+}
+
+/* Header Styles */
+.header {
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 16px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-left .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 2px;
+}
+
+.tagline {
+    font-size: 12px;
+    color: #6b7280;
+    font-weight: 400;
+}
+
+.user-profile {
+    width: 40px;
+    height: 40px;
+    background: #6366f1;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* Main Content */
+.main-content {
+    padding: 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Details Header */
+.details-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.back-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    color: #6b7280;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.class-title h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 4px;
+}
+
+.class-title p {
+    color: #6b7280;
+    font-size: 14px;
+}
+
+/* Class Info Bar */
+.class-info-bar {
+    background: white;
+    border-radius: 12px;
+    padding: 20px 24px;
+    border: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.class-schedule h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 4px;
+}
+
+.class-schedule p {
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.session-status {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.session-badge {
+    background: #10b981;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.session-badge.active {
+    background: #10b981;
+}
+
+.qr-btn {
+    background: #6366f1;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.qr-btn:hover {
+    background: #5856eb;
+}
+
+/* Statistics Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    border: 1px solid #e5e7eb;
+    transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.stat-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.stat-number {
+    font-size: 36px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 4px;
+}
+
+.stat-card h3 {
+    font-size: 14px;
+    font-weight: 500;
+    color: #6b7280;
+    margin-bottom: 8px;
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    background: #f3f4f6;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Navigation Tabs */
+.nav-tabs {
+    display: flex;
+    background: white;
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 32px;
+    border: 1px solid #e5e7eb;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 12px 24px;
+    border: none;
+    background: none;
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.tab-btn.active {
+    background: #f3f4f6;
+    color: #1f2937;
+}
+
+.tab-btn:hover:not(.active) {
+    color: #374151;
+}
+
+/* Attendance Section */
+.attendance-section {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    border: 1px solid #e5e7eb;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+}
+
+.section-header h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 4px;
+}
+
+.section-header p {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.section-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.export-btn {
+    background: #f3f4f6;
+    color: #374151;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.export-btn:hover {
+    background: #e5e7eb;
+}
+
+.add-student-btn {
+    background: #6366f1;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.add-student-btn:hover {
+    background: #5856eb;
+}
+
+/* Search and Filter */
+.search-filter {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.search-box {
+    flex: 1;
+    position: relative;
+}
+
+.search-box svg {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.search-box input {
+    width: 100%;
+    padding: 12px 12px 12px 44px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.filter-select {
+    padding: 12px 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    cursor: pointer;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Students Table */
+.students-table {
+    space-y: 12px;
+}
+
+.student-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr auto 1fr;
+    gap: 24px;
+    align-items: center;
+    padding: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: white;
+}
+
+.student-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.student-avatar {
+    width: 40px;
+    height: 40px;
+    background: #6366f1;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.student-details h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 2px;
+}
+
+.student-details p {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 2px;
+}
+
+.student-id {
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+.attendance-stats {
+    text-align: center;
+}
+
+.attendance-count {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 2px;
+}
+
+.attendance-percentage {
+    font-size: 12px;
+    color: #10b981;
+    font-weight: 500;
+}
+
+.status-indicator {
+    display: flex;
+    justify-content: center;
+}
+
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.status-badge.present {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-badge.absent {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.status-badge.late {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.attendance-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.attendance-actions .action-btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid #e5e7eb;
+    background: white;
+    color: #6b7280;
+}
+
+.attendance-actions .action-btn.present.active {
+    background: #10b981;
+    color: white;
+    border-color: #10b981;
+}
+
+.attendance-actions .action-btn.absent.active {
+    background: #ef4444;
+    color: white;
+    border-color: #ef4444;
+}
+
+.attendance-actions .action-btn.late.active {
+    background: #f59e0b;
+    color: white;
+    border-color: #f59e0b;
+}
+
+.attendance-actions .action-btn:hover:not(.active) {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .main-content {
+        padding: 16px;
+    }
+    
+    .header {
+        padding: 12px 16px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+    
+    .section-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .search-filter {
+        flex-direction: column;
+    }
+    
+    .student-row {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        text-align: center;
+    }
+    
+    .attendance-actions {
+        justify-content: center;
+    }
+    
+    .class-info-bar {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+    }
+    
+    .nav-tabs {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .class-title h2 {
+        font-size: 24px;
+    }
+    
+    .brand-name {
+        font-size: 18px;
+    }
+    
+    .tagline {
+        font-size: 11px;
+    }
+}

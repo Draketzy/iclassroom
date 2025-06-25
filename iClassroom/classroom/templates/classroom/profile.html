@@ -1,0 +1,179 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iClassroom - Profile</title>
+    <link rel="stylesheet" href="{% static 'classroom/css/profile.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 3L1 9L12 15L21 12.09V17H23V9M5 13.18V17.18L12 21L19 17.18V13.18L12 17L5 13.18Z" fill="#6366f1"/>
+                    </svg>
+                    <div>
+                        <h1 class="brand-name">iClassroom</h1>
+                        <p class="tagline">Smart Attendance & Participation Tracking</p>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                {% include 'classroom/components/profile_icon.html' %}
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Back Button and Header -->
+            <div class="page-header">
+                <button class="back-btn" onclick="history.back()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19 12H5M12 19L5 12L12 5" stroke="#374151" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Back to Dashboard
+                </button>
+                <div class="page-title">
+                    <h2>Profile</h2>
+                    <p>Manage your personal information</p>
+                </div>
+            </div>
+
+            <!-- Messages -->
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="message {{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Profile Content -->
+            <div class="profile-container">
+                <!-- Profile Card -->
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <div class="profile-avatar-section">
+                            {% if profile.avatar %}
+                                <img src="{{ profile.avatar.url }}" alt="Profile Picture" class="profile-avatar-large">
+                            {% else %}
+                                <div class="profile-avatar-large">
+                                    <span class="profile-initial-large">{{ user.first_name.0 }}{{ user.last_name.0 }}</span>
+                                </div>
+                            {% endif %}
+                            <div class="profile-info">
+                                <h3>{{ user.get_full_name }}</h3>
+                                <p class="profile-email">{{ user.email }}</p>
+                                {% if user.user_type == 'teacher' %}
+                                    <span class="profile-role teacher">Teacher</span>
+                                    {% if profile.title %}
+                                        <p class="profile-title">{{ profile.title }}</p>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="profile-role student">Student</span>
+                                    {% if profile.student_id %}
+                                        <p class="profile-id">ID: {{ profile.student_id }}</p>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <a href="{% url 'profile_edit' %}" class="edit-profile-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M18.5 2.50023C18.8978 2.1024 19.4374 1.87891 20 1.87891C20.5626 1.87891 21.1022 2.1024 21.5 2.50023C21.8978 2.89805 22.1213 3.43762 22.1213 4.00023C22.1213 4.56284 21.8978 5.1024 21.5 5.50023L12 15.0002L8 16.0002L9 12.0002L18.5 2.50023Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Edit Profile
+                        </a>
+                    </div>
+
+                    <!-- Profile Details -->
+                    <div class="profile-details-section">
+                        <div class="detail-group">
+                            <h4>Personal Information</h4>
+                            <div class="detail-grid">
+                                <div class="detail-item">
+                                    <label>First Name</label>
+                                    <span>{{ user.first_name|default:"Not provided" }}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <label>Last Name</label>
+                                    <span>{{ user.last_name|default:"Not provided" }}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <label>Email</label>
+                                    <span>{{ user.email }}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <label>Phone</label>
+                                    <span>{{ profile.phone|default:"Not provided" }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if profile.bio %}
+                        <div class="detail-group">
+                            <h4>About</h4>
+                            <p class="bio-text">{{ profile.bio }}</p>
+                        </div>
+                        {% endif %}
+
+                        <div class="detail-group">
+                            <h4>Institution Information</h4>
+                            <div class="detail-grid">
+                                <div class="detail-item">
+                                    <label>Institution</label>
+                                    <span>{{ profile.institution|default:"Not provided" }}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <label>Department</label>
+                                    <span>{{ profile.department|default:"Not provided" }}</span>
+                                </div>
+                                {% if user.user_type == 'teacher' %}
+                                    <div class="detail-item">
+                                        <label>Employee ID</label>
+                                        <span>{{ profile.employee_id|default:"Not provided" }}</span>
+                                    </div>
+                                {% else %}
+                                    <div class="detail-item">
+                                        <label>Student ID</label>
+                                        <span>{{ profile.student_id|default:"Not provided" }}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <label>Year of Study</label>
+                                        <span>
+                                            {% if profile.year_of_study %}
+                                                {{ profile.year_of_study }}{% if profile.year_of_study == '1' %}st{% elif profile.year_of_study == '2' %}nd{% elif profile.year_of_study == '3' %}rd{% else %}th{% endif %} Year
+                                            {% else %}
+                                                Not provided
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="detail-group">
+                            <h4>Account Information</h4>
+                            <div class="detail-grid">
+                                <div class="detail-item">
+                                    <label>Member Since</label>
+                                    <span>{{ user.date_joined|date:"F Y" }}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <label>Last Updated</label>
+                                    <span>{{ profile.updated_at|date:"M d, Y" }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
