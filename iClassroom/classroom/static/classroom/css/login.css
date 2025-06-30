@@ -168,6 +168,7 @@ body {
     cursor: pointer;
     transition: all 0.2s ease;
     margin-top: 8px;
+    box-shadow: 0 1px 2px 0px rgba(0, 0, 0, 0.3);
 }
 
 .signin-btn:hover {
@@ -195,6 +196,45 @@ body {
     text-decoration: underline;
 }
 
+/* show password */
+.password-container {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #6b7280;
+}
+
+.eye-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.toggle-password:hover {
+    color: #4b5563;
+}
+/* forgot-password */
+.forgot-password {
+    text-align: right;
+    margin-top: 0.5rem;
+}
+
+.forgot-password a {
+    color: #6366f1;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.forgot-password a:hover {
+    text-decoration: underline;
+    color: #4f46e5;
+}
 /* Responsive Design */
 @media (max-width: 480px) {
     .container {

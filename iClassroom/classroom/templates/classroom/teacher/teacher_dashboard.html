@@ -5,28 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>iClassroom - Teacher Dashboard</title>
-    <link rel="stylesheet" href="{% static 'classroom/css/teacher_dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'classroom/css/teacher_dashboard.css' %}?v=1.1">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'classroom/css/css/bootstrap.min.css' %}">
 </head>
 <body>
     <div class="dashboard-container">
         <!-- Header -->
-        <header class="header">
-            <div class="header-left">
-                <div class="logo">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 3L1 9L12 15L21 12.09V17H23V9M5 13.18V17.18L12 21L19 17.18V13.18L12 17L5 13.18Z" fill="#6366f1"/>
-                    </svg>
-                    <div>
-                        <h1 class="brand-name">iClassroom</h1>
-                        <p class="tagline">Smart Attendance & Participation Tracking</p>
-                    </div>
-                </div>
-            </div>
-              <div class="header-right">
-                {% include 'classroom/components/profile_icon.html' %}
-            </div>
-        </header>
+        {% include 'classroom/header.html' %}
 
         <!-- Main Content -->
         <main class="main-content">
@@ -181,9 +167,9 @@
 
                 <!-- Recent Activities Section -->
                 <div class="activities-section">
-                    <div class="section-header">
+                    <div class="sections-header">
                         <h3>Recent Activities</h3>
-                        <p>Latest updates from your classes</p>
+                        <p class="fs-6 fw-light">Latest updates from your classes</p>
                     </div>
 
                     <div class="activities-list">
@@ -220,5 +206,8 @@
             </div>
         </main>
     </div>
+    {% block content %}
+    {% endblock %}
+    <script src="{% static 'classroom/js/bootstrap.bundle.min.js' %}"></script>
 </body>
 </html>

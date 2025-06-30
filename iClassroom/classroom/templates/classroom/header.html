@@ -1,0 +1,28 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="{% static 'classroom/css/header.css' %}">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="{% static 'classroom/css/css/bootstrap.min.css' %}">
+    </head>
+    <body>
+        <header class="header">
+            <div class="header-left">
+                <div class="logo">
+                    <img src="{% static 'classroom/images/logo.png' %}" alt="">
+                    <div class="title">
+                        <h1 class="brand-name">iClassroom</h1>
+                        <p class="tagline">Smart Attendance & Participation Tracking</p>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                {% include 'classroom/components/profile_icon.html' %}
+            </div>
+        </header>
+    </body>
+</html>
