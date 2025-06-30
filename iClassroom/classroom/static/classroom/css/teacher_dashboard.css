@@ -169,6 +169,10 @@ body {
     font-size: 14px;
     color: #6b7280;
 }
+.sections-header .fs-6{
+    color: #6b7280;
+    margin-top: -10px;
+}
 
 .add-class-btn {
     background: #6366f1;

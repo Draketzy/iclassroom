@@ -5,8 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>iClassroom - Teacher Dashboard</title>
-    <link rel="stylesheet" href="{% static 'classroom/css/teacher_dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'classroom/css/teacher_dashboard.css' %}?v=1.1">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'classroom/css/css/bootstrap.min.css' %}">
 </head>
 <body>
     <div class="dashboard-container">
@@ -181,9 +182,9 @@
 
                 <!-- Recent Activities Section -->
                 <div class="activities-section">
-                    <div class="section-header">
+                    <div class="sections-header">
                         <h3>Recent Activities</h3>
-                        <p>Latest updates from your classes</p>
+                        <p class="fs-6 fw-light">Latest updates from your classes</p>
                     </div>
 
                     <div class="activities-list">
@@ -220,5 +221,6 @@
             </div>
         </main>
     </div>
+    <script src="{% static 'classroom/js/bootstrap.bundle.min.js' %}"></script>
 </body>
 </html>
