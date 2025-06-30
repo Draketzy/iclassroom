@@ -19,7 +19,7 @@ body {
 .header {
     background: white;
     border-bottom: 1px solid #e5e7eb;
-    padding: 16px 32px;
+    padding: 5px 32px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -28,9 +28,15 @@ body {
 .header-left .logo {
     display: flex;
     align-items: center;
-    gap: 12px;
+}
+.header-left .logo img {
+    height: 40px;
+    width: 50px;
 }
 
+.title{
+    padding-top: 20px;
+}
 .brand-name {
     font-size: 20px;
     font-weight: 700;
