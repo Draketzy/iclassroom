@@ -1,11 +1,12 @@
 {% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>iClassroom - Register</title>
-    <link rel="stylesheet" href="{% static 'classroom/css/register.css' %}">
+    <link rel="stylesheet" href="{% static 'classroom/css/register.css' %}?v=1.1">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -23,7 +24,7 @@
         <div class="register-card">
             <div class="card-header">
                 <h2>Create Account</h2>
-                <p>Let's start with the basic information</p>
+                <p>Let's get you started with your account</p>
             </div>
 
             <!-- Progress Indicator -->
@@ -34,6 +35,10 @@
                 <div class="progress-line"></div>
                 <div class="step" data-step="2">
                     <span>2</span>
+                </div>
+                <div class="progress-line"></div>
+                <div class="step" data-step="3">
+                    <span>3</span>
                 </div>
             </div>
 
@@ -48,25 +53,46 @@
             <form method="POST" class="register-form" id="registerForm">
                 {% csrf_token %}
                 
-                <!-- Step 1: Basic Information -->
+                <!-- Step 1: User Type Selection -->
                 <div class="form-step active" id="step1">
-                    <div class="user-type-toggle">
-                        <button type="button" class="toggle-btn active" data-type="teacher">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12ZM12 14C9.33 14 4 15.34 4 18V20H20V18C20 15.34 14.67 14 12 14Z" fill="currentColor"/>
-                            </svg>
-                            Teacher
-                        </button>
-                        <button type="button" class="toggle-btn" data-type="student">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 3L1 9L12 15L21 12.09V17H23V9M5 13.18V17.18L12 21L19 17.18V13.18L12 17L5 13.18Z" fill="currentColor"/>
-                            </svg>
-                            Student
-                        </button>
+                    <div class="user-type-selection">
+                        <h3>I am a...</h3>
+                        <p>Choose your role to get started</p>
+                        
+                        <div class="user-type-cards">
+                            <div class="user-type-card" data-type="teacher">
+                                <div class="card-icon">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12ZM12 14C9.33 14 4 15.34 4 18V20H20V18C20 15.34 14.67 14 12 14Z" fill="currentColor"/>
+                                    </svg>
+                                </div>
+                                <h4>Teacher</h4>
+                                <p>Create and manage classrooms, track attendance, and monitor student participation</p>
+                            </div>
+                            
+                            <div class="user-type-card" data-type="student">
+                                <div class="card-icon">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 3L1 9L12 15L21 12.09V17H23V9M5 13.18V17.18L12 21L19 17.18V13.18L12 17L5 13.18Z" fill="currentColor"/>
+                                    </svg>
+                                </div>
+                                <h4>Student</h4>
+                                <p>Join classrooms, mark attendance, and participate in class activities</p>
+                            </div>
+                        </div>
                     </div>
+                    
+                    <input type="hidden" name="user_type" id="user_type" value="">
+                    <button type="button" class="continue-btn" onclick="nextStep()" id="roleNextBtn" disabled>Continue</button>
+                </div>
 
-                    <input type="hidden" name="user_type" id="user_type" value="teacher">
-
+                <!-- Step 2: Basic Information -->
+                <div class="form-step" id="step2">
+                    <div class="step-header">
+                        <h3>Basic Information</h3>
+                        <p>Tell us about yourself</p>
+                    </div>
+                    
                     <div class="form-row">
                         <div class="form-group">
                             <label for="first_name">First Name *</label>
@@ -77,22 +103,28 @@
                             <input type="text" name="last_name" id="last_name" placeholder="Enter your last name" required>
                         </div>
                     </div>
-
                     <div class="form-group">
                         <label for="email">Email Address *</label>
                         <input type="email" name="email" id="email" placeholder="Enter your email address" required>
                     </div>
-
                     <div class="form-group">
                         <label for="phone">Phone Number *</label>
                         <input type="tel" name="phone" id="phone" placeholder="Enter your phone number" required>
                     </div>
-
-                    <button type="button" class="continue-btn" onclick="nextStep()">Continue</button>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="back-btn" onclick="prevStep()">Back</button>
+                        <button type="button" class="continue-btn" onclick="nextStep()">Continue</button>
+                    </div>
                 </div>
 
-                <!-- Step 2: Additional Information -->
-                <div class="form-step" id="step2">
+                <!-- Step 3: Additional Information -->
+                <div class="form-step" id="step3">
+                    <div class="step-header">
+                        <h3>Complete Your Profile</h3>
+                        <p>Just a few more details</p>
+                    </div>
+                    
                     <div class="form-row">
                         <div class="form-group">
                             <label for="password">Password *</label>
@@ -127,7 +159,6 @@
                                 </select>
                             </div>
                         </div>
-
                         <div class="form-group">
                             <label for="employee_id">Employee ID *</label>
                             <input type="text" name="employee_id" id="employee_id" placeholder="Enter your employee ID" required>
@@ -157,7 +188,6 @@
                                 </select>
                             </div>
                         </div>
-
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="student_id">Student ID *</label>
@@ -200,14 +230,15 @@
     <script>
         let currentStep = 1;
 
-        // Handle user type toggle
-        document.querySelectorAll('.toggle-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
+        // Handle user type selection
+        document.querySelectorAll('.user-type-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.user-type-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
                 document.getElementById('user_type').value = this.dataset.type;
+                document.getElementById('roleNextBtn').disabled = false;
                 
-                // Show/hide appropriate fields
+                // Show/hide appropriate fields for step 3
                 const teacherFields = document.querySelector('.teacher-fields');
                 const studentFields = document.querySelector('.student-fields');
                 
@@ -228,35 +259,54 @@
         });
 
         function nextStep() {
-            // Validate current step
-            const step1 = document.getElementById('step1');
-            const inputs = step1.querySelectorAll('input[required]');
-            let valid = true;
-
-            inputs.forEach(input => {
-                if (!input.value.trim()) {
-                    valid = false;
-                    input.classList.add('error');
-                } else {
-                    input.classList.remove('error');
+            if (currentStep === 1) {
+                // Validate user type selection
+                if (!document.getElementById('user_type').value) {
+                    return;
                 }
-            });
-
-            if (valid) {
                 currentStep = 2;
                 document.getElementById('step1').classList.remove('active');
                 document.getElementById('step2').classList.add('active');
                 document.querySelector('[data-step="1"]').classList.remove('active');
                 document.querySelector('[data-step="2"]').classList.add('active');
+            } else if (currentStep === 2) {
+                // Validate step 2
+                const step2 = document.getElementById('step2');
+                const inputs = step2.querySelectorAll('input[required]');
+                let valid = true;
+                inputs.forEach(input => {
+                    if (!input.value.trim()) {
+                        valid = false;
+                        input.classList.add('error');
+                    } else {
+                        input.classList.remove('error');
+                    }
+                });
+
+                if (valid) {
+                    currentStep = 3;
+                    document.getElementById('step2').classList.remove('active');
+                    document.getElementById('step3').classList.add('active');
+                    document.querySelector('[data-step="2"]').classList.remove('active');
+                    document.querySelector('[data-step="3"]').classList.add('active');
+                }
             }
         }
 
         function prevStep() {
-            currentStep = 1;
-            document.getElementById('step2').classList.remove('active');
-            document.getElementById('step1').classList.add('active');
-            document.querySelector('[data-step="2"]').classList.remove('active');
-            document.querySelector('[data-step="1"]').classList.add('active');
+            if (currentStep === 2) {
+                currentStep = 1;
+                document.getElementById('step2').classList.remove('active');
+                document.getElementById('step1').classList.add('active');
+                document.querySelector('[data-step="2"]').classList.remove('active');
+                document.querySelector('[data-step="1"]').classList.add('active');
+            } else if (currentStep === 3) {
+                currentStep = 2;
+                document.getElementById('step3').classList.remove('active');
+                document.getElementById('step2').classList.add('active');
+                document.querySelector('[data-step="3"]').classList.remove('active');
+                document.querySelector('[data-step="2"]').classList.add('active');
+            }
         }
 
         // Password confirmation validation
