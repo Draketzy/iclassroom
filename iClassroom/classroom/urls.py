@@ -14,8 +14,8 @@ urlpatterns = [
     # Profile URLs
     path('profile/', views.profile_view, name='profile'),
     path('profile/edit/', views.profile_edit, name='profile_edit'),
-     path('profile/upload-avatar/', views.upload_avatar, name='upload_avatar'),
-    path('profile/remove-avatar/', views.remove_avatar, name='remove_avatar'),
+     path('upload-avatar/', views.upload_avatar, name='upload_avatar'),
+    path('remove-avatar/', views.remove_avatar, name='remove_avatar'),
     # Settings URLs
     # path('settings/', views.settings_view, name='settings'),
     # path('settings/update/', views.settings_update, name='settings_update'),

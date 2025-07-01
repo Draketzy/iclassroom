@@ -1,0 +1,66 @@
+{% load static %}
+<!-- No <head> tag inside includes -->
+
+<link rel="stylesheet" href="{% static 'classroom/css/avatar_modal.css' %}">
+
+<!-- Modal HTML -->
+<div class="modal-backdrop" id="avatarModal">
+  <div class="avatar-modal">
+    <div class="modal-header">
+      <h3>Profile Picture</h3>
+      <button class="modal-close" onclick="closeAvatarModal()">×</button>
+    </div>
+    <div class="modal-content">
+      <div class="avatar-preview-section">
+        <div class="avatar-preview" id="avatarPreview">
+          <span class="avatar-initial-preview">
+            {{ user.first_name.0|default:"U" }}{{ user.last_name.0|default:"" }}
+          </span>
+        </div>
+      </div>
+
+      <div class="avatar-actions">
+        <input type="file" id="avatarInput" accept="image/*" style="display:none">
+        <button class="upload-btn" onclick="document.getElementById('avatarInput').click()">
+          Upload New Photo
+        </button>
+        <button class="remove-btn" onclick="removeAvatar()" style="display:none">
+          Remove Photo
+        </button>
+      </div>
+
+      <div class="upload-info">
+        <p>Supported formats: JPG, PNG, GIF</p>
+        <p>Maximum file size: 5MB</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <p>Uploading...</p>
+</div>
+
+<script>
+  function openAvatarModal() {
+    const modal = document.getElementById('avatarModal');
+    if (modal) {
+      modal.classList.add('active');
+    }
+  }
+
+  function closeAvatarModal() {
+    const modal = document.getElementById('avatarModal');
+    if (modal) {
+      modal.classList.remove('active');
+    }
+  }
+
+  function removeAvatar() {
+    if (confirm('Are you sure you want to remove your profile picture?')) {
+      console.log('Avatar removed (implement your logic here)');
+    }
+  }
+</script>
