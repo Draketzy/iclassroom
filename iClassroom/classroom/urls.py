@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('', views.login_view, name='login'),
@@ -8,4 +10,16 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('teacher/dashboard/', views.teacher_dashboard, name='teacher_dashboard'),
     path('student/dashboard/', views.student_dashboard, name='student_dashboard'),
-]
+
+    # Profile URLs
+    path('profile/', views.profile_view, name='profile'),
+    path('profile/edit/', views.profile_edit, name='profile_edit'),
+     path('profile/upload-avatar/', views.upload_avatar, name='upload_avatar'),
+    path('profile/remove-avatar/', views.remove_avatar, name='remove_avatar'),
+    # Settings URLs
+    # path('settings/', views.settings_view, name='settings'),
+    # path('settings/update/', views.settings_update, name='settings_update'),
+    # path('settings/change-password/', views.change_password, name='change_password'),
+    # path('settings/delete-account/', views.delete_account, name='delete_account'),
+    
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

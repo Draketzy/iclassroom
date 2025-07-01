@@ -1,7 +1,7 @@
 import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
-
+import pytz
 # ---------------------
 # Custom User
 # ---------------------
@@ -44,7 +44,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']
     objects = CustomUserManager()
+    
+     
+    def __str__(self):
+        return f"{self.first_name} {self.last_name} ({self.email})"
 
+    def get_avatar_url(self):
+        return self.avatar_url if self.avatar_url else None
 
 # ---------------------
 # Academic Structure
@@ -314,3 +320,48 @@ class Report(models.Model):
     file_path = models.CharField(max_length=500)
     generated_at = models.DateTimeField()
     expires_at = models.DateTimeField()
+
+# class UserSettings(models.Model):
+#     THEME_CHOICES = [
+#         ('light', 'Light'),
+#         ('dark', 'Dark'),
+#         ('auto', 'Auto'),
+#     ]
+    
+#     LANGUAGE_CHOICES = [
+#         ('en', 'English'),
+#         ('es', 'Spanish'),
+#         ('fr', 'French'),
+#         ('de', 'German'),
+#     ]
+    
+#     PRIVACY_CHOICES = [
+#         ('public', 'Public'),
+#         ('private', 'Private'),
+#         ('institution', 'Institution Only'),
+#     ]
+    
+#     TIMEZONE_CHOICES = [(tz, tz) for tz in pytz.common_timezones]
+    
+#     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    
+#     # Notification Settings
+#     email_notifications = models.BooleanField(default=True)
+#     push_notifications = models.BooleanField(default=True)
+#     attendance_reminders = models.BooleanField(default=True)
+#     weekly_reports = models.BooleanField(default=True)
+    
+#     # Appearance Settings
+#     theme_preference = models.CharField(max_length=10, choices=THEME_CHOICES, default='light')
+#     language = models.CharField(max_length=5, choices=LANGUAGE_CHOICES, default='en')
+#     timezone = models.CharField(max_length=50, choices=TIMEZONE_CHOICES, default='UTC')
+    
+#     # Privacy Settings
+#     privacy_profile = models.CharField(max_length=20, choices=PRIVACY_CHOICES, default='institution')
+#     privacy_attendance = models.CharField(max_length=20, choices=PRIVACY_CHOICES, default='private')
+    
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     updated_at = models.DateTimeField(auto_now=True)
+    
+#     def __str__(self):
+#         return f"{self.user.username}'s Settings"

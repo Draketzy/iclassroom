@@ -1,4 +1,5 @@
-{%load static%}
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -44,30 +45,29 @@
                 <div class="profile-card">
                     <div class="profile-header">
                         <div class="profile-avatar-section">
-                            {% if profile.avatar %}
-                                <img src="{{ profile.avatar.url }}" alt="Profile Picture" class="profile-avatar-large">
-                            {% else %}
-                                <div class="profile-avatar-large">
-                                    <span class="profile-initial-large">{{ user.first_name.0 }}{{ user.last_name.0 }}</span>
-                                </div>
-                            {% endif %}
-                            <div class="profile-info">
-                                <h3>{{ user.get_full_name }}</h3>
-                                <p class="profile-email">{{ user.email }}</p>
-                                {% if user.user_type == 'teacher' %}
-                                    <span class="profile-role teacher">Teacher</span>
-                                    {% if profile.title %}
-                                        <p class="profile-title">{{ profile.title }}</p>
-                                    {% endif %}
+                            <div class="profile-avatar-container">
+                                {% if user.avatar_url %}
+                                    <img src="{{ user.avatar_url }}" alt="Profile Picture" class="profile-avatar-large" id="profileAvatar">
                                 {% else %}
-                                    <span class="profile-role student">Student</span>
-                                    {% if profile.student_id %}
-                                        <p class="profile-id">ID: {{ profile.student_id }}</p>
-                                    {% endif %}
+                                    <div class="profile-avatar-large" id="profileAvatar">
+                                        <span class="profile-initial-large">{{ user.first_name.0|default:"U" }}{{ user.last_name.0|default:"" }}</span>
+                                    </div>
                                 {% endif %}
+                                <div class="avatar-overlay" id="avatarOverlay">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M23 19C23 20.1046 22.1046 21 21 21H3C1.89543 21 1 20.1046 1 19V8C1 6.89543 1.89543 6 3 6H7L9 4H15L17 6H21C22.1046 6 23 6.89543 23 8V19Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M12 17C14.2091 17 16 15.2091 16 13C16 10.7909 14.2091 9 12 9C9.79086 9 8 10.7909 8 13C8 15.2091 9.79086 17 12 17Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    <span>Change Photo</span>
+                                </div>
+                            </div>
+                            <div class="profile-info">
+                                <h3 class="profile-full-name">{{ user.get_full_name|default:"User Name" }}</h3>
+                                <p class="profile-email">{{ user.email }}</p>
+                                
                             </div>
                         </div>
-                        <a href="{% url 'profile_edit' %}" class="edit-profile-btn">
+                        <a  class="edit-profile-btn">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                 <path d="M18.5 2.50023C18.8978 2.1024 19.4374 1.87891 20 1.87891C20.5626 1.87891 21.1022 2.1024 21.5 2.50023C21.8978 2.89805 22.1213 3.43762 22.1213 4.00023C22.1213 4.56284 21.8978 5.1024 21.5 5.50023L12 15.0002L8 16.0002L9 12.0002L18.5 2.50023Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -93,51 +93,11 @@
                                     <label>Email</label>
                                     <span>{{ user.email }}</span>
                                 </div>
+                                {% if user.phone %}
                                 <div class="detail-item">
                                     <label>Phone</label>
-                                    <span>{{ profile.phone|default:"Not provided" }}</span>
+                                    <span>{{ user.phone }}</span>
                                 </div>
-                            </div>
-                        </div>
-
-                        {% if profile.bio %}
-                        <div class="detail-group">
-                            <h4>About</h4>
-                            <p class="bio-text">{{ profile.bio }}</p>
-                        </div>
-                        {% endif %}
-
-                        <div class="detail-group">
-                            <h4>Institution Information</h4>
-                            <div class="detail-grid">
-                                <div class="detail-item">
-                                    <label>Institution</label>
-                                    <span>{{ profile.institution|default:"Not provided" }}</span>
-                                </div>
-                                <div class="detail-item">
-                                    <label>Department</label>
-                                    <span>{{ profile.department|default:"Not provided" }}</span>
-                                </div>
-                                {% if user.user_type == 'teacher' %}
-                                    <div class="detail-item">
-                                        <label>Employee ID</label>
-                                        <span>{{ profile.employee_id|default:"Not provided" }}</span>
-                                    </div>
-                                {% else %}
-                                    <div class="detail-item">
-                                        <label>Student ID</label>
-                                        <span>{{ profile.student_id|default:"Not provided" }}</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <label>Year of Study</label>
-                                        <span>
-                                            {% if profile.year_of_study %}
-                                                {{ profile.year_of_study }}{% if profile.year_of_study == '1' %}st{% elif profile.year_of_study == '2' %}nd{% elif profile.year_of_study == '3' %}rd{% else %}th{% endif %} Year
-                                            {% else %}
-                                                Not provided
-                                            {% endif %}
-                                        </span>
-                                    </div>
                                 {% endif %}
                             </div>
                         </div>
@@ -150,8 +110,8 @@
                                     <span>{{ user.date_joined|date:"F Y" }}</span>
                                 </div>
                                 <div class="detail-item">
-                                    <label>Last Updated</label>
-                                    <span>{{ profile.updated_at|date:"M d, Y" }}</span>
+                                    <label>Last Login</label>
+                                    <span>{{ user.last_login|date:"M d, Y" }}</span>
                                 </div>
                             </div>
                         </div>
@@ -160,7 +120,212 @@
             </div>
         </main>
     </div>
-    {% block content %}
-    {% endblock %}
+
+    <!-- Avatar Upload Modal -->
+    <div class="modal-backdrop" id="avatarModal">
+        <div class="modal avatar-modal">
+            <div class="modal-header">
+                <h3>Profile Picture</h3>
+                <button class="modal-close" onclick="closeAvatarModal()">×</button>
+            </div>
+            <div class="modal-content">
+                <div class="avatar-preview-section">
+                    {% if user.avatar_url %}
+                        <img src="{{ user.avatar_url }}" alt="Current Profile Picture" class="avatar-preview" id="avatarPreview">
+                    {% else %}
+                        <div class="avatar-preview" id="avatarPreview">
+                            <span class="avatar-initial-preview">{{ user.first_name.0|default:"U" }}{{ user.last_name.0|default:"" }}</span>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="avatar-actions">
+                    <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+                    <button class="upload-btn" onclick="document.getElementById('avatarInput').click()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M17 8L12 3L7 8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 3V15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Upload New Photo
+                    </button>
+                    {% if user.avatar_url %}
+                        <button class="remove-btn" onclick="removeAvatar()">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 6H5H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Remove Photo
+                        </button>
+                    {% endif %}
+                </div>
+                
+                <div class="upload-info">
+                    <p>Supported formats: JPG, PNG, GIF</p>
+                    <p>Maximum file size: 5MB</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <p>Uploading...</p>
+    </div>
+
+    <script>
+        // Avatar functionality
+        const avatarContainer = document.querySelector('.profile-avatar-container');
+        const avatarModal = document.getElementById('avatarModal');
+        const avatarInput = document.getElementById('avatarInput');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+
+        // Show avatar modal on click
+        avatarContainer.addEventListener('click', function() {
+            avatarModal.classList.add('active');
+        });
+
+        // Close modal function
+        function closeAvatarModal() {
+            avatarModal.classList.remove('active');
+        }
+
+        // Close modal when clicking outside
+        avatarModal.addEventListener('click', function(e) {
+            if (e.target === avatarModal) {
+                closeAvatarModal();
+            }
+        });
+
+        // Handle file upload
+        avatarInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                uploadAvatar(file);
+            }
+        });
+
+        // Upload avatar function
+        function uploadAvatar(file) {
+            const formData = new FormData();
+            formData.append('avatar', file);
+            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+            loadingOverlay.classList.add('active');
+
+            fetch('{% url "upload_avatar" %}', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                loadingOverlay.classList.remove('active');
+                
+                if (data.success) {
+                    // Update avatar images
+                    updateAvatarImages(data.avatar_url);
+                    closeAvatarModal();
+                    showMessage('success', data.message);
+                } else {
+                    showMessage('error', data.error);
+                }
+            })
+            .catch(error => {
+                loadingOverlay.classList.remove('active');
+                showMessage('error', 'An error occurred while uploading the image.');
+                console.error('Error:', error);
+            });
+        }
+
+        // Remove avatar function
+        function removeAvatar() {
+            if (confirm('Are you sure you want to remove your profile picture?')) {
+                loadingOverlay.classList.add('active');
+
+                fetch('{% url "remove_avatar" %}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    loadingOverlay.classList.remove('active');
+                    
+                    if (data.success) {
+                        // Update avatar to show initials
+                        updateAvatarToInitials();
+                        closeAvatarModal();
+                        showMessage('success', data.message);
+                    } else {
+                        showMessage('error', data.error);
+                    }
+                })
+                .catch(error => {
+                    loadingOverlay.classList.remove('active');
+                    showMessage('error', 'An error occurred while removing the image.');
+                    console.error('Error:', error);
+                });
+            }
+        }
+
+        // Update avatar images
+        function updateAvatarImages(avatarUrl) {
+            const profileAvatar = document.getElementById('profileAvatar');
+            const avatarPreview = document.getElementById('avatarPreview');
+            
+            // Update main profile avatar
+            profileAvatar.innerHTML = `<img src="${avatarUrl}" alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+            
+            // Update modal preview
+            avatarPreview.innerHTML = `<img src="${avatarUrl}" alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+        }
+
+        // Update avatar to show initials
+        function updateAvatarToInitials() {
+            const profileAvatar = document.getElementById('profileAvatar');
+            const avatarPreview = document.getElementById('avatarPreview');
+            const initials = '{{ user.first_name.0|default:"U" }}{{ user.last_name.0|default:"" }}';
+            
+            // Update main profile avatar
+            profileAvatar.innerHTML = `<span class="profile-initial-large">${initials}</span>`;
+            profileAvatar.style.background = '#6366f1';
+            profileAvatar.style.display = 'flex';
+            profileAvatar.style.alignItems = 'center';
+            profileAvatar.style.justifyContent = 'center';
+            
+            // Update modal preview
+            avatarPreview.innerHTML = `<span class="avatar-initial-preview">${initials}</span>`;
+            avatarPreview.style.background = '#6366f1';
+            avatarPreview.style.display = 'flex';
+            avatarPreview.style.alignItems = 'center';
+            avatarPreview.style.justifyContent = 'center';
+        }
+
+        // Show message function
+        function showMessage(type, message) {
+            const messagesContainer = document.querySelector('.messages') || createMessagesContainer();
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = message;
+            
+            messagesContainer.appendChild(messageDiv);
+            
+            // Remove message after 5 seconds
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+
+        // Create messages container if it doesn't exist
+        function createMessagesContainer() {
+            const container = document.createElement('div');
+            container.className = 'messages';
+            document.querySelector('.main-content').insertBefore(container, document.querySelector('.profile-container'));
+            return container;
+        }
+    </script>
 </body>
 </html>
