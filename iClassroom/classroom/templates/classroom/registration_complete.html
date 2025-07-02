@@ -1,0 +1,121 @@
+<!-- templates/classroom/registration_complete.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Complete - iClassroom</title>
+    <link rel="stylesheet" href="{% static 'classroom/css/register.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .success-container {
+            max-width: 500px;
+            margin: 50px auto;
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+        .success-icon svg {
+            width: 40px;
+            height: 40px;
+            color: white;
+        }
+        .success-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 10px;
+        }
+        .success-message {
+            color: #6b7280;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        .email-check {
+            background: #f3f4f6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .email-check h4 {
+            margin: 0 0 10px 0;
+            color: #374151;
+        }
+        .email-check p {
+            margin: 0;
+            font-size: 14px;
+            color: #6b7280;
+        }
+        .login-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+        }
+        .resend-link {
+            color: #6366f1;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .resend-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 3L1 9L12 15L21 12.09V17H23V9M5 13.18V17.18L12 21L19 17.18V13.18L12 17L5 13.18Z" fill="#6366f1"/>
+                </svg>
+            </div>
+            <h1 class="brand-name">iClassroom</h1>
+        </div>
+
+        <div class="success-container">
+            <div class="success-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+            
+            <h2 class="success-title">Registration Successful!</h2>
+            <p class="success-message">Your account has been created successfully. We've sent a verification email to complete your registration.</p>
+            
+            <div class="email-check">
+                <h4>📧 Check Your Email</h4>
+                <p>Please check your inbox and click the verification link to activate your account. Don't forget to check your spam folder if you don't see the email.</p>
+            </div>
+            
+            <div style="margin-top: 30px;">
+                <a href="{% url 'login' %}" class="login-btn">Go to Login</a>
+                <br><br>
+                <a href="{% url 'resend_verification' %}" class="resend-link">Didn't receive the email? Resend verification</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

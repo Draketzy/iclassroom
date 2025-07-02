@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
@@ -8,14 +8,43 @@ from .models import User
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from .forms import UserProfileForm
-from .models import User
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.conf import settings
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.contrib.auth.tokens import default_token_generator
+from django.urls import reverse
+from django.utils.safestring import mark_safe  # Add this import
+import logging
+
+logger = logging.getLogger(__name__)
+
 def login_view(request):
     if request.user.is_authenticated:
-        return redirect('dashboard')  # Optionally redirect based on type again here
+        return redirect('dashboard')
 
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
+
+        # Check if user exists and is inactive
+        try:
+            user_obj = User.objects.get(email=email)
+            if not user_obj.is_active:
+                # Use mark_safe to allow HTML in the message
+                error_message = mark_safe(
+                    'Your account is not yet verified. Please verify your email address by clicking the link sent to your Gmail inbox. '
+                    'If you did not receive the email, <a href="{0}?email={1}">click here to resend verification</a>.'
+                    .format(reverse('resend_verification'), email)
+                )
+                messages.error(request, error_message)
+                return render(request, 'classroom/login.html')
+        except User.DoesNotExist:
+            pass  # Continue to normal authentication
+
         user = authenticate(request, email=email, password=password)
 
         if user is not None:
@@ -25,11 +54,43 @@ def login_view(request):
             elif user.user_type == 'student':
                 return redirect('student_dashboard')
             else:
-                return redirect('dashboard')  # fallback
+                return redirect('dashboard')
         else:
             messages.error(request, 'Invalid email or password.')
 
     return render(request, 'classroom/login.html')
+
+
+def send_verification_email(request, user):
+    """Send verification email to user"""
+    try:
+        current_site = get_current_site(request)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = default_token_generator.make_token(user)
+        verification_url = request.build_absolute_uri(
+            reverse('verify_email', kwargs={'uidb64': uid, 'token': token})
+        )
+        subject = 'Verify your iClassroom account'
+        html_message = render_to_string('classroom/emails/verification_email.html', {
+            'user': user,
+            'verification_url': verification_url,
+            'site_name': current_site.name,
+        })
+        plain_message = strip_tags(html_message)
+        logger.debug(f"Sending email to {user.email} with verification URL: {verification_url}")
+        send_mail(
+            subject=subject,
+            message=plain_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+            html_message=html_message,
+            fail_silently=False,
+        )
+        logger.info(f"Verification email sent to {user.email}")
+        return True
+    except Exception as e:
+        logger.error(f"Failed to send verification email to {user.email}: {str(e)}", exc_info=True)
+        return False
 
 
 def register_view(request):
@@ -47,19 +108,71 @@ def register_view(request):
             messages.error(request, "Email already registered.")
             return redirect('register')
 
+        # Create inactive user
         user = User.objects.create_user(
             email=email,
             password=password,
             first_name=first_name,
             last_name=last_name,
-            user_type=user_type
+            user_type=user_type,
+            is_active=False  # User must verify email first
         )
-        messages.success(request, "Registration successful! Please login.")
-        return redirect('login')
+        
+        # Send verification email
+        if send_verification_email(request, user):
+            messages.success(request, f"Registration successful! Please check your email ({email}) for a verification link.")
+        else:
+            messages.error(request, "Registration successful but failed to send verification email. Please contact support.")
+        
+        return redirect('registration_complete')
     
     return render(request, 'classroom/register.html')
 
-@login_required
+
+def registration_complete(request):
+    """Show registration complete page"""
+    return render(request, 'classroom/registration_complete.html')
+
+
+def verify_email(request, uidb64, token):
+    """Verify email address"""
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+        
+        if default_token_generator.check_token(user, token):
+            if not user.is_active:
+                user.is_active = True
+                user.save()
+                messages.success(request, 'Email verified successfully! You can now log in.')
+            else:
+                messages.info(request, 'Email already verified.')
+            return redirect('login')
+        else:
+            messages.error(request, 'Invalid verification link.')
+            return redirect('resend_verification')
+            
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        messages.error(request, 'Invalid verification link.')
+        return redirect('resend_verification')
+
+
+def resend_verification(request):
+    """Resend verification email"""
+    email = request.GET.get('email', '')  # Prefill if present
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        try:
+            user = User.objects.get(email=email, is_active=False)
+            if send_verification_email(request, user):
+                messages.success(request, f'Verification email resent to {email}')
+            else:
+                messages.error(request, 'Failed to send verification email. Please try again.')
+        except User.DoesNotExist:
+            messages.error(request, 'No inactive account found with this email address.')
+        return redirect('resend_verification')
+    return render(request, 'classroom/resend_verification.html', {'email': email})
+
 
 @login_required
 def dashboard_view(request):
@@ -175,49 +288,6 @@ def remove_avatar(request):
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
 
-
-# @login_required
-# def settings_view(request):
-#     """Display user settings page"""
-#     try:
-#         settings = request.user.usersettings
-#     except UserSettings.DoesNotExist:
-#         settings = UserSettings.objects.create(user=request.user)
-    
-#     context = {
-#         'user': request.user,
-#         'settings': settings,
-#         'user_type': getattr(request.user, 'user_type', 'student'),
-#     }
-    
-#     return render(request, 'classroom/settings.html', context)
-
-# @login_required
-# def settings_update(request):
-#     """Update user settings"""
-#     try:
-#         settings = request.user.usersettings
-#     except UserSettings.DoesNotExist:
-#         settings = UserSettings.objects.create(user=request.user)
-    
-#     if request.method == 'POST':
-#         form = UserSettingsForm(request.POST, instance=settings)
-#         if form.is_valid():
-#             form.save()
-#             messages.success(request, 'Settings updated successfully!')
-#             return redirect('settings')
-#         else:
-#             messages.error(request, 'Please correct the errors below.')
-#     else:
-#         form = UserSettingsForm(instance=settings)
-    
-#     context = {
-#         'form': form,
-#         'user': request.user,
-#         'settings': settings,
-#     }
-    
-#     return render(request, 'classroom/settings_edit.html', context)
 
 @login_required
 def change_password(request):

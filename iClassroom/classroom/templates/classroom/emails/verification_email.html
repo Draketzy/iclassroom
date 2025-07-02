@@ -1,0 +1,117 @@
+<!-- templates/classroom/emails/verification_email.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your iClassroom Account</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .email-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo {
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        .brand-name {
+            color: #6366f1;
+            font-size: 28px;
+            font-weight: bold;
+            margin: 0;
+        }
+        .verify-btn {
+            display: inline-block;
+            background-color: #6366f1;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .verify-btn:hover {
+            background-color: #5856eb;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 14px;
+            color: #666;
+        }
+        .warning {
+            background-color: #fef3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <div class="logo">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 3L1 9L12 15L21 12.09V17H23V9M5 13.18V17.18L12 21L19 17.18V13.18L12 17L5 13.18Z" fill="#6366f1"/>
+                </svg>
+            </div>
+            <h1 class="brand-name">iClassroom</h1>
+        </div>
+
+        <h2>Welcome to iClassroom, {{ user.first_name }}!</h2>
+        
+        <p>Thank you for registering with iClassroom. To complete your registration and start using your account, please verify your email address by clicking the button below:</p>
+        
+        <div style="text-align: center;">
+            <a href="{{ verification_url }}" class="verify-btn">Verify Email Address</a>
+        </div>
+        
+        <p>If the button doesn't work, you can also copy and paste this link into your browser:</p>
+        <p style="word-break: break-all; background-color: #f8f9fa; padding: 10px; border-radius: 5px; font-family: monospace;">{{ verification_url }}</p>
+        
+        <div class="warning">
+            <strong>Security Note:</strong> This verification link will expire in 24 hours for security reasons. If you didn't create an account with iClassroom, please ignore this email.
+        </div>
+        
+        <p>Once verified, you'll be able to:</p>
+        <ul>
+            {% if user.user_type == 'teacher' %}
+            <li>Create and manage your classrooms</li>
+            <li>Track student attendance</li>
+            <li>Monitor student participation</li>
+            <li>Generate reports and analytics</li>
+            {% else %}
+            <li>Join classrooms with invitation codes</li>
+            <li>Mark your attendance</li>
+            <li>Participate in class activities</li>
+            <li>View your attendance history</li>
+            {% endif %}
+        </ul>
+        
+        <div class="footer">
+            <p>Best regards,<br>The iClassroom Team</p>
+            <p><small>If you're having trouble with the verification link, please contact our support team.</small></p>
+        </div>
+    </div>
+</body>
+</html>
