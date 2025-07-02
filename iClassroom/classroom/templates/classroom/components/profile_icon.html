@@ -2,12 +2,22 @@
  {% load static %}
 <head>
     <link rel="stylesheet" href="{% static 'classroom/css/profile_icon.css' %}">
+    <link rel="stylesheet" href="{% static 'css/fonts.css' %}">
+   <style>
+     * {
+            font-family: 'Poppins', sans-serif;
+        }
+   </style>
 
 </head>
 <div class="profile-dropdown-container">
     <!-- Profile Icon Button -->
     <div class="user-profile" id="profileIcon">
-        <span class="user-initial">{{ user.first_name.0 }}{{ user.last_name.0 }}</span>
+        {% if user.avatar_url %}
+           <img src="{{ user.avatar_url }}" alt="Avatar" class="rounded-circle img-fluid w-100 h-100" style="object-fit: cover;">
+        {% else %}
+            <span class="user-initial">{{ user.first_name.0 }}{{ user.last_name.0 }}</span>
+        {% endif %}
     </div>
 
     <!-- Profile Dropdown Modal -->
@@ -16,7 +26,11 @@
             <!-- User Info Section -->
             <div class="profile-user-info">
                 <div class="profile-avatar">
-                    <span class="profile-initial">{{ user.first_name.0 }}{{ user.last_name.0 }}</span>
+                     {% if user.avatar_url %}
+                             <img src="{{ user.avatar_url }}" alt="Avatar" class="rounded-circle img-fluid w-100 h-100" style="object-fit: cover;">
+                    {% else %}
+                        <span class="profile-initial">{{ user.first_name.0 }}{{ user.last_name.0 }}</span>
+                    {% endif %}
                 </div>
                 <div class="profile-details">
                     <h3 class="profile-name">{{ user.first_name }} {{ user.last_name }}</h3>
