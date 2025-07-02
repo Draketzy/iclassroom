@@ -1,0 +1,722 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iClassroom - Edit Profile</title>
+    <link rel="stylesheet" href="{% static 'classroom/css/css/bootstrap.min.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-size: 14px;
+            min-height: 100vh;
+        }
+        
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #ffffff;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+        }
+        
+        .profile-avatar-placeholder {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.5rem;
+            border: 3px solid #ffffff;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .avatar-container {
+            position: relative;
+            cursor: pointer;
+            display: inline-block;
+        }
+        
+        .avatar-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.3s ease;
+            color: white;
+            font-size: 10px;
+            font-weight: 500;
+            backdrop-filter: blur(2px);
+        }
+        
+        .avatar-container:hover .avatar-overlay {
+            opacity: 1;
+        }
+        
+        .avatar-container:hover .profile-avatar,
+        .avatar-container:hover .profile-avatar-placeholder {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .back-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: #6c757d;
+            padding: 8px 16px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 1);
+            color: #495057;
+            text-decoration: none;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .save-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .save-btn:hover {
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .cancel-btn {
+            background: rgba(108, 117, 125, 0.1);
+            border: 1px solid rgba(108, 117, 125, 0.3);
+            color: #6c757d;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .cancel-btn:hover {
+            background: rgba(108, 117, 125, 0.2);
+            color: #495057;
+            text-decoration: none;
+            transform: translateY(-1px);
+        }
+        
+        .profile-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .profile-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+        
+        .form-control {
+            border: 2px solid rgba(226, 232, 240, 0.8);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            background: rgba(248, 250, 252, 0.8);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-1px);
+        }
+        
+        .form-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .form-select {
+            border: 2px solid rgba(226, 232, 240, 0.8);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            background: rgba(248, 250, 252, 0.8);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+            border-bottom: 2px solid transparent;
+            background: linear-gradient(90deg, #f8fafc, #f8fafc) padding-box,
+                        linear-gradient(90deg, #667eea, #764ba2) border-box;
+            border-image: linear-gradient(90deg, #667eea, #764ba2) 1;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+        
+        .page-subtitle {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 0;
+            font-weight: 500;
+        }
+        
+        .card-header-custom {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+            padding: 25px 30px;
+        }
+        
+        .card-body-custom {
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.5);
+        }
+        
+        .alert-custom {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .container-custom {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .form-text {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+            margin-top: 4px;
+        }
+        
+        .invalid-feedback {
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .form-floating > .form-control {
+            padding: 1rem 0.75rem;
+        }
+        
+        .form-floating > label {
+            padding: 1rem 0.75rem;
+            font-size: 13px;
+            font-weight: 500;
+            color: #64748b;
+        }
+        
+        .btn-outline-secondary {
+            border: 2px solid rgba(108, 117, 125, 0.3);
+            color: #6c757d;
+            font-weight: 500;
+            border-radius: 10px;
+            padding: 8px 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-secondary:hover {
+            background: rgba(108, 117, 125, 0.1);
+            border-color: rgba(108, 117, 125, 0.5);
+            color: #495057;
+            transform: translateY(-1px);
+        }
+        
+        .avatar-upload-section {
+            background: rgba(248, 250, 252, 0.8);
+            border: 2px dashed rgba(102, 126, 234, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .avatar-upload-section:hover {
+            border-color: rgba(102, 126, 234, 0.5);
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .required-field::after {
+            content: " *";
+            color: #dc3545;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="min-vh-100">
+        <!-- Header -->
+        {% include 'classroom/header.html' %}
+
+        <!-- Main Content -->
+        <main class="d-flex align-items-center justify-content-center py-5" style="min-height: calc(100vh - 80px);">
+            <div class="container-custom w-100">
+                
+                <!-- Back Button -->
+                <div class="mb-4">
+                    <a href="{% url 'profile' %}" class="back-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19 12H5M12 19L5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Back to Profile
+                    </a>
+                </div>
+
+                <!-- Page Header -->
+                <div class="text-center mb-4">
+                    <h1 class="page-title">Edit Profile</h1>
+                    <p class="page-subtitle">Update your personal information and preferences</p>
+                </div>
+
+                <!-- Flash Messages -->
+                {% if messages %}
+                    <div class="mb-4">
+                        {% for message in messages %}
+                            <div class="alert alert-custom {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %} py-3 px-4" role="alert">
+                                <div class="d-flex align-items-center">
+                                    {% if message.tags == 'success' %}
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="me-2">
+                                            <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    {% else %}
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="me-2">
+                                            <path d="M12 9V13M12 17H12.01M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    {% endif %}
+                                    {{ message }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <!-- Profile Edit Form -->
+                <form method="post" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="profile-card">
+                        <!-- Avatar Section -->
+                        <div class="card-header-custom">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <div class="d-flex align-items-center">
+                                        <!-- Current Avatar -->
+                                        <div class="avatar-container me-4" onclick="openAvatarModal()">
+                                            {% if user.avatar_url %}
+                                                <img src="{{ user.avatar_url }}" alt="Profile Picture" class="profile-avatar" id="profileAvatar">
+                                            {% else %}
+                                                <div class="profile-avatar-placeholder" id="profileAvatar">
+                                                    {% if user.first_name and user.last_name %}
+                                                        {{ user.first_name.0|upper }}{{ user.last_name.0|upper }}
+                                                    {% elif user.first_name %}
+                                                        {{ user.first_name.0|upper }}{{ user.first_name.1|upper|default:"" }}
+                                                    {% elif user.last_name %}
+                                                        {{ user.last_name.0|upper }}{{ user.last_name.1|upper|default:"" }}
+                                                    {% else %}
+                                                        {{ user.username.0|upper }}{{ user.username.1|upper|default:"U" }}
+                                                    {% endif %}
+                                                </div>
+                                            {% endif %}
+                                            
+                                            <div class="avatar-overlay">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M23 19C23 20.1046 22.1046 21 21 21H3C1.89543 21 1 20.1046 1 19V8C1 6.89543 1.89543 6 3 6H7L9 4H15L17 6H21C22.1046 6 23 6.89543 23 8V19Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                    <path d="M12 17C14.2091 17 16 15.2091 16 13C16 10.7909 14.2091 9 12 9C9.79086 9 8 10.7909 8 13C8 15.2091 9.79086 17 12 17Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                </svg>
+                                                <small>Change</small>
+                                            </div>
+                                        </div>
+
+                                        <!-- Avatar Upload Info -->
+                                        <div>
+                                            <h5 class="mb-1" style="font-weight: 600; color: #1e293b;">Profile Picture</h5>
+                                            <p class="mb-0" style="font-size: 13px; color: #64748b;">Click on your avatar to change your profile picture</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                                    {% if user.avatar_url %}
+                                        <button type="button" class="btn-outline-secondary" onclick="removeAvatar()">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="me-1">
+                                                <path d="M3 6H5H21M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                            Remove Photo
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Body -->
+                        <div class="card-body-custom">
+                            <!-- Personal Information -->
+                            <div class="mb-5">
+                                <h4 class="section-title">Personal Information</h4>
+                                <div class="row g-4">
+                                    <div class="col-md-6">
+                                        <label for="{{ form.first_name.id_for_label }}" class="form-label required-field">First Name</label>
+                                        <input type="text" class="form-control {% if form.first_name.errors %}is-invalid{% endif %}" 
+                                               id="{{ form.first_name.id_for_label }}" 
+                                               name="{{ form.first_name.name }}" 
+                                               value="{{ form.first_name.value|default:'' }}"
+                                               placeholder="Enter your first name">
+                                        {% if form.first_name.errors %}
+                                            <div class="invalid-feedback">
+                                                {{ form.first_name.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label for="{{ form.last_name.id_for_label }}" class="form-label required-field">Last Name</label>
+                                        <input type="text" class="form-control {% if form.last_name.errors %}is-invalid{% endif %}" 
+                                               id="{{ form.last_name.id_for_label }}" 
+                                               name="{{ form.last_name.name }}" 
+                                               value="{{ form.last_name.value|default:'' }}"
+                                               placeholder="Enter your last name">
+                                        {% if form.last_name.errors %}
+                                            <div class="invalid-feedback">
+                                                {{ form.last_name.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label for="{{ form.email.id_for_label }}" class="form-label required-field">Email Address</label>
+                                        <input type="email" class="form-control {% if form.email.errors %}is-invalid{% endif %}" 
+                                               id="{{ form.email.id_for_label }}" 
+                                               name="{{ form.email.name }}" 
+                                               value="{{ form.email.value|default:'' }}"
+                                               placeholder="Enter your email address">
+                                        {% if form.email.errors %}
+                                            <div class="invalid-feedback">
+                                                {{ form.email.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                        <div class="form-text">This will be used for login and notifications</div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label for="{{ form.phone.id_for_label }}" class="form-label">Phone Number</label>
+                                        <input type="tel" class="form-control {% if form.phone.errors %}is-invalid{% endif %}" 
+                                               id="{{ form.phone.id_for_label }}" 
+                                               name="{{ form.phone.name }}" 
+                                               value="{{ form.phone.value|default:'' }}"
+                                               placeholder="Enter your phone number">
+                                        {% if form.phone.errors %}
+                                            <div class="invalid-feedback">
+                                                {{ form.phone.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                        <div class="form-text">Include country code (e.g., +1234567890)</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Professional Information -->
+                            <div class="mb-5">
+                                <h4 class="section-title">Professional Information</h4>
+                                <div class="row g-4">
+                                    <div class="col-md-6">
+                                        <label for="{{ form.institution.id_for_label }}" class="form-label">Institution</label>
+                                        <input type="text" class="form-control {% if form.institution.errors %}is-invalid{% endif %}" 
+                                               id="{{ form.institution.id_for_label }}" 
+                                               name="{{ form.institution.name }}" 
+                                               value="{{ form.institution.value|default:'' }}"
+                                               placeholder="Enter your institution name">
+                                        {% if form.institution.errors %}
+                                            <div class="invalid-feedback">
+                                                {{ form.institution.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label for="{{ form.department.id_for_label }}" class="form-label">Department</label>
+                                        <input type="text" class="form-control {% if form.department.errors %}is-invalid{% endif %}" 
+                                               id="{{ form.department.id_for_label }}" 
+                                               name="{{ form.department.name }}" 
+                                               value="{{ form.department.value|default:'' }}"
+                                               placeholder="Enter your department">
+                                        {% if form.department.errors %}
+                                            <div class="invalid-feedback">
+                                                {{ form.department.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    {% if user.user_type == 'student' %}
+                                    <div class="col-md-6">
+                                        <label for="{{ form.student_id.id_for_label }}" class="form-label">Student ID</label>
+                                        <input type="text" class="form-control {% if form.student_id.errors %}is-invalid{% endif %}" 
+                                               id="{{ form.student_id.id_for_label }}" 
+                                               name="{{ form.student_id.name }}" 
+                                               value="{{ form.student_id.value|default:'' }}"
+                                               placeholder="Enter your student ID">
+                                        {% if form.student_id.errors %}
+                                            <div class="invalid-feedback">
+                                                {{ form.student_id.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label for="{{ form.year_of_study.id_for_label }}" class="form-label">Year of Study</label>
+                                        <select class="form-select {% if form.year_of_study.errors %}is-invalid{% endif %}" 
+                                                id="{{ form.year_of_study.id_for_label }}" 
+                                                name="{{ form.year_of_study.name }}">
+                                            <option value="">Select year</option>
+                                            <option value="1" {% if form.year_of_study.value == '1' %}selected{% endif %}>1st Year</option>
+                                            <option value="2" {% if form.year_of_study.value == '2' %}selected{% endif %}>2nd Year</option>
+                                            <option value="3" {% if form.year_of_study.value == '3' %}selected{% endif %}>3rd Year</option>
+                                            <option value="4" {% if form.year_of_study.value == '4' %}selected{% endif %}>4th Year</option>
+                                        </select>
+                                        {% if form.year_of_study.errors %}
+                                            <div class="invalid-feedback">
+                                                {{ form.year_of_study.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if user.user_type == 'teacher' %}
+                                    <div class="col-md-6">
+                                        <label for="{{ form.employee_id.id_for_label }}" class="form-label">Employee ID</label>
+                                        <input type="text" class="form-control {% if form.employee_id.errors %}is-invalid{% endif %}" 
+                                               id="{{ form.employee_id.id_for_label }}" 
+                                               name="{{ form.employee_id.name }}" 
+                                               value="{{ form.employee_id.value|default:'' }}"
+                                               placeholder="Enter your employee ID">
+                                        {% if form.employee_id.errors %}
+                                            <div class="invalid-feedback">
+                                                {{ form.employee_id.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label for="{{ form.title.id_for_label }}" class="form-label">Title</label>
+                                        <input type="text" class="form-control {% if form.title.errors %}is-invalid{% endif %}" 
+                                               id="{{ form.title.id_for_label }}" 
+                                               name="{{ form.title.name }}" 
+                                               value="{{ form.title.value|default:'' }}"
+                                               placeholder="e.g., Professor, Assistant Professor">
+                                        {% if form.title.errors %}
+                                            <div class="invalid-feedback">
+                                                {{ form.title.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Bio Section -->
+                            <div class="mb-5">
+                                <h4 class="section-title">About</h4>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <label for="{{ form.bio.id_for_label }}" class="form-label">Bio</label>
+                                        <textarea class="form-control {% if form.bio.errors %}is-invalid{% endif %}" 
+                                                  id="{{ form.bio.id_for_label }}" 
+                                                  name="{{ form.bio.name }}" 
+                                                  rows="4" 
+                                                  placeholder="Tell us about yourself...">{{ form.bio.value|default:'' }}</textarea>
+                                        {% if form.bio.errors %}
+                                            <div class="invalid-feedback">
+                                                {{ form.bio.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                        <div class="form-text">Maximum 500 characters</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Form Actions -->
+                            <div class="d-flex justify-content-between align-items-center pt-4 border-top">
+                                <a href="{% url 'profile' %}" class="cancel-btn">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="me-2">
+                                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    Cancel
+                                </a>
+                                
+                                <button type="submit" class="save-btn">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="me-2">
+                                        <path d="M19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 2.58579C3.96086 2.21071 4.46957 2 5 2H16L21 7V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M17 21V13H7V21M7 3V8H15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    Save Changes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    {% include 'classroom/components/avatar_modal.html' %}
+    <script src="{% static 'classroom/js/bootstrap.bundle.min.js' %}"></script>
+    
+    <script>
+        // Form validation and enhancement
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add real-time validation
+            const form = document.querySelector('form');
+            const inputs = form.querySelectorAll('input, textarea, select');
+            
+            inputs.forEach(input => {
+                input.addEventListener('blur', function() {
+                    validateField(this);
+                });
+                
+                input.addEventListener('input', function() {
+                    if (this.classList.contains('is-invalid')) {
+                        validateField(this);
+                    }
+                });
+            });
+            
+            function validateField(field) {
+                const value = field.value.trim();
+                const isRequired = field.labels[0]?.classList.contains('required-field');
+                
+                if (isRequired && !value) {
+                    field.classList.add('is-invalid');
+                    field.classList.remove('is-valid');
+                } else if (value) {
+                    field.classList.add('is-valid');
+                    field.classList.remove('is-invalid');
+                } else {
+                    field.classList.remove('is-valid', 'is-invalid');
+                }
+            }
+            
+            // Bio character counter
+            const bioField = document.querySelector('textarea[name="bio"]');
+            if (bioField) {
+                const maxLength = 500;
+                const helpText = bioField.nextElementSibling;
+                
+                function updateCounter() {
+                    const remaining = maxLength - bioField.value.length;
+                    helpText.textContent = `${remaining} characters remaining`;
+                    
+                    if (remaining < 50) {
+                        helpText.style.color = '#dc3545';
+                    } else if (remaining < 100) {
+                        helpText.style.color = '#fd7e14';
+                    } else {
+                        helpText.style.color = '#64748b';
+                    }
+                }
+                
+                bioField.addEventListener('input', updateCounter);
+                updateCounter();
+            }
+        });
+        
+        // Avatar removal function
+        function removeAvatar() {
+            if (confirm('Are you sure you want to remove your profile picture?')) {
+                fetch('{% url "remove_avatar" %}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Error removing avatar: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while removing the avatar.');
+                });
+            }
+        }
+    </script>
+</body>
+</html>
