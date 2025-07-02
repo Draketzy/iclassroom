@@ -114,7 +114,7 @@ def profile_edit(request):
         else:
             messages.error(request, 'Please correct the errors below.')
     else:
-        form = User(instance=request.user)
+        form = UserProfileForm(instance=request.user)
 
     return render(request, 'classroom/profile_edit.html', {'form': form, 'user': request.user})
 

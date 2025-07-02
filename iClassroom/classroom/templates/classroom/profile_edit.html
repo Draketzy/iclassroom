@@ -268,17 +268,6 @@
             font-weight: 500;
         }
         
-        .form-floating > .form-control {
-            padding: 1rem 0.75rem;
-        }
-        
-        .form-floating > label {
-            padding: 1rem 0.75rem;
-            font-size: 13px;
-            font-weight: 500;
-            color: #64748b;
-        }
-        
         .btn-outline-secondary {
             border: 2px solid rgba(108, 117, 125, 0.3);
             color: #6c757d;
@@ -293,21 +282,6 @@
             border-color: rgba(108, 117, 125, 0.5);
             color: #495057;
             transform: translateY(-1px);
-        }
-        
-        .avatar-upload-section {
-            background: rgba(248, 250, 252, 0.8);
-            border: 2px dashed rgba(102, 126, 234, 0.3);
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-        
-        .avatar-upload-section:hover {
-            border-color: rgba(102, 126, 234, 0.5);
-            background: rgba(255, 255, 255, 0.9);
         }
         
         .required-field::after {
@@ -377,7 +351,9 @@
                                     <div class="d-flex align-items-center">
                                         <!-- Current Avatar -->
                                         <div class="avatar-container me-4" onclick="openAvatarModal()">
-                                            {% if user.avatar_url %}
+                                            {% if profile.avatar %}
+                                                <img src="{{ profile.avatar.url }}" alt="Profile Picture" class="profile-avatar" id="profileAvatar">
+                                            {% elif user.avatar_url %}
                                                 <img src="{{ user.avatar_url }}" alt="Profile Picture" class="profile-avatar" id="profileAvatar">
                                             {% else %}
                                                 <div class="profile-avatar-placeholder" id="profileAvatar">
@@ -411,7 +387,7 @@
                                 </div>
                                 
                                 <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                                    {% if user.avatar_url %}
+                                    {% if profile.avatar or user.avatar_url %}
                                         <button type="button" class="btn-outline-secondary" onclick="removeAvatar()">
                                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="me-1">
                                                 <path d="M3 6H5H21M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -430,183 +406,49 @@
                                 <h4 class="section-title">Personal Information</h4>
                                 <div class="row g-4">
                                     <div class="col-md-6">
-                                        <label for="{{ form.first_name.id_for_label }}" class="form-label required-field">First Name</label>
-                                        <input type="text" class="form-control {% if form.first_name.errors %}is-invalid{% endif %}" 
-                                               id="{{ form.first_name.id_for_label }}" 
-                                               name="{{ form.first_name.name }}" 
-                                               value="{{ form.first_name.value|default:'' }}"
-                                               placeholder="Enter your first name">
-                                        {% if form.first_name.errors %}
-                                            <div class="invalid-feedback">
-                                                {{ form.first_name.errors.0 }}
-                                            </div>
-                                        {% endif %}
+                                        <label for="first_name" class="form-label required-field">First Name</label>
+                                        <input type="text" class="form-control" 
+                                               id="first_name" 
+                                               name="first_name" 
+                                               value="{{ user.first_name }}"
+                                               placeholder="Enter your first name"
+                                               required>
                                     </div>
                                     
                                     <div class="col-md-6">
-                                        <label for="{{ form.last_name.id_for_label }}" class="form-label required-field">Last Name</label>
-                                        <input type="text" class="form-control {% if form.last_name.errors %}is-invalid{% endif %}" 
-                                               id="{{ form.last_name.id_for_label }}" 
-                                               name="{{ form.last_name.name }}" 
-                                               value="{{ form.last_name.value|default:'' }}"
-                                               placeholder="Enter your last name">
-                                        {% if form.last_name.errors %}
-                                            <div class="invalid-feedback">
-                                                {{ form.last_name.errors.0 }}
-                                            </div>
-                                        {% endif %}
+                                        <label for="last_name" class="form-label required-field">Last Name</label>
+                                        <input type="text" class="form-control" 
+                                               id="last_name" 
+                                               name="last_name" 
+                                               value="{{ user.last_name }}"
+                                               placeholder="Enter your last name"
+                                               required>
                                     </div>
                                     
                                     <div class="col-md-6">
-                                        <label for="{{ form.email.id_for_label }}" class="form-label required-field">Email Address</label>
-                                        <input type="email" class="form-control {% if form.email.errors %}is-invalid{% endif %}" 
-                                               id="{{ form.email.id_for_label }}" 
-                                               name="{{ form.email.name }}" 
-                                               value="{{ form.email.value|default:'' }}"
-                                               placeholder="Enter your email address">
-                                        {% if form.email.errors %}
-                                            <div class="invalid-feedback">
-                                                {{ form.email.errors.0 }}
-                                            </div>
-                                        {% endif %}
+                                        <label for="email" class="form-label required-field">Email Address</label>
+                                        <input type="email" class="form-control" 
+                                               id="email" 
+                                               name="email" 
+                                               value="{{ user.email }}"
+                                               placeholder="Enter your email address"
+                                               required>
                                         <div class="form-text">This will be used for login and notifications</div>
                                     </div>
                                     
                                     <div class="col-md-6">
-                                        <label for="{{ form.phone.id_for_label }}" class="form-label">Phone Number</label>
-                                        <input type="tel" class="form-control {% if form.phone.errors %}is-invalid{% endif %}" 
-                                               id="{{ form.phone.id_for_label }}" 
-                                               name="{{ form.phone.name }}" 
-                                               value="{{ form.phone.value|default:'' }}"
+                                        <label for="phone" class="form-label">Phone Number</label>
+                                        <input type="tel" class="form-control" 
+                                               id="phone" 
+                                               name="phone" 
+                                               value="{{ profile.phone|default:'' }}"
                                                placeholder="Enter your phone number">
-                                        {% if form.phone.errors %}
-                                            <div class="invalid-feedback">
-                                                {{ form.phone.errors.0 }}
-                                            </div>
-                                        {% endif %}
                                         <div class="form-text">Include country code (e.g., +1234567890)</div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Professional Information -->
-                            <div class="mb-5">
-                                <h4 class="section-title">Professional Information</h4>
-                                <div class="row g-4">
-                                    <div class="col-md-6">
-                                        <label for="{{ form.institution.id_for_label }}" class="form-label">Institution</label>
-                                        <input type="text" class="form-control {% if form.institution.errors %}is-invalid{% endif %}" 
-                                               id="{{ form.institution.id_for_label }}" 
-                                               name="{{ form.institution.name }}" 
-                                               value="{{ form.institution.value|default:'' }}"
-                                               placeholder="Enter your institution name">
-                                        {% if form.institution.errors %}
-                                            <div class="invalid-feedback">
-                                                {{ form.institution.errors.0 }}
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                    
-                                    <div class="col-md-6">
-                                        <label for="{{ form.department.id_for_label }}" class="form-label">Department</label>
-                                        <input type="text" class="form-control {% if form.department.errors %}is-invalid{% endif %}" 
-                                               id="{{ form.department.id_for_label }}" 
-                                               name="{{ form.department.name }}" 
-                                               value="{{ form.department.value|default:'' }}"
-                                               placeholder="Enter your department">
-                                        {% if form.department.errors %}
-                                            <div class="invalid-feedback">
-                                                {{ form.department.errors.0 }}
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                    
-                                    {% if user.user_type == 'student' %}
-                                    <div class="col-md-6">
-                                        <label for="{{ form.student_id.id_for_label }}" class="form-label">Student ID</label>
-                                        <input type="text" class="form-control {% if form.student_id.errors %}is-invalid{% endif %}" 
-                                               id="{{ form.student_id.id_for_label }}" 
-                                               name="{{ form.student_id.name }}" 
-                                               value="{{ form.student_id.value|default:'' }}"
-                                               placeholder="Enter your student ID">
-                                        {% if form.student_id.errors %}
-                                            <div class="invalid-feedback">
-                                                {{ form.student_id.errors.0 }}
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                    
-                                    <div class="col-md-6">
-                                        <label for="{{ form.year_of_study.id_for_label }}" class="form-label">Year of Study</label>
-                                        <select class="form-select {% if form.year_of_study.errors %}is-invalid{% endif %}" 
-                                                id="{{ form.year_of_study.id_for_label }}" 
-                                                name="{{ form.year_of_study.name }}">
-                                            <option value="">Select year</option>
-                                            <option value="1" {% if form.year_of_study.value == '1' %}selected{% endif %}>1st Year</option>
-                                            <option value="2" {% if form.year_of_study.value == '2' %}selected{% endif %}>2nd Year</option>
-                                            <option value="3" {% if form.year_of_study.value == '3' %}selected{% endif %}>3rd Year</option>
-                                            <option value="4" {% if form.year_of_study.value == '4' %}selected{% endif %}>4th Year</option>
-                                        </select>
-                                        {% if form.year_of_study.errors %}
-                                            <div class="invalid-feedback">
-                                                {{ form.year_of_study.errors.0 }}
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                    {% endif %}
-                                    
-                                    {% if user.user_type == 'teacher' %}
-                                    <div class="col-md-6">
-                                        <label for="{{ form.employee_id.id_for_label }}" class="form-label">Employee ID</label>
-                                        <input type="text" class="form-control {% if form.employee_id.errors %}is-invalid{% endif %}" 
-                                               id="{{ form.employee_id.id_for_label }}" 
-                                               name="{{ form.employee_id.name }}" 
-                                               value="{{ form.employee_id.value|default:'' }}"
-                                               placeholder="Enter your employee ID">
-                                        {% if form.employee_id.errors %}
-                                            <div class="invalid-feedback">
-                                                {{ form.employee_id.errors.0 }}
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                    
-                                    <div class="col-md-6">
-                                        <label for="{{ form.title.id_for_label }}" class="form-label">Title</label>
-                                        <input type="text" class="form-control {% if form.title.errors %}is-invalid{% endif %}" 
-                                               id="{{ form.title.id_for_label }}" 
-                                               name="{{ form.title.name }}" 
-                                               value="{{ form.title.value|default:'' }}"
-                                               placeholder="e.g., Professor, Assistant Professor">
-                                        {% if form.title.errors %}
-                                            <div class="invalid-feedback">
-                                                {{ form.title.errors.0 }}
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-
-                            <!-- Bio Section -->
-                            <div class="mb-5">
-                                <h4 class="section-title">About</h4>
-                                <div class="row">
-                                    <div class="col-12">
-                                        <label for="{{ form.bio.id_for_label }}" class="form-label">Bio</label>
-                                        <textarea class="form-control {% if form.bio.errors %}is-invalid{% endif %}" 
-                                                  id="{{ form.bio.id_for_label }}" 
-                                                  name="{{ form.bio.name }}" 
-                                                  rows="4" 
-                                                  placeholder="Tell us about yourself...">{{ form.bio.value|default:'' }}</textarea>
-                                        {% if form.bio.errors %}
-                                            <div class="invalid-feedback">
-                                                {{ form.bio.errors.0 }}
-                                            </div>
-                                        {% endif %}
-                                        <div class="form-text">Maximum 500 characters</div>
-                                    </div>
-                                </div>
-                            </div>
+                            
 
                             <!-- Form Actions -->
                             <div class="d-flex justify-content-between align-items-center pt-4 border-top">
@@ -656,7 +498,7 @@
             
             function validateField(field) {
                 const value = field.value.trim();
-                const isRequired = field.labels[0]?.classList.contains('required-field');
+                const isRequired = field.hasAttribute('required');
                 
                 if (isRequired && !value) {
                     field.classList.add('is-invalid');
@@ -667,30 +509,58 @@
                 } else {
                     field.classList.remove('is-valid', 'is-invalid');
                 }
+                
+                // Email validation
+                if (field.type === 'email' && value) {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(value)) {
+                        field.classList.add('is-invalid');
+                        field.classList.remove('is-valid');
+                    }
+                }
             }
             
             // Bio character counter
             const bioField = document.querySelector('textarea[name="bio"]');
-            if (bioField) {
+            const bioCounter = document.getElementById('bioCounter');
+            
+            if (bioField && bioCounter) {
                 const maxLength = 500;
-                const helpText = bioField.nextElementSibling;
                 
                 function updateCounter() {
                     const remaining = maxLength - bioField.value.length;
-                    helpText.textContent = `${remaining} characters remaining`;
+                    bioCounter.textContent = `${remaining} characters remaining`;
                     
                     if (remaining < 50) {
-                        helpText.style.color = '#dc3545';
+                        bioCounter.style.color = '#dc3545';
                     } else if (remaining < 100) {
-                        helpText.style.color = '#fd7e14';
+                        bioCounter.style.color = '#fd7e14';
                     } else {
-                        helpText.style.color = '#64748b';
+                        bioCounter.style.color = '#64748b';
                     }
                 }
                 
                 bioField.addEventListener('input', updateCounter);
-                updateCounter();
+                updateCounter(); // Initialize counter
             }
+            
+            // Form submission validation
+            form.addEventListener('submit', function(e) {
+                let isValid = true;
+                const requiredFields = form.querySelectorAll('[required]');
+                
+                requiredFields.forEach(field => {
+                    if (!field.value.trim()) {
+                        field.classList.add('is-invalid');
+                        isValid = false;
+                    }
+                });
+                
+                if (!isValid) {
+                    e.preventDefault();
+                    alert('Please fill in all required fields.');
+                }
+            });
         });
         
         // Avatar removal function
