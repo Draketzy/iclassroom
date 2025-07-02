@@ -227,11 +227,7 @@ def profile_edit(request):
         else:
             messages.error(request, 'Please correct the errors below.')
     else:
-<<<<<<< Updated upstream
-        form = User(instance=request.user)
-=======
         form = UserProfileForm(instance=request.user)
->>>>>>> Stashed changes
 
     return render(request, 'classroom/profile_edit.html', {'form': form, 'user': request.user})
 
