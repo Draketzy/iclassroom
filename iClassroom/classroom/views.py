@@ -326,3 +326,70 @@ def delete_account(request):
             return redirect('settings')
     
     return redirect('settings')
+
+def forgot_password(request):
+    """Handle forgot password functionality"""
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        try:
+            user = User.objects.get(email=email)
+            if not user.is_active:
+                messages.error(request, 'You must verify your email before you can reset your password.')
+                return redirect('forgot_password')
+            current_site = get_current_site(request)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = default_token_generator.make_token(user)
+            reset_url = request.build_absolute_uri(
+                reverse('reset_password', kwargs={'uidb64': uid, 'token': token})
+            )
+            subject = 'Reset your iClassroom password'
+            html_message = render_to_string('classroom/emails/reset_password_email.html', {
+                'user': user,
+                'reset_url': reset_url,
+                'site_name': current_site.name,
+            })
+            plain_message = strip_tags(html_message)
+            send_mail(
+                subject=subject,
+                message=plain_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[email],
+                html_message=html_message,
+                fail_silently=False,
+            )
+            messages.success(request, f'Password reset link sent to {email}.')
+        except User.DoesNotExist:
+            messages.error(request, 'No account found with that email address.')
+        return redirect('forgot_password')
+    
+    return render(request, 'classroom/forgot_password.html')
+
+def reset_password(request, uidb64, token):
+    """Reset user password"""
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+
+        if not user.is_active:
+            messages.error(request, 'You must verify your email before you can reset your password.')
+            return redirect('login')
+
+        if default_token_generator.check_token(user, token):
+            if request.method == 'POST':
+                new_password = request.POST.get('new_password')
+                confirm_password = request.POST.get('confirm_password')
+
+                if new_password == confirm_password:
+                    user.set_password(new_password)
+                    user.save()
+                    messages.success(request, 'Password reset successfully! You can now log in.')
+                    return redirect('login')
+                else:
+                    messages.error(request, 'Passwords do not match.')
+            return render(request, 'classroom/reset_password.html', {'uidb64': uidb64, 'token': token})
+        else:
+            messages.error(request, 'Invalid password reset link.')
+            return redirect('forgot_password')
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        messages.error(request, 'Invalid password reset link.')
+        return redirect('forgot_password')

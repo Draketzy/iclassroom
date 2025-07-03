@@ -11,6 +11,10 @@ urlpatterns = [
     path('teacher/dashboard/', views.teacher_dashboard, name='teacher_dashboard'),
     path('student/dashboard/', views.student_dashboard, name='student_dashboard'),
 
+    # Forgot password URLs
+    path('forgot-password/', views.forgot_password, name='forgot_password'),
+    path('reset-password/<uidb64>/<token>/', views.reset_password, name='reset_password'),
+
     # Email verification URLs
     path('registration-complete/', views.registration_complete, name='registration_complete'),
     path('verify-email/<uidb64>/<token>/', views.verify_email, name='verify_email'),
