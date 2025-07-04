@@ -9,6 +9,7 @@ urlpatterns = [
     path('dashboard/', views.dashboard_view, name='dashboard'),
     path('logout/', views.logout_view, name='logout'),
     path('teacher/dashboard/', views.teacher_dashboard, name='teacher_dashboard'),
+    path('teacher/class/<uuid:class_id>/', views.class_detail, name='class_detail'),
     path('student/dashboard/', views.student_dashboard, name='student_dashboard'),
 
     # Forgot password URLs

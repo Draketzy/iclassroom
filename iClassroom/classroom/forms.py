@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from .models import User
-
+from .models import Class
 class UserProfileForm(forms.ModelForm):
     first_name = forms.CharField(
         max_length=30,
@@ -43,6 +43,35 @@ class UserProfileForm(forms.ModelForm):
         self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         
+       
+class ClassForm(forms.ModelForm):
+    class Meta:
+        model = Class
+        fields = ['course_name', 'semester', 'section', 'room', 'schedule']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['course_name'].widget.attrs.update({
+            'class': 'form-control modern-input',
+            'placeholder': 'e.g., Introduction to Computer Science'
+        })
+        self.fields['semester'].widget.attrs.update({
+            'class': 'form-select modern-select'
+        })
+        self.fields['section'].widget.attrs.update({
+            'class': 'form-control modern-input',
+            'placeholder': 'e.g., A, B, 01'
+        })
+        self.fields['room'].widget.attrs.update({
+            'class': 'form-control modern-input',
+            'placeholder': 'e.g., Room 101, Online'
+        })
+        self.fields['schedule'].widget.attrs.update({
+            'class': 'form-control modern-input',
+            'placeholder': 'e.g., MWF 9:00-10:00'
+        })
+
+
        
 
 # class UserSettingsForm(forms.ModelForm):
