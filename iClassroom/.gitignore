@@ -19,7 +19,8 @@ env/
 
 # SQLite (if you ever use it temporarily)
 # *.sqlite3
-
+# Ignore Django settings
+settings.py
 # VS Code settings
 .vscode/
 
