@@ -76,7 +76,7 @@ WSGI_APPLICATION = 'iClassroom.wsgi.application'
 DATABASES = {
      'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'iClassroom',
+        'NAME': 'classroom',
         'USER': 'postgres',
         'PASSWORD': '123456',
         'HOST': 'localhost',

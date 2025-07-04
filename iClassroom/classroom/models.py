@@ -81,7 +81,7 @@ class Class(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     course_name = models.CharField(
         max_length=100,
-        default='Introduction to Computer Science',  # Add default value here
+        default='Information Technology',  # Add default value here
         blank=True  # Optional: Allows empty values if needed
     )
     semester = models.CharField(
