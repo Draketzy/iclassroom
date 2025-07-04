@@ -620,7 +620,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const semester = formData.get('semester');
             const section = formData.get('section');
             
-            if (!course || !semester || !section) {
+            if (!course_name || !semester || !section) {
                 alert('Please fill in all required fields (Course, Semester, and Section)');
                 return;
             }
