@@ -6,7 +6,296 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>iClassroom - Student Dashboard</title>
     <link rel="stylesheet" href="{% static 'classroom/css/student_dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'classroom/css/css/bootstrap.min.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Modern Modal Styles */
+        .modern-modal {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        .modern-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 24px 32px;
+            border-radius: 0;
+        }
+
+        .modal-title-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .modal-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0;
+            color: white;
+        }
+
+        .modal-subtitle {
+            font-size: 14px;
+            margin: 4px 0 0 0;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 400;
+        }
+
+        .modern-close {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .modern-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .modern-body {
+            padding: 32px;
+            background: #ffffff;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .required {
+            color: #ef4444;
+            font-weight: 700;
+        }
+
+        .modern-input {
+            padding: 16px 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            background: #ffffff;
+            transition: all 0.3s ease;
+            color: #374151;
+        }
+
+        .modern-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .modern-input::placeholder {
+            color: #9ca3af;
+            font-weight: 400;
+        }
+
+        .input-help {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 6px;
+            font-weight: 400;
+        }
+
+        .modern-footer {
+            background: #f9fafb;
+            border: none;
+            padding: 24px 32px;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .btn-cancel {
+            background: #ffffff;
+            border: 2px solid #e5e7eb;
+            color: #6b7280;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cancel:hover {
+            background: #f3f4f6;
+            border-color: #d1d5db;
+            color: #374151;
+            transform: translateY(-1px);
+        }
+
+        .btn-join {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-join:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+        .btn-join:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-loading {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Join Class Button */
+        .join-class-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .join-class-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+        /* Alert Messages in Modal */
+        .modal-alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .modal-alert.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .modal-alert.error {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .modal-alert.warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .modal-dialog {
+                margin: 16px;
+            }
+            
+            .modern-header {
+                padding: 20px 24px;
+            }
+            
+            .modern-body {
+                padding: 24px;
+            }
+            
+            .modern-footer {
+                padding: 20px 24px;
+                flex-direction: column;
+            }
+            
+            .modal-title-wrapper {
+                gap: 12px;
+            }
+            
+            .modal-icon {
+                width: 40px;
+                height: 40px;
+            }
+        }
+
+        /* Fix modal backdrop issue */
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal.fade .modal-dialog {
+            transition: transform 0.3s ease-out;
+            transform: translate(0, -50px);
+        }
+
+        .modal.show .modal-dialog {
+            transform: none;
+        }
+
+        /* Remove old enrollment section styles since we're moving to modal */
+        .enrollment-section {
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <div class="dashboard-container">
@@ -89,12 +378,24 @@
                             <h3>My Classes</h3>
                             <p>Your enrolled courses and attendance status</p>
                         </div>
+                        <button type="button" class="join-class-btn" data-bs-toggle="modal" data-bs-target="#joinClassModal">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Join Class
+                        </button>
                     </div>
 
                     {% if not attendance_stats %}
                         <div class="no-classes-message">
-                            <p>You are not currently enrolled in any classes.</p>
-                            <button class="enroll-btn">Enroll in a Class</button>
+                            <div class="empty-state">
+                                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 14L21 9L12 4L3 9L12 14Z" stroke="#9ca3af" stroke-width="1.5"/>
+                                    <path d="M12 14L18.16 10.16C18.16 10.16 18.16 13.16 18.16 16.16C18.16 17.16 15.31 18.16 12 18.16C8.69 18.16 5.84 17.16 5.84 16.16C5.84 13.16 5.84 10.16 5.84 10.16L12 14Z" stroke="#9ca3af" stroke-width="1.5"/>
+                                </svg>
+                                <h4>No Classes Yet</h4>
+                                <p>Join a class using the "Join Class" button above to get started</p>
+                            </div>
                         </div>
                     {% else %}
                         {% for stat in attendance_stats %}
@@ -111,7 +412,6 @@
                                     <span class="session-badge scheduled">Scheduled</span>
                                 {% endif %}
                             </div>
-
                             <div class="progress-bars">
                                 <div class="progress-item">
                                     <div class="progress-header">
@@ -132,7 +432,6 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="class-actions">
                                 {% if stat.next_session %}
                                     <span class="next-class">Next: {{ stat.next_session.session_date|date:"D M d" }} {{ stat.next_session.start_time|time:"g:i A" }}</span>
@@ -161,10 +460,14 @@
                             <h3>Recent Activities</h3>
                             <p>Your latest attendance and participation updates</p>
                         </div>
-
                         <div class="activities-list">
                             {% if not recent_activities %}
-                                <p class="no-activities">No recent activities</p>
+                                <div class="empty-state small">
+                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="#9ca3af" stroke-width="1.5"/>
+                                    </svg>
+                                    <p>No recent activities</p>
+                                </div>
                             {% else %}
                                 {% for activity in recent_activities %}
                                 <div class="activity-item">
@@ -212,7 +515,280 @@
             </div>
         </main>
     </div>
-    {% block content %}
-    {% endblock %}
+
+    <!-- Join Class Modal -->
+    <div class="modal fade" id="joinClassModal" tabindex="-1" aria-labelledby="joinClassModalLabel" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modern-modal">
+                <div class="modal-header modern-header">
+                    <div class="modal-title-wrapper">
+                        <div class="modal-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h5 class="modal-title" id="joinClassModalLabel">Join a Class</h5>
+                            <p class="modal-subtitle">Enter the class ID provided by your teacher</p>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close modern-close" data-bs-dismiss="modal" aria-label="Close">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <form method="post" action="{% url 'enroll_in_class' %}" id="joinClassForm">
+                    {% csrf_token %}
+                    <div class="modal-body modern-body">
+                        <!-- Alert Messages -->
+                        <div id="modalMessages" style="display: none;"></div>
+                        
+                        <div class="form-group">
+                            <label for="class_id" class="form-label">
+                                Class ID <span class="required">*</span>
+                            </label>
+                            <input type="text" 
+                                   class="modern-input" 
+                                   id="class_id" 
+                                   name="class_id"
+                                   placeholder="Paste the class ID here (e.g., CLS123456)" 
+                                   required>
+                            <div class="input-help">
+                                Ask your teacher for the class ID. It usually starts with letters followed by numbers.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-footer modern-footer">
+                        <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-join">
+                            <span class="btn-text">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Join Class
+                            </span>
+                            <span class="btn-loading" style="display: none;">
+                                <svg class="spinner" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
+                                        <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
+                                        <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
+                                    </circle>
+                                </svg>
+                                Joining...
+                            </span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded');
+            
+            // Check if Bootstrap is loaded
+            if (typeof bootstrap === 'undefined') {
+                console.error('Bootstrap is not loaded!');
+                return;
+            }
+            
+            let modalInstance = null;
+            
+            // Initialize modal
+            const modalElement = document.getElementById('joinClassModal');
+            if (modalElement) {
+                modalInstance = new bootstrap.Modal(modalElement, {
+                    backdrop: true,
+                    keyboard: true,
+                    focus: true
+                });
+            }
+            
+            // Manual modal trigger for join class button
+            const joinClassButtons = document.querySelectorAll('.join-class-btn, [data-bs-target="#joinClassModal"]');
+            joinClassButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Join Class button clicked, opening modal');
+                    
+                    if (modalInstance) {
+                        modalInstance.show();
+                    }
+                });
+            });
+            
+            // Form submission
+            const form = document.getElementById('joinClassForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(this);
+                    const classId = formData.get('class_id');
+                    
+                    if (!classId || !classId.trim()) {
+                        showModalMessage('Please enter a valid class ID', 'error');
+                        return;
+                    }
+                    
+                    // Show loading state
+                    const submitBtn = this.querySelector('.btn-join');
+                    const btnText = submitBtn.querySelector('.btn-text');
+                    const btnLoading = submitBtn.querySelector('.btn-loading');
+                    
+                    btnText.style.display = 'none';
+                    btnLoading.style.display = 'flex';
+                    submitBtn.disabled = true;
+                    
+                    // Submit form
+                    fetch(this.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                        }
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            return response.text();
+                        }
+                        throw new Error('Network response was not ok');
+                    })
+                    .then(data => {
+                        // Check if the response contains success indicators
+                        if (data.includes('successfully') || data.includes('enrolled')) {
+                            // Close modal properly
+                            if (modalInstance) {
+                                modalInstance.hide();
+                            }
+                            
+                            // Show success message on main page
+                            showPageMessage('Successfully joined the class!', 'success');
+                            
+                            // Reset form
+                            this.reset();
+                            
+                            // Refresh page after 2 seconds
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 2000);
+                        } else if (data.includes('already enrolled') || data.includes('Already')) {
+                            showModalMessage('You are already enrolled in this class', 'warning');
+                        } else if (data.includes('not found') || data.includes('invalid')) {
+                            showModalMessage('Class ID not found. Please check and try again.', 'error');
+                        } else {
+                            showModalMessage('Unable to join class. Please try again.', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showModalMessage('An error occurred while joining the class. Please try again.', 'error');
+                    })
+                    .finally(() => {
+                        // Reset button state
+                        btnText.style.display = 'flex';
+                        btnLoading.style.display = 'none';
+                        submitBtn.disabled = false;
+                    });
+                });
+            }
+            
+            // Clean up when modal is hidden
+            if (modalElement) {
+                modalElement.addEventListener('hidden.bs.modal', function() {
+                    console.log('Modal hidden');
+                    
+                    // Reset form
+                    const form = document.getElementById('joinClassForm');
+                    if (form) {
+                        form.reset();
+                        form.querySelectorAll('.is-invalid, .is-valid').forEach(el => {
+                            el.classList.remove('is-invalid', 'is-valid');
+                        });
+                    }
+                    
+                    // Clear modal messages
+                    const modalMessages = document.getElementById('modalMessages');
+                    modalMessages.style.display = 'none';
+                    modalMessages.innerHTML = '';
+                    
+                    // Reset button state
+                    const submitBtn = form.querySelector('.btn-join');
+                    const btnText = submitBtn.querySelector('.btn-text');
+                    const btnLoading = submitBtn.querySelector('.btn-loading');
+                    
+                    btnText.style.display = 'flex';
+                    btnLoading.style.display = 'none';
+                    submitBtn.disabled = false;
+                    
+                    // Force remove any remaining backdrops
+                    setTimeout(() => {
+                        const backdrops = document.querySelectorAll('.modal-backdrop');
+                        backdrops.forEach(backdrop => backdrop.remove());
+                        document.body.classList.remove('modal-open');
+                        document.body.style.removeProperty('padding-right');
+                    }, 100);
+                });
+                
+                // Handle backdrop click
+                modalElement.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        if (modalInstance) {
+                            modalInstance.hide();
+                        }
+                    }
+                });
+            }
+            
+            // Show existing messages if any
+            {% if messages %}
+                {% for message in messages %}
+                    showPageMessage('{{ message|escapejs }}', '{{ message.tags }}');
+                {% endfor %}
+            {% endif %}
+        });
+        
+        function showModalMessage(message, type) {
+            const modalMessages = document.getElementById('modalMessages');
+            modalMessages.innerHTML = `<div class="modal-alert ${type}">${message}</div>`;
+            modalMessages.style.display = 'block';
+        }
+        
+        function showPageMessage(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="me-2">
+                    ${type === 'success' ? 
+                        '<path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2"/>' :
+                        '<path d="M12 9V13M12 17H12.01M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2"/>'
+                    }
+                </svg>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.querySelector('.main-content').insertBefore(alertDiv, document.querySelector('.dashboard-header'));
+        }
+
+        // Copy Class ID functionality for any elements that might need it
+        document.querySelectorAll('.copy-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const textToCopy = this.getAttribute('data-copy');
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    const originalText = this.textContent;
+                    this.textContent = 'Copied!';
+                    setTimeout(() => {
+                        this.textContent = originalText;
+                    }, 2000);
+                });
+            });
+        });
+    </script>
 </body>
 </html>

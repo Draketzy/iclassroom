@@ -405,7 +405,6 @@ def class_detail(request, class_id):
 
 @login_required
 def student_dashboard(request):
-    """Student dashboard view with real data from database"""
     student = request.user
     
     # Get all active enrollments for this student
@@ -493,7 +492,7 @@ def student_dashboard(request):
         # Calculate overall participation score (average of class averages)
         overall_participation_score = sum(s['participation_score'] for s in attendance_stats) / len(attendance_stats) if attendance_stats else 0
     
-    # Get recent activities (attendance records and participation)
+    # Get recent activities
     recent_activities = []
     attendance_activities = Attendance.objects.filter(
         student=student
@@ -520,7 +519,7 @@ def student_dashboard(request):
     
     # Sort combined activities by time
     recent_activities.sort(key=lambda x: x['time'], reverse=True)
-    recent_activities = recent_activities[:5]  # Take only the 5 most recent
+    recent_activities = recent_activities[:5]
     
     context = {
         'enrollments': enrollments,
@@ -533,7 +532,33 @@ def student_dashboard(request):
     }
     
     return render(request, 'classroom/student/student_dashboard.html', context)
-
+@login_required
+def enroll_in_class(request):
+    if request.method == 'POST':
+        class_id = request.POST.get('class_id')
+        
+        try:
+            class_to_join = Class.objects.get(id=class_id, is_active=True)
+            
+            # Check if student is already enrolled
+            if Enrollment.objects.filter(student=request.user, class_instance=class_to_join).exists():
+                messages.warning(request, 'You are already enrolled in this class')
+            else:
+                # Create new enrollment
+                Enrollment.objects.create(
+                    student=request.user,
+                    class_instance=class_to_join,
+                    status='active'
+                )
+                messages.success(request, f'Successfully enrolled in {class_to_join.course_name}')
+                
+        except Class.DoesNotExist:
+            messages.error(request, 'Invalid class ID. Please check with your teacher')
+        except Exception as e:
+            messages.error(request, 'An error occurred. Please try again')
+            print(f"Enrollment error: {e}")
+            
+    return redirect('student_dashboard')
 def logout_view(request):
     logout(request)
     return redirect('login')

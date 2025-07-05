@@ -13,6 +13,11 @@
         * {
             font-family: 'Poppins', sans-serif;
         }
+        
+        /* Add relative positioning to class cards for the menu button */
+        .class-card {
+            position: relative;
+        }
     </style>
 </head>
 <body>
@@ -116,7 +121,6 @@
             </div>
 
             <!-- Content Grid -->
-           <!-- Content Grid -->
             <div class="content-grid">
                 <!-- My Classes Section -->
                 <div class="classes-section">
@@ -135,8 +139,21 @@
 
                     {% if classes_with_stats %}
                     {% for class in classes_with_stats %}
-
                         <div class="class-card">
+                            <!-- Three Dots Menu Button -->
+                            <button class="class-menu-btn" onclick="openClassSettingsPopup('{{ class.object.id }}', {
+                                id: '{{ class.object.id }}',
+                                uuid: '{{ class.object.uuid|default:"N/A" }}',
+                                name: '{{ class.object.course_name }}',
+                                semester: '{{ class.object.semester }}'
+                            })">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="1" stroke="currentColor" stroke-width="2"/>
+                                    <circle cx="12" cy="5" r="1" stroke="currentColor" stroke-width="2"/>
+                                    <circle cx="12" cy="19" r="1" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                            </button>
+                            
                             <div class="class-header">
                                 <div class="class-info">
                                     <h4>{{ class.object.course_name }}</h4>
@@ -246,488 +263,490 @@
     </div>
 
     <!-- Create Class Modal -->
-<div class="modal fade" id="createClassModal" tabindex="-1" aria-labelledby="createClassModalLabel" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content modern-modal">
-            <div class="modal-header modern-header">
-                <div class="modal-title-wrapper">
-                    <div class="modal-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h5 class="modal-title" id="createClassModalLabel">Create New Class</h5>
-                        <p class="modal-subtitle">Set up a new class for your students</p>
-                    </div>
-                </div>
-                <button type="button" class="btn-close modern-close" data-bs-dismiss="modal" aria-label="Close">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </button>
-            </div>
-            
-            <form method="post" id="createClassForm">
-                {% csrf_token %}
-                <div class="modal-body modern-body">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            {{ form.course_name.label_tag }}
-                            {{ form.course_name }}
-                            {% if form.course_name.errors %}
-                                <div class="text-danger">{{ form.course_name.errors }}</div>
-                            {% endif %}
-                        </div>
-                        
-                         <div class="form-group">
-                            {{ form.semester.label_tag }}
-                            {{ form.semester }}
-                            {% if form.semester.errors %}
-                                <div class="text-danger">{{ form.semester.errors }}</div>
-                            {% endif %}
-                        </div>
-                        
-                        <!-- Section -->
-                        <div class="form-group">
-                            {{ form.section.label_tag }}
-                            {{ form.section }}
-                            {% if form.section.errors %}
-                                <div class="text-danger">{{ form.section.errors }}</div>
-                            {% endif %}
-                        </div>
-                        
-                         <div class="form-group">
-                            {{ form.room.label_tag }}
-                            {{ form.room }}
-                        </div>
-                        
-                        <div class="form-group full-width">
-                            {{ form.schedule.label_tag }}
-                            {{ form.schedule }}
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="modal-footer modern-footer">
-                    <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-create">
-                        <span class="btn-text">Create Class</span>
-                        <span class="btn-loading" style="display: none;">
-                            <svg class="spinner" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
-                                    <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
-                                    <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
-                                </circle>
+    <div class="modal fade" id="createClassModal" tabindex="-1" aria-labelledby="createClassModalLabel" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modern-modal">
+                <div class="modal-header modern-header">
+                    <div class="modal-title-wrapper">
+                        <div class="modal-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                             </svg>
-                            Creating...
-                        </span>
+                        </div>
+                        <div>
+                            <h5 class="modal-title" id="createClassModalLabel">Create New Class</h5>
+                            <p class="modal-subtitle">Set up a new class for your students</p>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close modern-close" data-bs-dismiss="modal" aria-label="Close">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
                     </button>
                 </div>
-            </form>
+                
+                <form method="post" id="createClassForm">
+                    {% csrf_token %}
+                    <div class="modal-body modern-body">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                {{ form.course_name.label_tag }}
+                                {{ form.course_name }}
+                                {% if form.course_name.errors %}
+                                    <div class="text-danger">{{ form.course_name.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                {{ form.semester.label_tag }}
+                                {{ form.semester }}
+                                {% if form.semester.errors %}
+                                    <div class="text-danger">{{ form.semester.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                {{ form.section.label_tag }}
+                                {{ form.section }}
+                                {% if form.section.errors %}
+                                    <div class="text-danger">{{ form.section.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                {{ form.room.label_tag }}
+                                {{ form.room }}
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                {{ form.schedule.label_tag }}
+                                {{ form.schedule }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-footer modern-footer">
+                        <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-create">
+                            <span class="btn-text">Create Class</span>
+                            <span class="btn-loading" style="display: none;">
+                                <svg class="spinner" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
+                                        <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
+                                        <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
+                                    </circle>
+                                </svg>
+                                Creating...
+                            </span>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
-<style>
-/* Modern Modal Styles */
-.modern-modal {
-    border: none;
-    border-radius: 20px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    overflow: hidden;
-    background: #ffffff;
-}
+    <!-- Include Class Settings Popup Component -->
+    {% include 'classroom/components/class_settings_popup.html' %}
 
-.modern-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
-    padding: 24px 32px;
-    border-radius: 0;
-}
-
-.modal-title-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.modal-icon {
-    width: 48px;
-    height: 48px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(10px);
-}
-
-.modal-title {
-    font-size: 20px;
-    font-weight: 700;
-    margin: 0;
-    color: white;
-}
-
-.modal-subtitle {
-    font-size: 14px;
-    margin: 4px 0 0 0;
-    color: rgba(255, 255, 255, 0.8);
-    font-weight: 400;
-}
-
-.modern-close {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
-}
-
-.modern-close:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: scale(1.05);
-}
-
-.modern-body {
-    padding: 32px;
-    background: #ffffff;
-}
-
-.form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-}
-
-.form-group.full-width {
-    grid-column: 1 / -1;
-}
-
-.form-label {
-    font-size: 14px;
-    font-weight: 600;
-    color: #374151;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.required {
-    color: #ef4444;
-    font-weight: 700;
-}
-
-.modern-input,
-.modern-select {
-    padding: 12px 16px;
-    border: 2px solid #e5e7eb;
-    border-radius: 12px;
-    font-size: 14px;
-    font-weight: 500;
-    background: #ffffff;
-    transition: all 0.3s ease;
-    color: #374151;
-}
-
-.modern-input:focus,
-.modern-select:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    transform: translateY(-1px);
-}
-
-.modern-input::placeholder {
-    color: #9ca3af;
-    font-weight: 400;
-}
-
-.modern-footer {
-    background: #f9fafb;
-    border: none;
-    padding: 24px 32px;
-    display: flex;
-    gap: 12px;
-    justify-content: flex-end;
-}
-
-.btn-cancel {
-    background: #ffffff;
-    border: 2px solid #e5e7eb;
-    color: #6b7280;
-    padding: 12px 24px;
-    border-radius: 12px;
-    font-weight: 600;
-    font-size: 14px;
-    transition: all 0.3s ease;
-}
-
-.btn-cancel:hover {
-    background: #f3f4f6;
-    border-color: #d1d5db;
-    color: #374151;
-    transform: translateY(-1px);
-}
-
-.btn-create {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none;
-    color: white;
-    padding: 12px 24px;
-    border-radius: 12px;
-    font-weight: 600;
-    font-size: 14px;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.btn-create:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-}
-
-.btn-create:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-    transform: none;
-}
-
-.btn-loading {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.spinner {
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .modal-dialog {
-        margin: 16px;
+    <style>
+    /* Modern Modal Styles */
+    .modern-modal {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        overflow: hidden;
+        background: #ffffff;
     }
-    
+
     .modern-header {
-        padding: 20px 24px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 24px 32px;
+        border-radius: 0;
     }
-    
-    .modern-body {
-        padding: 24px;
-    }
-    
-    .form-grid {
-        grid-template-columns: 1fr;
+
+    .modal-title-wrapper {
+        display: flex;
+        align-items: center;
         gap: 16px;
     }
-    
-    .modern-footer {
-        padding: 20px 24px;
-        flex-direction: column;
-    }
-    
-    .modal-title-wrapper {
-        gap: 12px;
-    }
-    
+
     .modal-icon {
+        width: 48px;
+        height: 48px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(10px);
+    }
+
+    .modal-title {
+        font-size: 20px;
+        font-weight: 700;
+        margin: 0;
+        color: white;
+    }
+
+    .modal-subtitle {
+        font-size: 14px;
+        margin: 4px 0 0 0;
+        color: rgba(255, 255, 255, 0.8);
+        font-weight: 400;
+    }
+
+    .modern-close {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
         width: 40px;
         height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
     }
-}
 
-/* Fix modal backdrop issue */
-.modal-backdrop {
-    background-color: rgba(0, 0, 0, 0.5);
-}
-
-.modal.fade .modal-dialog {
-    transition: transform 0.3s ease-out;
-    transform: translate(0, -50px);
-}
-
-.modal.show .modal-dialog {
-    transform: none;
-}
-</style>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded');
-    
-    // Check if Bootstrap is loaded
-    if (typeof bootstrap === 'undefined') {
-        console.error('Bootstrap is not loaded!');
-        return;
+    .modern-close:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(1.05);
     }
-    
-    let modalInstance = null;
-    
-    // Initialize modal
-    const modalElement = document.getElementById('createClassModal');
-    if (modalElement) {
-        modalInstance = new bootstrap.Modal(modalElement, {
-            backdrop: true,
-            keyboard: true,
-            focus: true
-        });
+
+    .modern-body {
+        padding: 32px;
+        background: #ffffff;
     }
-    
-    // Manual modal trigger for all buttons
-    const addClassButtons = document.querySelectorAll('.add-class-btn, [data-bs-target="#createClassModal"]');
-    addClassButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('Button clicked, opening modal');
-            
-            if (modalInstance) {
-                modalInstance.show();
-            }
-        });
-    });
-    
-    // Form submission
-    const form = document.getElementById('createClassForm');
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-            const course_name = formData.get('course_name');
-            const semester = formData.get('semester');
-            const section = formData.get('section');
-            
-            if (!course_name || !semester || !section) {
-                alert('Please fill in all required fields (Course, Semester, and Section)');
-                return;
-            }
-            
-            // Show loading state
-            const submitBtn = this.querySelector('.btn-create');
-            const btnText = submitBtn.querySelector('.btn-text');
-            const btnLoading = submitBtn.querySelector('.btn-loading');
-            
-            btnText.style.display = 'none';
-            btnLoading.style.display = 'flex';
-            submitBtn.disabled = true;
-            
-            // Submit form
-            fetch(window.location.href, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .form-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .required {
+        color: #ef4444;
+        font-weight: 700;
+    }
+
+    .modern-input,
+    .modern-select {
+        padding: 12px 16px;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 500;
+        background: #ffffff;
+        transition: all 0.3s ease;
+        color: #374151;
+    }
+
+    .modern-input:focus,
+    .modern-select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        transform: translateY(-1px);
+    }
+
+    .modern-input::placeholder {
+        color: #9ca3af;
+        font-weight: 400;
+    }
+
+    .modern-footer {
+        background: #f9fafb;
+        border: none;
+        padding: 24px 32px;
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+    }
+
+    .btn-cancel {
+        background: #ffffff;
+        border: 2px solid #e5e7eb;
+        color: #6b7280;
+        padding: 12px 24px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-cancel:hover {
+        background: #f3f4f6;
+        border-color: #d1d5db;
+        color: #374151;
+        transform: translateY(-1px);
+    }
+
+    .btn-create {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-create:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-create:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .btn-loading {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .spinner {
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .modal-dialog {
+            margin: 16px;
+        }
+        
+        .modern-header {
+            padding: 20px 24px;
+        }
+        
+        .modern-body {
+            padding: 24px;
+        }
+        
+        .form-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+        
+        .modern-footer {
+            padding: 20px 24px;
+            flex-direction: column;
+        }
+        
+        .modal-title-wrapper {
+            gap: 12px;
+        }
+        
+        .modal-icon {
+            width: 40px;
+            height: 40px;
+        }
+    }
+
+    /* Fix modal backdrop issue */
+    .modal-backdrop {
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal.fade .modal-dialog {
+        transition: transform 0.3s ease-out;
+        transform: translate(0, -50px);
+    }
+
+    .modal.show .modal-dialog {
+        transform: none;
+    }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM loaded');
+        
+        // Check if Bootstrap is loaded
+        if (typeof bootstrap === 'undefined') {
+            console.error('Bootstrap is not loaded!');
+            return;
+        }
+        
+        let modalInstance = null;
+        
+        // Initialize modal
+        const modalElement = document.getElementById('createClassModal');
+        if (modalElement) {
+            modalInstance = new bootstrap.Modal(modalElement, {
+                backdrop: true,
+                keyboard: true,
+                focus: true
+            });
+        }
+        
+        // Manual modal trigger for all buttons
+        const addClassButtons = document.querySelectorAll('.add-class-btn, [data-bs-target="#createClassModal"]');
+        addClassButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Button clicked, opening modal');
+                
+                if (modalInstance) {
+                    modalInstance.show();
                 }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Close modal properly
-                    if (modalInstance) {
-                        modalInstance.hide();
+            });
+        });
+        
+        // Form submission
+        const form = document.getElementById('createClassForm');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                const course_name = formData.get('course_name');
+                const semester = formData.get('semester');
+                const section = formData.get('section');
+                
+                if (!course_name || !semester || !section) {
+                    alert('Please fill in all required fields (Course, Semester, and Section)');
+                    return;
+                }
+                
+                // Show loading state
+                const submitBtn = this.querySelector('.btn-create');
+                const btnText = submitBtn.querySelector('.btn-text');
+                const btnLoading = submitBtn.querySelector('.btn-loading');
+                
+                btnText.style.display = 'none';
+                btnLoading.style.display = 'flex';
+                submitBtn.disabled = true;
+                
+                // Submit form
+                fetch(window.location.href, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': formData.get('csrfmiddlewaretoken')
                     }
-                    
-                    // Show success message
-                    const alertDiv = document.createElement('div');
-                    alertDiv.className = 'alert alert-success alert-dismissible fade show';
-                    alertDiv.innerHTML = `
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="me-2">
-                            <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        ${data.message || 'Class created successfully!'}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    `;
-                    document.querySelector('.main-content').insertBefore(alertDiv, document.querySelector('.dashboard-header'));
-                    
-                    // Reset form
-                    this.reset();
-                    
-                    // Refresh page after 2 seconds
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 2000);
-                } else {
-                    alert('Error creating class: ' + (data.error || 'Unknown error'));
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Close modal properly
+                        if (modalInstance) {
+                            modalInstance.hide();
+                        }
+                        
+                        // Show success message
+                        const alertDiv = document.createElement('div');
+                        alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                        alertDiv.innerHTML = `
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="me-2">
+                                <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            ${data.message || 'Class created successfully!'}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        `;
+                        document.querySelector('.main-content').insertBefore(alertDiv, document.querySelector('.dashboard-header'));
+                        
+                        // Reset form
+                        this.reset();
+                        
+                        // Refresh page after 2 seconds
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
+                    } else {
+                        alert('Error creating class: ' + (data.error || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while creating the class. Please try again.');
+                })
+                .finally(() => {
+                    // Reset button state
+                    btnText.style.display = 'inline';
+                    btnLoading.style.display = 'none';
+                    submitBtn.disabled = false;
+                });
+            });
+        }
+        
+        // Clean up when modal is hidden
+        if (modalElement) {
+            modalElement.addEventListener('hidden.bs.modal', function() {
+                console.log('Modal hidden');
+                
+                // Reset form
+                const form = document.getElementById('createClassForm');
+                if (form) {
+                    form.reset();
+                    form.querySelectorAll('.is-invalid, .is-valid').forEach(el => {
+                        el.classList.remove('is-invalid', 'is-valid');
+                    });
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while creating the class. Please try again.');
-            })
-            .finally(() => {
+                
                 // Reset button state
+                const submitBtn = form.querySelector('.btn-create');
+                const btnText = submitBtn.querySelector('.btn-text');
+                const btnLoading = submitBtn.querySelector('.btn-loading');
+                
                 btnText.style.display = 'inline';
                 btnLoading.style.display = 'none';
                 submitBtn.disabled = false;
+                
+                // Force remove any remaining backdrops
+                setTimeout(() => {
+                    const backdrops = document.querySelectorAll('.modal-backdrop');
+                    backdrops.forEach(backdrop => backdrop.remove());
+                    document.body.classList.remove('modal-open');
+                    document.body.style.removeProperty('padding-right');
+                }, 100);
             });
-        });
-    }
-    
-    // Clean up when modal is hidden
-    if (modalElement) {
-        modalElement.addEventListener('hidden.bs.modal', function() {
-            console.log('Modal hidden');
             
-            // Reset form
-            const form = document.getElementById('createClassForm');
-            if (form) {
-                form.reset();
-                form.querySelectorAll('.is-invalid, .is-valid').forEach(el => {
-                    el.classList.remove('is-invalid', 'is-valid');
-                });
-            }
-            
-            // Reset button state
-            const submitBtn = form.querySelector('.btn-create');
-            const btnText = submitBtn.querySelector('.btn-text');
-            const btnLoading = submitBtn.querySelector('.btn-loading');
-            
-            btnText.style.display = 'inline';
-            btnLoading.style.display = 'none';
-            submitBtn.disabled = false;
-            
-            // Force remove any remaining backdrops
-            setTimeout(() => {
-                const backdrops = document.querySelectorAll('.modal-backdrop');
-                backdrops.forEach(backdrop => backdrop.remove());
-                document.body.classList.remove('modal-open');
-                document.body.style.removeProperty('padding-right');
-            }, 100);
-        });
-        
-        // Handle backdrop click
-        modalElement.addEventListener('click', function(e) {
-            if (e.target === this) {
-                if (modalInstance) {
-                    modalInstance.hide();
+            // Handle backdrop click
+            modalElement.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    }
                 }
-            }
-        });
-    }
-});
-</script>
+            });
+        }
+    });
+    </script>
 </body>
 </html>
