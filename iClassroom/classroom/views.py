@@ -403,8 +403,136 @@ def class_detail(request, class_id):
     
     return render(request, 'classroom/class_detail.html', context)
 
+@login_required
 def student_dashboard(request):
-    return render(request, 'classroom/student/student_dashboard.html')
+    """Student dashboard view with real data from database"""
+    student = request.user
+    
+    # Get all active enrollments for this student
+    enrollments = Enrollment.objects.filter(
+        student=student,
+        status='active'
+    ).select_related('class_instance')
+    
+    # Calculate overall statistics
+    total_classes = enrollments.count()
+    today = timezone.now().date()
+    
+    # Calculate classes today
+    classes_today = ClassSession.objects.filter(
+        class_instance__in=[e.class_instance for e in enrollments],
+        session_date=today
+    ).count()
+    
+    # Calculate attendance statistics
+    attendance_stats = []
+    overall_attendance_percentage = 0
+    overall_participation_score = 0
+    
+    if enrollments.exists():
+        # Calculate attendance for each enrolled class
+        for enrollment in enrollments:
+            class_obj = enrollment.class_instance
+            
+            # Get completed sessions for this class
+            completed_sessions = ClassSession.objects.filter(
+                class_instance=class_obj,
+                status='completed'
+            )
+            
+            # Get attendance records for this student
+            attendance_records = Attendance.objects.filter(
+                session__in=completed_sessions,
+                student=student
+            )
+            
+            # Calculate attendance percentage
+            total_sessions = completed_sessions.count()
+            present_count = attendance_records.filter(status='present').count()
+            attendance_percentage = (present_count / total_sessions * 100) if total_sessions > 0 else 0
+            
+            # Calculate participation score
+            participation_records = Participation.objects.filter(
+                session__class_instance=class_obj,
+                student=student
+            )
+            participation_points = participation_records.aggregate(total=Sum('points'))['total'] or 0
+            participation_avg = participation_records.aggregate(avg=Avg('points'))['avg'] or 0
+            
+            # Get next session
+            next_session = ClassSession.objects.filter(
+                class_instance=class_obj,
+                session_date__gte=today
+            ).order_by('session_date', 'start_time').first()
+            
+            # Check for current session
+            current_session = ClassSession.objects.filter(
+                class_instance=class_obj,
+                session_date=today,
+                start_time__lte=timezone.now().time(),
+                end_time__gte=timezone.now().time(),
+                status='in_progress'
+            ).first()
+            
+            attendance_stats.append({
+                'class': class_obj,
+                'attendance_percentage': round(attendance_percentage, 1),
+                'participation_score': round(participation_avg, 1),
+                'next_session': next_session,
+                'current_session': current_session,
+                'total_sessions': total_sessions,
+                'present_count': present_count,
+                'participation_points': participation_points
+            })
+        
+        # Calculate overall attendance percentage
+        total_present = sum(s['present_count'] for s in attendance_stats)
+        total_sessions = sum(s['total_sessions'] for s in attendance_stats)
+        overall_attendance_percentage = (total_present / total_sessions * 100) if total_sessions > 0 else 0
+        
+        # Calculate overall participation score (average of class averages)
+        overall_participation_score = sum(s['participation_score'] for s in attendance_stats) / len(attendance_stats) if attendance_stats else 0
+    
+    # Get recent activities (attendance records and participation)
+    recent_activities = []
+    attendance_activities = Attendance.objects.filter(
+        student=student
+    ).select_related('session', 'session__class_instance').order_by('-marked_at')[:5]
+    
+    participation_activities = Participation.objects.filter(
+        student=student
+    ).select_related('session', 'session__class_instance', 'category').order_by('-created_at')[:5]
+    
+    # Combine and sort activities
+    for activity in attendance_activities:
+        recent_activities.append({
+            'type': 'attendance',
+            'activity': activity,
+            'time': activity.marked_at
+        })
+    
+    for activity in participation_activities:
+        recent_activities.append({
+            'type': 'participation',
+            'activity': activity,
+            'time': activity.created_at
+        })
+    
+    # Sort combined activities by time
+    recent_activities.sort(key=lambda x: x['time'], reverse=True)
+    recent_activities = recent_activities[:5]  # Take only the 5 most recent
+    
+    context = {
+        'enrollments': enrollments,
+        'attendance_stats': attendance_stats,
+        'total_classes': total_classes,
+        'classes_today': classes_today,
+        'overall_attendance_percentage': round(overall_attendance_percentage, 1),
+        'overall_participation_score': round(overall_participation_score, 1),
+        'recent_activities': recent_activities,
+    }
+    
+    return render(request, 'classroom/student/student_dashboard.html', context)
 
 def logout_view(request):
     logout(request)

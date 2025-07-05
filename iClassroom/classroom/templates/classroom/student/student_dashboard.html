@@ -1,4 +1,4 @@
-{% load static%}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,7 +25,7 @@
                 <div class="stat-card">
                     <div class="stat-content">
                         <div class="stat-info">
-                            <div class="stat-number">2</div>
+                            <div class="stat-number">{{ total_classes }}</div>
                             <h3>Enrolled Classes</h3>
                         </div>
                         <div class="stat-icon student-icon">
@@ -40,7 +40,7 @@
                 <div class="stat-card">
                     <div class="stat-content">
                         <div class="stat-info">
-                            <div class="stat-number">91%</div>
+                            <div class="stat-number">{{ overall_attendance_percentage }}%</div>
                             <h3>Overall Attendance</h3>
                         </div>
                         <div class="stat-icon student-icon">
@@ -54,7 +54,7 @@
                 <div class="stat-card">
                     <div class="stat-content">
                         <div class="stat-info">
-                            <div class="stat-number">88%</div>
+                            <div class="stat-number">{{ overall_participation_score }}%</div>
                             <h3>Participation Score</h3>
                         </div>
                         <div class="stat-icon student-icon">
@@ -68,7 +68,7 @@
                 <div class="stat-card">
                     <div class="stat-content">
                         <div class="stat-info">
-                            <div class="stat-number">1</div>
+                            <div class="stat-number">{{ classes_today }}</div>
                             <h3>Classes Today</h3>
                         </div>
                         <div class="stat-icon student-icon">
@@ -91,89 +91,66 @@
                         </div>
                     </div>
 
-                    <div class="student-class-card">
-                        <div class="class-header">
-                            <div class="class-info">
-                                <h4>Data Structures & Algorithms</h4>
-                                <p>CS79 • Prof. Johnson</p>
-                                <p>MWF 9:00-10:00 AM</p>
-                            </div>
-                            <span class="session-badge">In Session</span>
+                    {% if not attendance_stats %}
+                        <div class="no-classes-message">
+                            <p>You are not currently enrolled in any classes.</p>
+                            <button class="enroll-btn">Enroll in a Class</button>
                         </div>
+                    {% else %}
+                        {% for stat in attendance_stats %}
+                        <div class="student-class-card">
+                            <div class="class-header">
+                                <div class="class-info">
+                                    <h4>{{ stat.class.course_name }}</h4>
+                                    <p>{{ stat.class.section }} • {{ stat.class.teacher.first_name }} {{ stat.class.teacher.last_name }}</p>
+                                    <p>{{ stat.class.schedule }}</p>
+                                </div>
+                                {% if stat.current_session %}
+                                    <span class="session-badge">In Session</span>
+                                {% elif stat.next_session %}
+                                    <span class="session-badge scheduled">Scheduled</span>
+                                {% endif %}
+                            </div>
 
-                        <div class="progress-bars">
-                            <div class="progress-item">
-                                <div class="progress-header">
-                                    <span>Attendance</span>
-                                    <span>85%</span>
+                            <div class="progress-bars">
+                                <div class="progress-item">
+                                    <div class="progress-header">
+                                        <span>Attendance</span>
+                                        <span>{{ stat.attendance_percentage }}%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: {{ stat.attendance_percentage }}%"></div>
+                                    </div>
                                 </div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 85%"></div>
+                                <div class="progress-item">
+                                    <div class="progress-header">
+                                        <span>Participation</span>
+                                        <span>{{ stat.participation_score }}%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: {{ stat.participation_score }}%"></div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="progress-item">
-                                <div class="progress-header">
-                                    <span>Participation</span>
-                                    <span>80%</span>
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 80%"></div>
-                                </div>
-                            </div>
-                        </div>
 
-                        <div class="class-actions">
-                            <span class="next-class">Next: Today 9:00 AM</span>
-                            <button class="check-in-btn">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="white" stroke-width="2"/>
-                                </svg>
-                                Check In
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="student-class-card">
-                        <div class="class-header">
-                            <div class="class-info">
-                                <h4>Data Structures & Algorithms</h4>
-                                <p>CS79 • Prof. Johnson</p>
-                                <p>MWF 9:00-10:00 AM</p>
-                            </div>
-                            <span class="session-badge scheduled">Scheduled</span>
-                        </div>
-
-                        <div class="progress-bars">
-                            <div class="progress-item">
-                                <div class="progress-header">
-                                    <span>Attendance</span>
-                                    <span>85%</span>
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 85%"></div>
-                                </div>
-                            </div>
-                            <div class="progress-item">
-                                <div class="progress-header">
-                                    <span>Participation</span>
-                                    <span>80%</span>
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 80%"></div>
-                                </div>
+                            <div class="class-actions">
+                                {% if stat.next_session %}
+                                    <span class="next-class">Next: {{ stat.next_session.session_date|date:"D M d" }} {{ stat.next_session.start_time|time:"g:i A" }}</span>
+                                {% else %}
+                                    <span class="next-class">No upcoming sessions</span>
+                                {% endif %}
+                                {% if stat.current_session %}
+                                    <button class="check-in-btn">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="white" stroke-width="2"/>
+                                        </svg>
+                                        Check In
+                                    </button>
+                                {% endif %}
                             </div>
                         </div>
-
-                        <div class="class-actions">
-                            <span class="next-class">Next: Today 9:00 AM</span>
-                            <button class="check-in-btn">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="white" stroke-width="2"/>
-                                </svg>
-                                Check In
-                            </button>
-                        </div>
-                    </div>
+                        {% endfor %}
+                    {% endif %}
                 </div>
 
                 <!-- Sidebar -->
@@ -186,34 +163,23 @@
                         </div>
 
                         <div class="activities-list">
-                            <div class="activity-item">
-                                <div class="activity-dot success"></div>
-                                <div class="activity-content">
-                                    <p>Marked present in CS79</p>
-                                    <span class="activity-time">2 hours ago</span>
+                            {% if not recent_activities %}
+                                <p class="no-activities">No recent activities</p>
+                            {% else %}
+                                {% for activity in recent_activities %}
+                                <div class="activity-item">
+                                    <div class="activity-dot success"></div>
+                                    <div class="activity-content">
+                                        {% if activity.type == 'attendance' %}
+                                            <p>Marked {{ activity.activity.get_status_display|lower }} in {{ activity.activity.session.class_instance.course_name }}</p>
+                                        {% else %}
+                                            <p>Awarded {{ activity.activity.points }} participation points in {{ activity.activity.session.class_instance.course_name }}</p>
+                                        {% endif %}
+                                        <span class="activity-time">{{ activity.time|timesince }} ago</span>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="activity-item">
-                                <div class="activity-dot success"></div>
-                                <div class="activity-content">
-                                    <p>Marked present in CS79</p>
-                                    <span class="activity-time">2 hours ago</span>
-                                </div>
-                            </div>
-                            <div class="activity-item">
-                                <div class="activity-dot success"></div>
-                                <div class="activity-content">
-                                    <p>Marked present in CS79</p>
-                                    <span class="activity-time">2 hours ago</span>
-                                </div>
-                            </div>
-                            <div class="activity-item">
-                                <div class="activity-dot success"></div>
-                                <div class="activity-content">
-                                    <p>Marked present in CS79</p>
-                                    <span class="activity-time">2 hours ago</span>
-                                </div>
-                            </div>
+                                {% endfor %}
+                            {% endif %}
                         </div>
                     </div>
 
