@@ -401,40 +401,72 @@
                         {% for stat in attendance_stats %}
                         <div class="student-class-card">
                             <div class="class-header">
-                                <div class="class-info">
+                                 <div class="class-info">
                                     <h4>{{ stat.class.course_name }}</h4>
                                     <p>{{ stat.class.section }} • {{ stat.class.teacher.first_name }} {{ stat.class.teacher.last_name }}</p>
-                                    <p>{{ stat.class.schedule }}</p>
+                                    <p>{{ stat.class.schedule }} (PH Time)</p>
                                 </div>
                                 {% if stat.current_session %}
-                                    <span class="session-badge">In Session</span>
+                                    <span class="session-badge" style="background-color: #10B981;">In Session (PH Time)</span>
                                 {% elif stat.next_session %}
-                                    <span class="session-badge scheduled">Scheduled</span>
+                                    <span class="session-badge" style="background-color: #3B82F6;">
+                                        Scheduled: {{ stat.next_session.session_date|date:"M j" }} {{ stat.next_session.start_time|time:"g:i A" }} PH
+                                    </span>
                                 {% endif %}
                             </div>
                             <div class="progress-bars">
                                 <div class="progress-item">
                                     <div class="progress-header">
                                         <span>Attendance</span>
-                                        <span>{{ stat.attendance_percentage }}%</span>
+                                        <span>
+                                            {% if stat.total_sessions > 0 %}
+                                                {{ stat.attendance_percentage }}%
+                                            {% else %}
+                                                No data
+                                            {% endif %}
+                                        </span>
                                     </div>
                                     <div class="progress-bar">
-                                        <div class="progress-fill" style="width: {{ stat.attendance_percentage }}%"></div>
+                                        <div class="progress-fill" 
+                                            style="width: {% if stat.total_sessions > 0 %}{{ stat.attendance_percentage }}%{% else %}0%{% endif %};
+                                                    background-color: {% if stat.attendance_percentage >= 80 %}#10B981
+                                                                    {% elif stat.attendance_percentage >= 50 %}#F59E0B
+                                                                    {% else %}#EF4444{% endif %};">
+                                        </div>
+                                    </div>
+                                    <div class="progress-note">
+                                        {{ stat.present_count }} of {{ stat.total_sessions }} sessions
                                     </div>
                                 </div>
                                 <div class="progress-item">
                                     <div class="progress-header">
                                         <span>Participation</span>
-                                        <span>{{ stat.participation_score }}%</span>
+                                        <span>
+                                            {% if stat.participation_points > 0 %}
+                                                {{ stat.participation_score }}%
+                                            {% else %}
+                                                No data
+                                            {% endif %}
+                                        </span>
                                     </div>
                                     <div class="progress-bar">
-                                        <div class="progress-fill" style="width: {{ stat.participation_score }}%"></div>
+                                        <div class="progress-fill" 
+                                            style="width: {% if stat.participation_points > 0 %}{{ stat.participation_score }}%{% else %}0%{% endif %};
+                                                    background-color: {% if stat.participation_score >= 80 %}#10B981
+                                                                    {% elif stat.participation_score >= 50 %}#F59E0B
+                                                                    {% else %}#EF4444{% endif %};">
+                                        </div>
+                                    </div>
+                                    <div class="progress-note">
+                                        {{ stat.participation_points }} total points
                                     </div>
                                 </div>
                             </div>
                             <div class="class-actions">
                                 {% if stat.next_session %}
-                                    <span class="next-class">Next: {{ stat.next_session.session_date|date:"D M d" }} {{ stat.next_session.start_time|time:"g:i A" }}</span>
+                                    <span class="next-class">
+                                        Next: {{ stat.next_session.session_date|date:"D M d" }} {{ stat.next_session.start_time|time:"g:i A" }} PH
+                                    </span>
                                 {% else %}
                                     <span class="next-class">No upcoming sessions</span>
                                 {% endif %}

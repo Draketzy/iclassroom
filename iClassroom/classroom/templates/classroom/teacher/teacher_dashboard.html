@@ -164,7 +164,13 @@
                                     </p>
                                 </div>
                                 {% if class.current_session %}
-                                    <span class="session-badge">In Session</span>
+                                    <span class="session-badge" style="background-color: #10B981;">In Session (PH Time)</span>
+                                {% elif class.next_session %}
+                                    {% with next_session_date=class.next_session.session_date|date:"M j" %}
+                                    <span class="session-badge" style="background-color: #3B82F6;">
+                                        Next: {{ next_session_date }} {{ class.next_session.start_time|time:"g:i A" }} PH
+                                    </span>
+                                    {% endwith %}
                                 {% endif %}
                             </div>
                             <div class="class-details">
@@ -190,34 +196,69 @@
                                 </div>
                                 <div class="detail-item">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M12 6V12L16 14M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke="#6b7280" stroke-width="2"/>
+                                        <path d="M8 2V5M16 2V5M3.5 9.09H20.5M21 8.5V17C21 18.1046 20.1046 19 19 19H5C3.89543 19 3 18.1046 3 17V8.5C3 7.39543 3.89543 6.5 5 6.5H19C20.1046 6.5 21 7.39543 21 8.5Z" stroke="#6b7280" stroke-width="2"/>
                                     </svg>
-                                    <span>
-                                        {% if class.next_session %}
-                                            Next: {{ class.next_session.session_date|date:"D M j" }} {{ class.next_session.start_time|time:"g:i A" }}
-                                        {% else %}
-                                            No upcoming sessions
-                                        {% endif %}
-                                    </span>
+                                    <span>{{ class.object.schedule }} (PH Time)</span>
                                 </div>
+
+                            <div class="detail-item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 6V12L16 14M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke="#6b7280" stroke-width="2"/>
+                                </svg>
+                                <span>
+                                    {% if class.next_session %}
+                                        Next: {{ class.next_session.session_date|date:"D M j" }} {{ class.next_session.start_time|time:"g:i A" }} PH
+                                    {% else %}
+                                        No upcoming sessions
+                                    {% endif %}
+                                </span>
+                            </div>
                             </div>
                             <div class="progress-bars">
                                 <div class="progress-item">
                                     <div class="progress-header">
                                         <span>Attendance</span>
-                                        <span>{{ class.attendance_percentage }}%</span>
+                                        <span>
+                                            {% if class.attendance_percentage > 0 %}
+                                                {{ class.attendance_percentage }}%
+                                            {% else %}
+                                                No data
+                                            {% endif %}
+                                        </span>
                                     </div>
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" style="width: {{ class.attendance_percentage }}%"></div>
+                                     <div class="progress-bar">
+                                        <div class="progress-fill" 
+                                            style="width: {% if class.attendance_percentage > 0 %}{{ class.attendance_percentage }}%{% else %}0%{% endif %};
+                                                    background-color: {% if class.attendance_percentage >= 80 %}#10B981
+                                                                    {% elif class.attendance_percentage >= 50 %}#F59E0B
+                                                                    {% else %}#EF4444{% endif %};">
+                                        </div>
+                                    </div>
+                                    <div class="progress-note">
+                                        Based on {{ class.enrollment_count }} students across all sessions
                                     </div>
                                 </div>
-                                <div class="progress-item">
+                                 <div class="progress-item">
                                     <div class="progress-header">
                                         <span>Participation</span>
-                                        <span>{{ class.participation_average }}%</span>
+                                        <span>
+                                            {% if class.participation_count > 0 %}
+                                                {{ class.participation_average }}%
+                                            {% else %}
+                                                No data
+                                            {% endif %}
+                                        </span>
                                     </div>
                                     <div class="progress-bar">
-                                        <div class="progress-fill" style="width: {{ class.participation_average }}%"></div>
+                                        <div class="progress-fill" 
+                                            style="width: {% if class.participation_count > 0 %}{{ class.participation_average }}%{% else %}0%{% endif %};
+                                                    background-color: {% if class.participation_average >= 80 %}#10B981
+                                                                    {% elif class.participation_average >= 50 %}#F59E0B
+                                                                    {% else %}#EF4444{% endif %};">
+                                        </div>
+                                    </div>
+                                    <div class="progress-note">
+                                        Average from {{ class.participation_count }} evaluations
                                     </div>
                                 </div>
                             </div>
@@ -589,6 +630,14 @@
     .modal.show .modal-dialog {
         transform: none;
     }
+    .session-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    color: white;
+    margin-left: 8px;
+}
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

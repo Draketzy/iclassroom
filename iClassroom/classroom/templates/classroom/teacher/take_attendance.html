@@ -360,7 +360,7 @@
     {% include 'classroom/header.html' %}
     <div class="container">
         {% csrf_token %}
-        
+        <div id="error-message" style="display: none; color: red; margin: 10px 0;"></div>
         <div class="header">
             <a href="{% url 'session_list' class_id=session.class_instance.id %}" class="back-link">
                 ← Back to Sessions
@@ -468,7 +468,12 @@
                 attendanceData['{{ student.id }}'] = '{{ student.status }}';
             {% endif %}
         {% endfor %}
-
+         function showError(message) {
+    const errorDiv = document.getElementById('error-message');
+    errorDiv.textContent = message;
+    errorDiv.style.display = 'block';
+    setTimeout(() => errorDiv.style.display = 'none', 5000);
+}
         // Update UI function
         function updateUI() {
             const counts = { present: 0, late: 0, absent: 0 };
@@ -554,41 +559,44 @@
 
         // Save attendance
         document.getElementById('save-btn').addEventListener('click', async function() {
-            const btn = this;
-            btn.disabled = true;
-            const originalText = btn.textContent;
-            btn.textContent = 'Saving...';
+        const btn = this;
+        btn.disabled = true;
+        const originalText = btn.textContent;
+        btn.textContent = 'Saving...';
+        
+        try {
+            const response = await fetch('', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'  // Important for Django to recognize AJAX
+                },
+                body: JSON.stringify({ 
+                    attendance: attendanceData 
+                })
+            });
             
-            try {
-                const response = await fetch('', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrfToken
-                    },
-                    body: JSON.stringify({ attendance: attendanceData })
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Failed to save attendance');
-                }
-                
-                const data = await response.json();
-                if (data.success) {
-                    alert('Attendance saved successfully!');
-                } else {
-                    throw new Error(data.error || 'Unknown error');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error: ' + error.message);
-                // Revert changes if save failed
-                updateUI();
-            } finally {
-                btn.textContent = originalText;
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to save attendance');
             }
-        });
-
+            
+            if (data.success) {
+                // Refresh the page to show updated data
+                window.location.reload();
+            } else {
+                throw new Error(data.message || 'Unknown error occurred');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error: ' + error.message);
+            updateUI();
+        } finally {
+            btn.textContent = originalText;
+        }
+    });
         // Initial UI update
         updateUI();
     });

@@ -20,6 +20,7 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe  # Add this import
 import logging
 import pytz
+from pytz import timezone as pytz_timezone
 from django.utils import timezone
 from django.db import transaction
 import json
@@ -197,6 +198,10 @@ def dashboard_view(request):
 @login_required
 def teacher_dashboard(request):
     """Teacher dashboard view with create class modal"""
+    manila_tz = pytz_timezone('Asia/Manila')
+    now = timezone.now().astimezone(manila_tz)
+    current_date = now.date()
+    current_time = now.time()
 
     if request.method == 'POST':
         # Handle AJAX form submission for creating class
@@ -230,7 +235,6 @@ def teacher_dashboard(request):
         teacher=request.user,
         is_active=True
     )
-
     # Annotate each class with additional data
     classes_with_stats = []
     for class_obj in teacher_classes:
@@ -240,52 +244,83 @@ def teacher_dashboard(request):
             status='active'
         ).count()
 
-        # Calculate attendance percentage
-        total_sessions = ClassSession.objects.filter(
+        # Calculate attendance percentage (PH timezone aware)
+        completed_sessions = ClassSession.objects.filter(
             class_instance=class_obj,
             status='completed'
-        ).count()
+        )
 
-        present_attendance = Attendance.objects.filter(
-            session__class_instance=class_obj,
-            status='present',
-            session__status='completed'
-        ).count()
+        total_possible_attendances = 0
+        present_attendances = 0
+        
+        for session in completed_sessions:
+            # Convert session times to Manila timezone for accurate comparison
+            session_date_manila = session.session_date
+            session_start_manila = session.start_time
+            session_end_manila = session.end_time
+            
+            session_attendances = Attendance.objects.filter(
+                session=session
+            ).count()
+            total_possible_attendances += enrollment_count
+            present_attendances += session_attendances
 
         attendance_percentage = 0
-        if total_sessions > 0 and enrollment_count > 0:
-            max_possible_attendance = total_sessions * enrollment_count
-            attendance_percentage = (present_attendance / max_possible_attendance) * 100
+        if total_possible_attendances > 0:
+            attendance_percentage = (present_attendances / total_possible_attendances) * 100
 
         # Calculate participation average
         participation_avg = Participation.objects.filter(
             session__class_instance=class_obj
-        ).aggregate(avg=Avg('points'))['avg'] or 0
+        ).aggregate(
+            avg=Avg('points'),
+            count=Count('id')
+        )
+        participation_average = participation_avg['avg'] or 0
+        participation_count = participation_avg['count'] or 0
 
-        # Get next session
+        # Get next session (PH timezone aware)
         next_session = ClassSession.objects.filter(
             class_instance=class_obj,
-            session_date__gte=timezone.now().date()
+            session_date__gte=current_date,
+            status='scheduled'  # Only get scheduled sessions
+        ).exclude(
+            session_date=current_date,
+            start_time__lte=current_time,
+            end_time__gte=current_time
         ).order_by('session_date', 'start_time').first()
 
-        # Get current session (if ongoing now)
+        # Get current session (PH timezone aware)
         current_session = ClassSession.objects.filter(
             class_instance=class_obj,
-            session_date=timezone.now().date(),
-            start_time__lte=timezone.now().time(),
-            end_time__gte=timezone.now().time(),
+            session_date=current_date,
+            start_time__lte=current_time,
+            end_time__gte=current_time,
             status='in_progress'
         ).first()
+
+        # If no current session found, check if there should be one
+        if not current_session:
+            potential_session = ClassSession.objects.filter(
+                class_instance=class_obj,
+                session_date=current_date,
+                start_time__lte=current_time,
+                end_time__gte=current_time
+            ).first()
+            if potential_session:
+                potential_session.status = 'in_progress'
+                potential_session.save()
+                current_session = potential_session
 
         classes_with_stats.append({
             'object': class_obj,
             'enrollment_count': enrollment_count,
             'attendance_percentage': round(attendance_percentage, 1),
-            'participation_average': round(participation_avg, 1),
+            'participation_average': round(participation_average, 1),
+            'participation_count': participation_count,
             'next_session': next_session,
             'current_session': current_session
         })
-
     # Recent activities (notifications)
     recent_activities = Notification.objects.filter(
         user=request.user
@@ -416,6 +451,12 @@ def class_detail(request, class_id):
 def student_dashboard(request):
     student = request.user
     
+    # Set Manila timezone
+    manila_tz = pytz_timezone('Asia/Manila')
+    now = timezone.now().astimezone(manila_tz)
+    current_date = now.date()
+    current_time = now.time()
+    
     # Get all active enrollments for this student
     enrollments = Enrollment.objects.filter(
         student=student,
@@ -424,12 +465,11 @@ def student_dashboard(request):
     
     # Calculate overall statistics
     total_classes = enrollments.count()
-    today = timezone.now().date()
     
-    # Calculate classes today
+    # Calculate classes today (PH time)
     classes_today = ClassSession.objects.filter(
         class_instance__in=[e.class_instance for e in enrollments],
-        session_date=today
+        session_date=current_date
     ).count()
     
     # Calculate attendance statistics
@@ -438,7 +478,6 @@ def student_dashboard(request):
     overall_participation_score = 0
     
     if enrollments.exists():
-        # Calculate attendance for each enrolled class
         for enrollment in enrollments:
             class_obj = enrollment.class_instance
             
@@ -467,20 +506,38 @@ def student_dashboard(request):
             participation_points = participation_records.aggregate(total=Sum('points'))['total'] or 0
             participation_avg = participation_records.aggregate(avg=Avg('points'))['avg'] or 0
             
-            # Get next session
+            # Get next session (PH time)
             next_session = ClassSession.objects.filter(
                 class_instance=class_obj,
-                session_date__gte=today
+                session_date__gte=current_date,
+                status='scheduled'  # Only get scheduled sessions
+            ).exclude(
+                session_date=current_date,
+                start_time__lte=current_time,
+                end_time__gte=current_time
             ).order_by('session_date', 'start_time').first()
             
-            # Check for current session
+            # Check for current session (PH time)
             current_session = ClassSession.objects.filter(
                 class_instance=class_obj,
-                session_date=today,
-                start_time__lte=timezone.now().time(),
-                end_time__gte=timezone.now().time(),
+                session_date=current_date,
+                start_time__lte=current_time,
+                end_time__gte=current_time,
                 status='in_progress'
             ).first()
+            
+            # If no current session found, check if there should be one
+            if not current_session:
+                potential_session = ClassSession.objects.filter(
+                    class_instance=class_obj,
+                    session_date=current_date,
+                    start_time__lte=current_time,
+                    end_time__gte=current_time
+                ).first()
+                if potential_session:
+                    potential_session.status = 'in_progress'
+                    potential_session.save()
+                    current_session = potential_session
             
             attendance_stats.append({
                 'class': class_obj,
@@ -498,10 +555,10 @@ def student_dashboard(request):
         total_sessions = sum(s['total_sessions'] for s in attendance_stats)
         overall_attendance_percentage = (total_present / total_sessions * 100) if total_sessions > 0 else 0
         
-        # Calculate overall participation score (average of class averages)
+        # Calculate overall participation score
         overall_participation_score = sum(s['participation_score'] for s in attendance_stats) / len(attendance_stats) if attendance_stats else 0
     
-    # Get recent activities
+    # Get recent activities with PH time
     recent_activities = []
     attendance_activities = Attendance.objects.filter(
         student=student
@@ -511,19 +568,19 @@ def student_dashboard(request):
         student=student
     ).select_related('session', 'session__class_instance', 'category').order_by('-created_at')[:5]
     
-    # Combine and sort activities
+    # Combine and sort activities with PH time
     for activity in attendance_activities:
         recent_activities.append({
             'type': 'attendance',
             'activity': activity,
-            'time': activity.marked_at
+            'time': activity.marked_at.astimezone(manila_tz)
         })
     
     for activity in participation_activities:
         recent_activities.append({
             'type': 'participation',
             'activity': activity,
-            'time': activity.created_at
+            'time': activity.created_at.astimezone(manila_tz)
         })
     
     # Sort combined activities by time
@@ -538,6 +595,7 @@ def student_dashboard(request):
         'overall_attendance_percentage': round(overall_attendance_percentage, 1),
         'overall_participation_score': round(overall_participation_score, 1),
         'recent_activities': recent_activities,
+        'current_ph_time': now.strftime("%b %d, %Y %I:%M %p"),  # For display in template
     }
     
     return render(request, 'classroom/student/student_dashboard.html', context)
@@ -862,34 +920,40 @@ def take_attendance(request, session_id):
 
     if request.method == 'POST':
         try:
-            # Handle both form and AJAX submissions
-            data = json.loads(request.body) if request.headers.get('Content-Type') == 'application/json' else request.POST
+            # Only accept JSON data
+            data = json.loads(request.body)
             
-            if 'attendance' in data:  # Bulk update
-                with transaction.atomic():
-                    for student_id, status in data['attendance'].items():
-                        student = get_object_or_404(User, id=student_id)
+            if 'attendance' not in data:
+                return JsonResponse({'error': 'Attendance data missing'}, status=400)
+            
+            with transaction.atomic():
+                for student_id, status in data['attendance'].items():
+                    try:
+                        student = User.objects.get(id=student_id)
+                        # Validate status
+                        if status not in dict(Attendance.Status.choices).keys():
+                            continue
+                            
                         Attendance.objects.update_or_create(
                             session=session,
                             student=student,
-                            defaults={'status': status, 'marked_by': request.user}
+                            defaults={
+                                'status': status, 
+                                'marked_by': request.user,
+                                'marked_at': timezone.now()
+                            }
                         )
-                return JsonResponse({'success': True})
+                    except User.DoesNotExist:
+                        continue
+                        
+            return JsonResponse({
+                'success': True,
+                'message': 'Attendance saved successfully',
+                'saved_count': len(data['attendance'])
+            })
             
-            # Single student update
-            student_id = data.get('student_id')
-            status = data.get('status')
-            if student_id and status:
-                student = get_object_or_404(User, id=student_id)
-                Attendance.objects.update_or_create(
-                    session=session,
-                    student=student,
-                    defaults={'status': status, 'marked_by': request.user}
-                )
-                return JsonResponse({'success': True, 'status': status})
-            
-            return JsonResponse({'error': 'Invalid data'}, status=400)
-            
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
 
