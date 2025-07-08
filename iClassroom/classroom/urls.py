@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
-
+from .views import SessionListView, SessionCreateView, start_session, complete_session
 urlpatterns = [
     path('', views.login_view, name='login'),
     path('register/', views.register_view, name='register'),
@@ -27,6 +27,13 @@ urlpatterns = [
     path('profile/edit/', views.profile_edit, name='profile_edit'),
      path('upload-avatar/', views.upload_avatar, name='upload_avatar'),
     path('remove-avatar/', views.remove_avatar, name='remove_avatar'),
+
+    # ... other URLs ...
+    path('classes/<uuid:class_id>/sessions/', SessionListView.as_view(), name='session_list'),
+    path('classes/<uuid:class_id>/sessions/new/', SessionCreateView.as_view(), name='create_session'),
+    path('sessions/<uuid:session_id>/start/', start_session, name='start_session'),
+    path('sessions/<uuid:session_id>/complete/', complete_session, name='complete_session'),
+    path('sessions/<uuid:session_id>/attendance/', views.take_attendance, name='take_attendance'),
     # Settings URLs
     # path('settings/', views.settings_view, name='settings'),
     # path('settings/update/', views.settings_update, name='settings_update'),

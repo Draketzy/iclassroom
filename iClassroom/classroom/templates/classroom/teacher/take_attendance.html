@@ -1,0 +1,597 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ class_obj.course_name }} - Attendance</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #f8fafc;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+            padding-bottom: 100px;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 32px;
+        }
+
+        .back-link {
+            color: #64748b;
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            color: #334155;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 6px;
+        }
+
+        .session-info {
+            color: #64748b;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            gap: 16px;
+        }
+
+        .search-box {
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 15px;
+            background: white;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .bulk-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .bulk-btn {
+            padding: 8px 16px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .bulk-btn:hover {
+            background: #f1f5f9;
+        }
+
+        .bulk-btn.present { 
+            background: #dcfce7; 
+            border-color: #bbf7d0; 
+            color: #166534; 
+        }
+
+        .bulk-btn.late { 
+            background: #fef3c7; 
+            border-color: #fde68a; 
+            color: #92400e; 
+        }
+
+        .bulk-btn.absent { 
+            background: #fee2e2; 
+            border-color: #fecaca; 
+            color: #991b1b; 
+        }
+
+        /* Table */
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            padding: 16px 20px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #f1f5f9;
+            transition: background-color 0.2s;
+        }
+
+        tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        td {
+            padding: 16px 20px;
+            vertical-align: middle;
+        }
+
+        /* Student Info */
+        .student-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #e2e8f0;
+            border: 2px solid #f1f5f9;
+        }
+
+        .student-details h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 2px;
+        }
+
+        .student-id {
+            font-size: 13px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        /* Attendance Actions */
+        .attendance-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .attendance-btn {
+            padding: 8px 16px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 70px;
+            text-align: center;
+        }
+
+        .attendance-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .attendance-btn.present {
+            background: #22c55e;
+            border-color: #22c55e;
+            color: white;
+        }
+
+        .attendance-btn.late {
+            background: #f59e0b;
+            border-color: #f59e0b;
+            color: white;
+        }
+
+        .attendance-btn.absent {
+            background: #ef4444;
+            border-color: #ef4444;
+            color: white;
+        }
+
+        /* Status Indicator */
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .status-indicator.present { background: #22c55e; }
+        .status-indicator.late { background: #f59e0b; }
+        .status-indicator.absent { background: #ef4444; }
+        .status-indicator.unmarked { background: #e2e8f0; }
+
+        /* Save Bar */
+        .save-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 16px 24px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .summary {
+            display: flex;
+            gap: 24px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .summary-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .save-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .save-btn:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        .save-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .bulk-actions {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            th, td {
+                padding: 12px 16px;
+            }
+
+            .attendance-actions {
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .attendance-btn {
+                min-width: auto;
+                padding: 6px 12px;
+            }
+
+            .save-bar {
+                flex-direction: column;
+                gap: 12px;
+                padding: 16px;
+            }
+
+            .summary {
+                gap: 16px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include 'classroom/header.html' %}
+    <div class="container">
+        {% csrf_token %}
+        
+        <div class="header">
+            <a href="{% url 'session_list' class_id=session.class_instance.id %}" class="back-link">
+                ← Back to Sessions
+            </a>
+            <h1>{{ class_obj.course_name }} - {{ class_obj.section }}</h1>
+            <div class="session-info">
+                {{ session_date }} • {{ session_time }}
+                {% if session.topic %} • {{ session.topic }}{% endif %}
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="Search students..." id="searchInput">
+            </div>
+            <div class="bulk-actions">
+                <button class="bulk-btn present" onclick="markAllAs('present')">All Present</button>
+                <button class="bulk-btn late" onclick="markAllAs('late')">All Late</button>
+                <button class="bulk-btn absent" onclick="markAllAs('absent')">All Absent</button>
+                <button class="bulk-btn" onclick="clearAll()">Clear All</button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Student ID</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students_with_attendance %}
+                    <tr class="student-row" data-student-id="{{ student.id }}" data-student-name="{{ student.first_name }} {{ student.last_name }}">
+                        <td>
+                            <div class="student-info">
+                                <img src="{{ student.avatar_url }}" 
+                                     alt="{{ student.first_name }} {{ student.last_name }}" 
+                                     class="avatar">
+                                <div class="student-details">
+                                    <h3>{{ student.first_name }} {{ student.last_name }}</h3>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="student-id">{{ student.id|slice:"0:8" }}</span>
+                        </td>
+                        <td>
+                            <div class="status-display">
+                                <span class="status-indicator {% if student.status %}{{ student.status }}{% else %}unmarked{% endif %}"></span>
+                                <span class="status-text">
+                                    {% if student.status %}
+                                        {{ student.status|capfirst }}
+                                    {% else %}
+                                        Unmarked
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="attendance-actions">
+                                <button class="attendance-btn {% if student.status == 'present' %}present{% endif %}" 
+                                        data-status="present">Present</button>
+                                <button class="attendance-btn {% if student.status == 'late' %}late{% endif %}" 
+                                        data-status="late">Late</button>
+                                <button class="attendance-btn {% if student.status == 'absent' %}absent{% endif %}" 
+                                        data-status="absent">Absent</button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="save-bar">
+        <div class="summary">
+            <div class="summary-item">
+                <span class="status-indicator present"></span>
+                Present: <span id="present-count">0</span>
+            </div>
+            <div class="summary-item">
+                <span class="status-indicator late"></span>
+                Late: <span id="late-count">0</span>
+            </div>
+            <div class="summary-item">
+                <span class="status-indicator absent"></span>
+                Absent: <span id="absent-count">0</span>
+            </div>
+        </div>
+        <button id="save-btn" class="save-btn">Save Attendance</button>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const attendanceData = {};
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        // Initialize from existing records
+        {% for student in students_with_attendance %}
+            {% if student.status %}
+                attendanceData['{{ student.id }}'] = '{{ student.status }}';
+            {% endif %}
+        {% endfor %}
+
+        // Update UI function
+        function updateUI() {
+            const counts = { present: 0, late: 0, absent: 0 };
+            
+            // Update counts and button states
+            document.querySelectorAll('.student-row').forEach(row => {
+                const studentId = row.dataset.studentId;
+                const status = attendanceData[studentId];
+                
+                // Update status display
+                const indicator = row.querySelector('.status-indicator');
+                const statusText = row.querySelector('.status-text');
+                
+                if (status) {
+                    counts[status]++;
+                    indicator.className = 'status-indicator ' + status;
+                    statusText.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+                } else {
+                    indicator.className = 'status-indicator unmarked';
+                    statusText.textContent = 'Unmarked';
+                }
+                
+                // Update button states
+                row.querySelectorAll('.attendance-btn').forEach(btn => {
+                    btn.className = 'attendance-btn'; // Reset all classes
+                    if (btn.dataset.status === status) {
+                        btn.classList.add(status);
+                    }
+                });
+            });
+            
+            // Update summary counts
+            document.getElementById('present-count').textContent = counts.present;
+            document.getElementById('late-count').textContent = counts.late;
+            document.getElementById('absent-count').textContent = counts.absent;
+            
+            // Update save button state
+            document.getElementById('save-btn').disabled = Object.keys(attendanceData).length === 0;
+        }
+
+        // Handle attendance button clicks
+        document.querySelectorAll('.attendance-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const row = this.closest('.student-row');
+                const studentId = row.dataset.studentId;
+                const status = this.dataset.status;
+                
+                // Toggle status
+                if (attendanceData[studentId] === status) {
+                    delete attendanceData[studentId];
+                } else {
+                    attendanceData[studentId] = status;
+                }
+                
+                updateUI();
+            });
+        });
+
+        // Bulk actions
+        window.markAllAs = function(status) {
+            document.querySelectorAll('.student-row').forEach(row => {
+                const studentId = row.dataset.studentId;
+                attendanceData[studentId] = status;
+            });
+            updateUI();
+        };
+
+        window.clearAll = function() {
+            for (const studentId in attendanceData) {
+                delete attendanceData[studentId];
+            }
+            updateUI();
+        };
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            document.querySelectorAll('.student-row').forEach(row => {
+                const name = row.dataset.studentName.toLowerCase();
+                row.style.display = name.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        // Save attendance
+        document.getElementById('save-btn').addEventListener('click', async function() {
+            const btn = this;
+            btn.disabled = true;
+            const originalText = btn.textContent;
+            btn.textContent = 'Saving...';
+            
+            try {
+                const response = await fetch('', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({ attendance: attendanceData })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to save attendance');
+                }
+                
+                const data = await response.json();
+                if (data.success) {
+                    alert('Attendance saved successfully!');
+                } else {
+                    throw new Error(data.error || 'Unknown error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error: ' + error.message);
+                // Revert changes if save failed
+                updateUI();
+            } finally {
+                btn.textContent = originalText;
+            }
+        });
+
+        // Initial UI update
+        updateUI();
+    });
+    </script>
+</body>
+</html>

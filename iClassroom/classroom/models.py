@@ -2,6 +2,7 @@ import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 import pytz
+from datetime import datetime, timedelta
 from django.core.validators import MinValueValidator, MaxValueValidator
 # ---------------------
 # Custom User
@@ -133,7 +134,7 @@ class ClassSession(models.Model):
         CANCELLED = 'cancelled', 'Cancelled'
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    class_instance = models.ForeignKey(Class, on_delete=models.CASCADE)
+    class_instance = models.ForeignKey('Class', on_delete=models.CASCADE)
     session_date = models.DateField()
     start_time = models.TimeField()
     end_time = models.TimeField()
@@ -142,12 +143,50 @@ class ClassSession(models.Model):
     notes = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
     class Meta:
         ordering = ['session_date', 'start_time']
 
     def __str__(self):
         return f"{self.class_instance} on {self.session_date}"
-    
+
+    def get_ph_time(self):
+        """Get current time in Philippine timezone"""
+        ph_tz = pytz.timezone('Asia/Manila')
+        return datetime.now(ph_tz)
+
+    def get_end_datetime(self):
+        """Combine session date and end time with Philippine timezone"""
+        ph_tz = pytz.timezone('Asia/Manila')
+        naive_datetime = datetime.combine(self.session_date, self.end_time)
+        return ph_tz.localize(naive_datetime)
+
+    def is_past_end_time(self):
+        """Check if current PH time is past session end time"""
+        return self.get_ph_time() > self.get_end_datetime()
+
+    def auto_complete_if_expired(self):
+        """Automatically complete session if end time has passed"""
+        if self.status == self.Status.IN_PROGRESS and self.is_past_end_time():
+            self.status = self.Status.COMPLETED
+            self.save()
+            return True
+        return False
+
+    def save(self, *args, **kwargs):
+        """Override save to auto-complete in-progress sessions if they are expired"""
+        if self.pk:
+            try:
+                original = ClassSession.objects.get(pk=self.pk)
+                if original.status == self.Status.IN_PROGRESS and self.status != self.Status.COMPLETED:
+                    if self.is_past_end_time():
+                        self.status = self.Status.COMPLETED
+            except ClassSession.DoesNotExist:
+                # Object does not exist yet (first save), no need to compare
+                pass
+
+        super().save(*args, **kwargs)
+
 
 # ---------------------
 # Attendance Tracking

@@ -19,11 +19,18 @@ from django.contrib.auth.tokens import default_token_generator
 from django.urls import reverse
 from django.utils.safestring import mark_safe  # Add this import
 import logging
+import pytz
 from django.utils import timezone
+from django.db import transaction
+import json
+from datetime import datetime, timedelta
 from django.db import models
 from django.db.models import Count, Avg, Sum, F,FloatField,Q
 from .models import Class, Notification, ClassSession, Enrollment, Attendance, Participation
-from .forms import ClassForm 
+from .forms import ClassForm ,SessionForm
+from django.views.generic import ListView, CreateView, UpdateView
+from django.http import JsonResponse
+from django.urls import reverse_lazy
 logger = logging.getLogger(__name__)
 
 def login_view(request):
@@ -190,6 +197,7 @@ def dashboard_view(request):
 @login_required
 def teacher_dashboard(request):
     """Teacher dashboard view with create class modal"""
+
     if request.method == 'POST':
         # Handle AJAX form submission for creating class
         try:
@@ -216,7 +224,7 @@ def teacher_dashboard(request):
                 'success': False,
                 'error': str(e)
             })
-    
+
     # Get all active classes taught by this teacher
     teacher_classes = Class.objects.filter(
         teacher=request.user,
@@ -260,7 +268,7 @@ def teacher_dashboard(request):
             session_date__gte=timezone.now().date()
         ).order_by('session_date', 'start_time').first()
 
-        # Check for current session
+        # Get current session (if ongoing now)
         current_session = ClassSession.objects.filter(
             class_instance=class_obj,
             session_date=timezone.now().date(),
@@ -278,34 +286,35 @@ def teacher_dashboard(request):
             'current_session': current_session
         })
 
-    # Get recent activities (notifications)
+    # Recent activities (notifications)
     recent_activities = Notification.objects.filter(
         user=request.user
     ).order_by('-created_at')[:5]
 
-    # Calculate statistics
+    # Statistics
     total_students = sum(c['enrollment_count'] for c in classes_with_stats)
-    
+
     avg_attendance = 0
     if classes_with_stats:
         avg_attendance = sum(c['attendance_percentage'] for c in classes_with_stats) / len(classes_with_stats)
 
     active_classes = len(classes_with_stats)
 
-    # Calculate total session hours (in hours)
-    session_hours = ClassSession.objects.filter(
+    # Calculate session hours manually for this month
+    sessions_this_month = ClassSession.objects.filter(
         class_instance__teacher=request.user,
         session_date__month=timezone.now().month
-    ).aggregate(
-        total_hours=Sum(
-            (F('end_time') - F('start_time')) / 3600,
-            output_field=FloatField()
-        )
-    )['total_hours'] or 0
+    )
 
-    # Create form for modal with active semesters only
+    total_duration = timedelta()
+    for session in sessions_this_month:
+        start = datetime.combine(session.session_date, session.start_time)
+        end = datetime.combine(session.session_date, session.end_time)
+        total_duration += (end - start)
+
+    session_hours = total_duration.total_seconds() / 3600  # Convert to hours
+
     form = ClassForm()
-    
 
     context = {
         'classes_with_stats': classes_with_stats,
@@ -314,9 +323,9 @@ def teacher_dashboard(request):
         'average_attendance': round(avg_attendance, 1),
         'active_classes': active_classes,
         'session_hours': round(session_hours, 1),
-        'form': form,  # Add form to context for modal
+        'form': form,
     }
-    
+
     return render(request, 'classroom/teacher/teacher_dashboard.html', context)
 
 @login_required
@@ -761,5 +770,158 @@ def reset_password(request, uidb64, token):
     except (TypeError, ValueError, OverflowError, User.DoesNotExist):
         messages.error(request, 'Invalid password reset link.')
         return redirect('forgot_password')
-    
 
+class SessionListView(ListView):
+    model = ClassSession
+    template_name = 'classroom/teacher/session_list.html'
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        # Auto-close expired sessions when listing
+        for session in queryset.filter(status='in_progress'):
+            session.auto_complete_if_expired()
+        return queryset.filter(class_instance_id=self.kwargs['class_id']).order_by('-session_date')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['class_obj'] = self.class_obj = get_object_or_404(Class, id=self.kwargs['class_id'])
+        context['now_ph'] = timezone.now().astimezone(pytz.timezone('Asia/Manila'))
+        return context
+
+class SessionCreateView(CreateView):
+    model = ClassSession
+    fields = ['session_date', 'start_time', 'end_time', 'topic', 'notes']
+
+    def form_valid(self, form):
+        class_instance = get_object_or_404(Class, id=self.kwargs['class_id'])
+        form.instance.class_instance = class_instance
+        form.instance.status = 'scheduled'
+        self.object = form.save()
+
+        # ✅ Return JSON if AJAX
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': True,
+                'message': 'Session created successfully!',
+                'session_id': str(self.object.id),
+                'class_id': str(class_instance.id),
+            })
+
+        messages.success(self.request, 'Session created successfully!')
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        # ✅ Return JSON if AJAX
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': False,
+                'errors': form.errors,
+            }, status=400)
+
+        return super().form_invalid(form)
+
+    def get(self, request, *args, **kwargs):
+        # ✅ Prevent GET from accidentally returning HTML on AJAX call
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({
+                'error': 'GET not allowed for this endpoint'
+            }, status=405)
+
+        return super().get(request, *args, **kwargs)
+@login_required
+def start_session(request, session_id):
+    session = get_object_or_404(ClassSession, id=session_id)
+    if session.status != 'scheduled':
+        messages.error(request, 'Only scheduled sessions can be started')
+    elif session.is_past_end_time():
+        messages.error(request, 'Cannot start session - end time has already passed')
+    else:
+        session.status = 'in_progress'
+        session.save()
+        messages.success(request, 'Session started successfully!')
+    return redirect('session_list', class_id=session.class_instance.id)
+
+@login_required
+def complete_session(request, session_id):
+    session = get_object_or_404(ClassSession, id=session_id)
+    if session.status != 'in_progress':
+        messages.error(request, 'Only in-progress sessions can be completed')
+    else:
+        session.status = 'completed'
+        session.save()
+        messages.success(request, 'Session completed successfully!')
+    return redirect('session_list', class_id=session.class_instance.id)
+@login_required
+def take_attendance(request, session_id):
+    """Handle attendance marking for a session"""
+    session = get_object_or_404(ClassSession, id=session_id)
+    
+    # Verify teacher owns this class
+    if session.class_instance.teacher != request.user:
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+
+    if request.method == 'POST':
+        try:
+            # Handle both form and AJAX submissions
+            data = json.loads(request.body) if request.headers.get('Content-Type') == 'application/json' else request.POST
+            
+            if 'attendance' in data:  # Bulk update
+                with transaction.atomic():
+                    for student_id, status in data['attendance'].items():
+                        student = get_object_or_404(User, id=student_id)
+                        Attendance.objects.update_or_create(
+                            session=session,
+                            student=student,
+                            defaults={'status': status, 'marked_by': request.user}
+                        )
+                return JsonResponse({'success': True})
+            
+            # Single student update
+            student_id = data.get('student_id')
+            status = data.get('status')
+            if student_id and status:
+                student = get_object_or_404(User, id=student_id)
+                Attendance.objects.update_or_create(
+                    session=session,
+                    student=student,
+                    defaults={'status': status, 'marked_by': request.user}
+                )
+                return JsonResponse({'success': True, 'status': status})
+            
+            return JsonResponse({'error': 'Invalid data'}, status=400)
+            
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+    # GET request - show attendance page
+    students = User.objects.filter(
+        enrollment__class_instance=session.class_instance,
+        enrollment__status='active',
+        user_type='student'
+    ).order_by('last_name', 'first_name')
+
+    attendance_records = {
+        record.student_id: record 
+        for record in Attendance.objects.filter(session=session)
+    }
+
+    students_with_attendance = []
+    for student in students:
+        record = attendance_records.get(student.id)
+        students_with_attendance.append({
+            'id': student.id,
+            'first_name': student.first_name,
+            'last_name': student.last_name,
+            'avatar_url': student.avatar_url or '/static/default-avatar.png',
+            'status': record.status if record else None,
+            'marked_at': record.marked_at.strftime('%Y-%m-%d %H:%M') if record and record.marked_at else None
+        })
+
+    context = {
+        'session': session,
+        'students_with_attendance': students_with_attendance,
+        'class_obj': session.class_instance,
+        'session_date': session.session_date.strftime("%b %d, %Y"),
+        'session_time': f"{session.start_time.strftime('%I:%M %p').lstrip('0')} - {session.end_time.strftime('%I:%M %p').lstrip('0')}",
+    }
+    return render(request, 'classroom/teacher/take_attendance.html', context)

@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from .models import User
-from .models import Class
+from .models import Class, ClassSession, Attendance
 class UserProfileForm(forms.ModelForm):
     first_name = forms.CharField(
         max_length=30,
@@ -72,7 +72,26 @@ class ClassForm(forms.ModelForm):
         })
 
 
-       
+class SessionForm(forms.ModelForm):
+    class Meta:
+        model = ClassSession
+        fields = ['session_date', 'start_time', 'end_time', 'topic', 'notes']
+        widgets = {
+            'session_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'start_time': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
+            'end_time': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
+            'topic': forms.TextInput(attrs={'class': 'form-control'}),
+            'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        }
+
+class AttendanceForm(forms.ModelForm):
+    class Meta:
+        model = Attendance
+        fields = ['status', 'notes']
+        widgets = {
+            'status': forms.Select(attrs={'class': 'form-control'}),
+            'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 2})
+        }
 
 # class UserSettingsForm(forms.ModelForm):
 #     class Meta:

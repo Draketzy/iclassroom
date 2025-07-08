@@ -682,7 +682,7 @@
                             </div>
                             
                             <div class="student-info">
-                                <h4 class="student-name">{{ attendance.enrollment.student.get_full_name|default:attendance.enrollment.student.username }}</h4>
+                                <h4 class="student-name">{{ attendance.enrollment.student.last_name|default:attendance.enrollment.student.first_name }}</h4>
                                 <p class="student-email">{{ attendance.enrollment.student.email }}</p>
                                 <p class="student-id">ID: {{ attendance.enrollment.student.id|stringformat:"05d" }}</p>
                             </div>

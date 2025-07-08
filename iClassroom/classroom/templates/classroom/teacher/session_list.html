@@ -1,0 +1,835 @@
+{% load tz %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sessions - {{ class_obj.course_name }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header Section */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .header-content p {
+            color: #64748b;
+            font-size: 1rem;
+        }
+
+        .current-time {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            text-align: center;
+            min-width: 250px;
+        }
+
+        .current-time strong {
+            display: block;
+            font-size: 0.875rem;
+            opacity: 0.9;
+            margin-bottom: 0.25rem;
+        }
+
+        /* Create Session Button */
+        .create-session-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .create-session-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Session Cards */
+        .session-list {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .session-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .session-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .session-card.active-session {
+            border-left: 4px solid #10b981;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        }
+
+        .session-card.active-session::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 30px 30px 0;
+            border-color: transparent #10b981 transparent transparent;
+        }
+
+        .session-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .session-header h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.25rem;
+        }
+
+        .status-badge {
+            padding: 0.375rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-badge.scheduled {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-badge.in_progress {
+            background: #d1fae5;
+            color: #065f46;
+            animation: pulse 2s infinite;
+        }
+
+        .status-badge.completed {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .session-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #64748b;
+        }
+
+        .detail-item svg {
+            width: 16px;
+            height: 16px;
+            color: #6366f1;
+        }
+
+        .time-remaining {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .session-actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 0.625rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .btn-start:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-complete {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        .btn-complete:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            color: #9ca3af;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h3 {
+            font-size: 1.25rem;
+            color: #6b7280;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            color: #9ca3af;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 16px 16px 0 0;
+            text-align: center;
+        }
+
+        .modal-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-header p {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s;
+            background: #f9fafb;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #6366f1;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-control.is-invalid {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .invalid-feedback {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-danger {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            padding: 1.5rem 2rem;
+            border-top: 1px solid #e5e7eb;
+            background: #f9fafb;
+            border-radius: 0 0 16px 16px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            padding: 0.75rem 2rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #64748b;
+            padding: 0.75rem 2rem;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .close-modal:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Loading State */
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .page-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .current-time {
+                min-width: auto;
+                width: 100%;
+            }
+
+            .session-details {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 1rem;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include 'classroom/header.html' %}
+    <div class="container">
+       
+        <!-- Page Header -->
+        <div class="page-header">
+            <a href="{% url 'teacher_dashboard' %}" class="back-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19 12H5M12 19L5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Back to Dashboard
+            </a>
+            <div class="header-content">
+                <h1>Sessions</h1>
+                <p>{{ class_obj.course_name }} - {{ class_obj.section }}</p>
+            </div>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <div class="current-time">
+                    <strong>Philippine Time</strong>
+                    {{ now_ph|date:"F j, Y H:i:s" }}
+                </div>
+                <button class="create-session-btn" onclick="openCreateModal()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 4V20M4 12H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    Create Session
+                </button>
+            </div>
+        </div>
+
+        <!-- Sessions List -->
+        <div class="session-list">
+            {% for session in object_list %}
+            <div class="session-card {% if session.status == 'in_progress' %}active-session{% endif %}"
+                 data-end-datetime="{{ session.get_end_datetime|date:'c' }}">
+                <div class="session-header">
+                    <div>
+                        <h3>{{ session.topic|default:"No Topic Set" }}</h3>
+                    </div>
+                    <span class="status-badge {{ session.status }}">
+                        {{ session.get_status_display }}
+                    </span>
+                </div>
+
+                <div class="session-details">
+                    <div class="detail-item">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 2V5M16 2V5M3.5 9.09H20.5M21 8.5V17C21 18.1046 20.1046 19 19 19H5C3.89543 19 3 18.1046 3 17V8.5C3 7.39543 3.89543 6.5 5 6.5H19C20.1046 6.5 21 7.39543 21 8.5Z" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        <span><strong>Date:</strong> {{ session.session_date|date:"M j, Y" }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 6V12L16 14M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        <span><strong>Time:</strong> {{ session.start_time|time:"H:i" }} - {{ session.end_time|time:"H:i" }}</span>
+                    </div>
+                    {% if session.notes %}
+                    <div class="detail-item">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 12H15M9 16H15M17 21H7C5.89543 21 5 20.1046 5 19V5C5 3.89543 5.89543 3 7 3H12.5858C12.851 3 13.1054 3.10536 13.2929 3.29289L19.7071 9.70711C19.8946 9.89464 20 10.149 20 10.4142V19C20 20.1046 19.1046 21 18 21H17Z" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        <span><strong>Notes:</strong> {{ session.notes|truncatechars:50 }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if session.status == 'in_progress' %}
+                <div class="time-remaining">
+                    <strong>Session ends in:</strong> <span class="countdown" data-end="{{ session.get_end_datetime|date:'c' }}"></span>
+                </div>
+                {% endif %}
+
+                <div class="session-actions">
+                    {% if session.status == 'scheduled' %}
+                    <a href="{% url 'start_session' session_id=session.id %}" class="btn btn-start">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 5V19L19 12L8 5Z" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        Start Session
+                    </a>
+                    {% elif session.status == 'in_progress' %}
+                    <a href="{% url 'complete_session' session_id=session.id %}" class="btn btn-complete">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        Complete Session
+                    </a>
+                    <a href="{% url 'take_attendance' session_id=session.id %}" class="btn btn-attendance">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" 
+                      stroke="currentColor" stroke-width="2"/>
+            </svg>
+            Take Attendance
+        </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 2V5M16 2V5M3.5 9.09H20.5M21 8.5V17C21 18.1046 20.1046 19 19 19H5C3.89543 19 3 18.1046 3 17V8.5C3 7.39543 3.89543 6.5 5 6.5H19C20.1046 6.5 21 7.39543 21 8.5Z" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <h3>No Sessions Yet</h3>
+                <p>Create your first session to get started with class management</p>
+            </div>
+            <div class="session-actions">
+        
+    </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Create Session Modal -->
+    <div id="createSessionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close-modal" onclick="closeCreateModal()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+                <div>
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 1rem; opacity: 0.9;">
+                        <path d="M8 2V5M16 2V5M3.5 9.09H20.5M21 8.5V17C21 18.1046 20.1046 19 19 19H5C3.89543 19 3 18.1046 3 17V8.5C3 7.39543 3.89543 6.5 5 6.5H19C20.1046 6.5 21 7.39543 21 8.5Z" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    <h2>Create New Session</h2>
+                    <p>Schedule a new class session for {{ class_obj.course_name }}</p>
+                </div>
+            </div>
+            
+            <form id="createSessionForm" method="post" action="{% url 'create_session' class_id=class_obj.id %}">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    
+                    <div id="modalAlerts"></div>
+                    
+                    <div class="form-group">
+                        <label for="id_session_date">Session Date</label>
+                        <input type="date" id="id_session_date" name="session_date" class="form-control" required>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_start_time">Start Time</label>
+                        <input type="time" id="id_start_time" name="start_time" class="form-control" required>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_end_time">End Time</label>
+                        <input type="time" id="id_end_time" name="end_time" class="form-control" required>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_topic">Session Topic</label>
+                        <input type="text" id="id_topic" name="topic" class="form-control" placeholder="Enter the topic for this session">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_notes">Session Notes</label>
+                        <textarea id="id_notes" name="notes" class="form-control" rows="4" placeholder="Add any additional notes or instructions for this session"></textarea>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeCreateModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <span class="btn-text">Create Session</span>
+                        <span class="spinner" style="display: none;"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Modal functionality
+        function openCreateModal() {
+            document.getElementById('createSessionModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+            
+            // Set default date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('id_session_date').value = today;
+        }
+
+        function closeCreateModal() {
+            document.getElementById('createSessionModal').classList.remove('show');
+            document.body.style.overflow = 'auto';
+            
+            // Reset form
+            document.getElementById('createSessionForm').reset();
+            clearFormErrors();
+        }
+
+        // Close modal on outside click
+        document.getElementById('createSessionModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeCreateModal();
+            }
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('createSessionModal').classList.contains('show')) {
+                closeCreateModal();
+            }
+        });
+
+        // Form submission
+        document.getElementById('createSessionForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const form = e.target;
+    const formData = new FormData(form);
+    
+    try {
+        const response = await fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+            // Success case
+            window.location.href = `/classes/${data.class_id}/sessions/`;
+        } else {
+            // Error case
+            const alertDiv = document.getElementById('modalAlerts');
+            alertDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    ${Object.entries(data.errors).map(([field, errors]) => 
+                        `${field}: ${errors.join(', ')}`
+                    ).join('<br>')}
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('modalAlerts').innerHTML = `
+            <div class="alert alert-danger">
+                An unexpected error occurred. Please try again.
+            </div>
+        `;
+    }
+});
+
+        function clearFormErrors() {
+            document.querySelectorAll('.form-control').forEach(input => {
+                input.classList.remove('is-invalid');
+            });
+            document.querySelectorAll('.invalid-feedback').forEach(feedback => {
+                feedback.textContent = '';
+            });
+            document.getElementById('modalAlerts').innerHTML = '';
+        }
+
+        function displayFormErrors(errors) {
+            Object.keys(errors).forEach(fieldName => {
+                const field = document.querySelector(`[name="${fieldName}"]`);
+                if (field) {
+                    field.classList.add('is-invalid');
+                    const feedback = field.parentNode.querySelector('.invalid-feedback');
+                    if (feedback) {
+                        feedback.textContent = errors[fieldName].join(', ');
+                    }
+                }
+            });
+        }
+
+        function displayAlert(message, type) {
+            const alertsContainer = document.getElementById('modalAlerts');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = message;
+            alertsContainer.appendChild(alert);
+        }
+
+        // Auto-update session status and countdown
+        document.addEventListener('DOMContentLoaded', function() {
+            function updateAllSessions() {
+                const now = new Date();
+                
+                document.querySelectorAll('.session-card[data-end-datetime]').forEach(card => {
+                    const endTime = new Date(card.dataset.endDatetime);
+                    const countdownEl = card.querySelector('.countdown');
+                    
+                    if (endTime < now) {
+                        // Session should be completed
+                        if (card.querySelector('.btn-complete')) {
+                            // Auto-redirect to complete session (optional)
+                            // card.querySelector('.btn-complete').click();
+                        }
+                    } else if (countdownEl) {
+                        // Update countdown
+                        const diff = endTime - now;
+                        const hours = Math.floor(diff / (1000 * 60 * 60));
+                        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                        
+                        if (hours > 0) {
+                            countdownEl.textContent = `${hours}h ${minutes}m`;
+                        } else if (minutes > 0) {
+                            countdownEl.textContent = `${minutes}m ${seconds}s`;
+                        } else {
+                            countdownEl.textContent = `${seconds}s`;
+                        }
+                    }
+                });
+            }
+            
+            // Update immediately and then every 30 seconds
+            updateAllSessions();
+            setInterval(updateAllSessions, 30000);
+        });
+
+        // Update current time every second
+        function updateCurrentTime() {
+            const now = new Date();
+            const options = {
+                timeZone: 'Asia/Manila',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            
+            const timeElement = document.querySelector('.current-time');
+            if (timeElement) {
+                const formattedTime = now.toLocaleDateString('en-US', options);
+                timeElement.innerHTML = `<strong>Philippine Time</strong>${formattedTime}`;
+            }
+        }
+
+        // Update time every second
+        setInterval(updateCurrentTime, 1000);
+    </script>
+</body>
+</html>
