@@ -33,6 +33,7 @@ urlpatterns = [
     path('classes/<uuid:class_id>/sessions/new/', SessionCreateView.as_view(), name='create_session'),
     path('sessions/<uuid:session_id>/start/', start_session, name='start_session'),
     path('sessions/<uuid:session_id>/complete/', complete_session, name='complete_session'),
+    path('sessions/<uuid:session_id>/attendance/', views.take_attendance, name='take_attendance'),
     # For participation reports (add this if you haven't)
     path('class/<uuid:class_id>/student/<uuid:student_id>/participation-report/',
      views.student_participation_report,
