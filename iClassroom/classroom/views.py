@@ -27,11 +27,12 @@ import json
 from datetime import datetime, timedelta
 from django.db import models
 from django.db.models import Count, Avg, Sum, F,FloatField,Q
-from .models import Class, Notification, ClassSession, Enrollment, Attendance, Participation
+from .models import Class, Notification, ClassSession, Enrollment, Attendance, Participation, ParticipationCategory
 from .forms import ClassForm ,SessionForm
 from django.views.generic import ListView, CreateView, UpdateView
 from django.http import JsonResponse
 from django.urls import reverse_lazy
+from collections import defaultdict 
 logger = logging.getLogger(__name__)
 
 def login_view(request):
@@ -414,18 +415,43 @@ def class_detail(request, class_id):
             'dashoffset': dashoffset
         })
     
-    # Calculate participation stats per student
+    # Calculate participation stats per student with category breakdown
     participation_stats = []
     for enrollment in enrollments:
-        total_points = Participation.objects.filter(
-            student=enrollment.student,
-            session__class_instance=class_obj
-        ).aggregate(total=Sum('points'))['total'] or 0
+        # Get total points per category
+        categories = ParticipationCategory.objects.filter(
+            class_instance=class_obj
+        )
+        
+        category_points = {}
+        for category in categories:
+            points = Participation.objects.filter(
+                student=enrollment.student,
+                session__class_instance=class_obj,
+                category=category
+            ).aggregate(total=Sum('points'))['total'] or 0
+            category_points[category.name.lower()] = points
+        
+        # Get total points across all categories
+        total_points = sum(category_points.values())
         
         participation_stats.append({
             'enrollment': enrollment,
-            'total_points': total_points
+            'total_points': total_points,
+            'category_points': category_points
         })
+    
+    # Calculate averages for the class
+    total_students = enrollments.count()
+    avg_attendance = 0
+    avg_participation = 0
+    
+    if total_students > 0:
+        total_attendance = sum(stat['percentage'] for stat in attendance_stats)
+        avg_attendance = round(total_attendance / total_students, 1)
+        
+        total_participation = sum(stat['total_points'] for stat in participation_stats)
+        avg_participation = round(total_participation / total_students, 1)
     
     # Combine both attendance and participation per student using zip
     student_stats = list(zip(attendance_stats, participation_stats))
@@ -443,10 +469,12 @@ def class_detail(request, class_id):
         'recent_sessions': recent_sessions,
         'student_stats': student_stats,
         'recent_activities': recent_activities,
+        'avg_attendance': avg_attendance,
+        'avg_participation': avg_participation,
+        'total_students': total_students,
     }
     
     return render(request, 'classroom/class_detail.html', context)
-
 @login_required
 def student_dashboard(request):
     student = request.user
@@ -911,81 +939,152 @@ def complete_session(request, session_id):
     return redirect('session_list', class_id=session.class_instance.id)
 @login_required
 def take_attendance(request, session_id):
-    """Handle attendance marking for a session"""
+    """Handle attendance and participation marking for a session"""
     session = get_object_or_404(ClassSession, id=session_id)
     
     # Verify teacher owns this class
     if session.class_instance.teacher != request.user:
         return JsonResponse({'error': 'Unauthorized'}, status=403)
-
+    
     if request.method == 'POST':
         try:
-            # Only accept JSON data
             data = json.loads(request.body)
             
-            if 'attendance' not in data:
-                return JsonResponse({'error': 'Attendance data missing'}, status=400)
-            
             with transaction.atomic():
-                for student_id, status in data['attendance'].items():
-                    try:
-                        student = User.objects.get(id=student_id)
-                        # Validate status
-                        if status not in dict(Attendance.Status.choices).keys():
-                            continue
-                            
-                        Attendance.objects.update_or_create(
-                            session=session,
-                            student=student,
-                            defaults={
-                                'status': status, 
-                                'marked_by': request.user,
-                                'marked_at': timezone.now()
-                            }
-                        )
-                    except User.DoesNotExist:
-                        continue
-                        
+                # Process Attendance
+                if 'attendance' in data:
+                    for student_id, status in data['attendance'].items():
+                        if status in dict(Attendance.Status.choices).keys():
+                            Attendance.objects.update_or_create(
+                                session=session,
+                                student_id=student_id,
+                                defaults={
+                                    'status': status,
+                                    'marked_by': request.user,
+                                    'marked_at': timezone.now()
+                                }
+                            )
+                
+                # Process Participation
+                if 'participation' in data:
+                    # Get or create default participation categories for this class
+                    discussion_cat, _ = ParticipationCategory.objects.get_or_create(
+                        class_instance=session.class_instance,
+                        name='Discussion',
+                        defaults={
+                            'description': 'Class discussion participation',
+                            'default_points': 1,
+                            'color': '#3B82F6'
+                        }
+                    )
+                    quiz_cat, _ = ParticipationCategory.objects.get_or_create(
+                        class_instance=session.class_instance,
+                        name='Quiz',
+                        defaults={
+                            'description': 'Quiz performance',
+                            'default_points': 1,
+                            'color': '#10B981'
+                        }
+                    )
+                    activity_cat, _ = ParticipationCategory.objects.get_or_create(
+                        class_instance=session.class_instance,
+                        name='Activity',
+                        defaults={
+                            'description': 'Class activity participation',
+                            'default_points': 1,
+                            'color': '#F59E0B'
+                        }
+                    )
+                    other_cat, _ = ParticipationCategory.objects.get_or_create(
+                        class_instance=session.class_instance,
+                        name='Other',
+                        defaults={
+                            'description': 'Other participation',
+                            'default_points': 1,
+                            'color': '#64748B'
+                        }
+                    )
+                    
+                    for student_id, categories in data['participation'].items():
+                        # Save each category participation separately
+                        for category_name, points in categories.items():
+                            if points > 0:  # Only save if points awarded
+                                category = {
+                                    'discussion': discussion_cat,
+                                    'quiz': quiz_cat,
+                                    'activity': activity_cat,
+                                    'other': other_cat
+                                }.get(category_name.lower())
+                                
+                                if category:
+                                    Participation.objects.update_or_create(
+                                        session=session,
+                                        student_id=student_id,
+                                        category=category,
+                                        defaults={
+                                            'points': points,
+                                            'awarded_by': request.user
+                                        }
+                                    )
+            
             return JsonResponse({
                 'success': True,
-                'message': 'Attendance saved successfully',
-                'saved_count': len(data['attendance'])
+                'message': 'Data saved successfully'
             })
             
-        except json.JSONDecodeError:
-            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
-
-    # GET request - show attendance page
+    
+    # GET request - show combined page
     students = User.objects.filter(
         enrollment__class_instance=session.class_instance,
         enrollment__status='active',
         user_type='student'
     ).order_by('last_name', 'first_name')
-
+    
+    # Get existing records
     attendance_records = {
         record.student_id: record 
         for record in Attendance.objects.filter(session=session)
     }
-
-    students_with_attendance = []
+    
+    participation_records = Participation.objects.filter(
+        session=session
+    ).select_related('category')
+    
+    # Organize participation by student and category
+    student_participation = defaultdict(dict)
+    for record in participation_records:
+        student_participation[record.student_id][record.category.name.lower()] = record.points
+    
+    students_data = []
     for student in students:
-        record = attendance_records.get(student.id)
-        students_with_attendance.append({
+        attendance = attendance_records.get(student.id)
+        participation = student_participation.get(student.id, {})
+        
+        students_data.append({
             'id': student.id,
             'first_name': student.first_name,
             'last_name': student.last_name,
             'avatar_url': student.avatar_url or '/static/default-avatar.png',
-            'status': record.status if record else None,
-            'marked_at': record.marked_at.strftime('%Y-%m-%d %H:%M') if record and record.marked_at else None
+            'attendance': {
+                'status': attendance.status if attendance else None,
+                'marked_at': attendance.marked_at if attendance else None
+            },
+            'participation': {
+                'discussion': participation.get('discussion', 0),
+                'quiz': participation.get('quiz', 0),
+                'activity': participation.get('activity', 0),
+                'other': participation.get('other', 0)
+            }
         })
-
+    
     context = {
         'session': session,
-        'students_with_attendance': students_with_attendance,
+        'students': students_data,
         'class_obj': session.class_instance,
         'session_date': session.session_date.strftime("%b %d, %Y"),
         'session_time': f"{session.start_time.strftime('%I:%M %p').lstrip('0')} - {session.end_time.strftime('%I:%M %p').lstrip('0')}",
     }
+    
     return render(request, 'classroom/teacher/take_attendance.html', context)

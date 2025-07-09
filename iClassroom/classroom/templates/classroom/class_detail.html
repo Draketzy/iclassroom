@@ -633,98 +633,203 @@
         <!-- Tab Content -->
         <div class="tab-content">
             <!-- Attendance Tab -->
-            <div class="tab-pane fade show active" id="attendance">
-                <div class="content-card">
-                    <div class="content-header">
-                        <div>
-                            <h3 class="content-title">Student Attendance</h3>
-                            <p class="content-subtitle">Track and manage student attendance for today's session</p>
-                        </div>
-                        <div class="content-actions">
-                            <button class="btn-export">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 2.58579 20.4142C2.21071 20.0391 2 19.5304 2 19V15" stroke="currentColor" stroke-width="2"/>
-                                    <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2"/>
-                                    <path d="M12 15V3" stroke="currentColor" stroke-width="2"/>
-                                </svg>
-                                Export
-                            </button>
-                            <button class="btn-add">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2"/>
-                                </svg>
-                                Add Student
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="search-filter-bar">
-                        <input type="text" class="search-input" placeholder="Search students by name, email, or ID">
-                        <select class="filter-select">
-                            <option>All Students</option>
-                            <option>Present</option>
-                            <option>Absent</option>
-                            <option>Late</option>
-                        </select>
-                    </div>
-                    
-                    <div class="student-list">
-                        {% for attendance, participation in student_stats %}
-                        <div class="student-item">
-                            <div class="student-avatar">
-                                {% if attendance.enrollment.student.first_name and attendance.enrollment.student.last_name %}
-                                    {{ attendance.enrollment.student.first_name.0|upper }}{{ attendance.enrollment.student.last_name.0|upper }}
-                                {% elif attendance.enrollment.student.first_name %}
-                                    {{ attendance.enrollment.student.first_name.0|upper }}{{ attendance.enrollment.student.first_name.1|upper|default:"" }}
-                                {% else %}
-                                    {{ attendance.enrollment.student.username.0|upper }}{{ attendance.enrollment.student.username.1|upper|default:"U" }}
-                                {% endif %}
-                            </div>
-                            
-                            <div class="student-info">
-                                <h4 class="student-name">{{ attendance.enrollment.student.last_name|default:attendance.enrollment.student.first_name }}</h4>
-                                <p class="student-email">{{ attendance.enrollment.student.email }}</p>
-                                <p class="student-id">ID: {{ attendance.enrollment.student.id|stringformat:"05d" }}</p>
-                            </div>
-                            
-                            <div class="student-stats">
-                                <div class="attendance-stat">
-                                    <div class="progress-ring">
-                                        <svg>
-                                            <circle class="bg" cx="30" cy="30" r="26"></circle>
-                                            <circle class="progress" cx="30" cy="30" r="26"
-                                                    stroke-dasharray="163.36"
-                                                    stroke-dashoffset="{{ attendance.dashoffset }}"></circle>
-                                        </svg>
-                                    </div>
-                                    <p class="attendance-sessions">{{ attendance.present_count }}/{{ attendance.total_sessions }} sessions</p>
-                                    <p class="attendance-percentage">{{ attendance.percentage|floatformat:0 }}% attendance</p>
-                                </div>
-                                
-                                <div class="attendance-stat">
-                                    <div style="text-align: center; color: #10b981; font-weight: 600; font-size: 14px;">Present</div>
-                                </div>
-                            </div>
-                            
-                            <div class="attendance-actions">
-                                <button class="attendance-btn btn-present">Present</button>
-                                <button class="attendance-btn btn-absent">Absent</button>
-                                <button class="attendance-btn btn-late">Late</button>
-                            </div>
-                        </div>
-                        {% empty %}
-                        <div class="empty-state">
-                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21" stroke="currentColor" stroke-width="2"/>
-                                <path d="M9 11C11.2091 11 13 9.20914 13 7C13 4.79086 11.2091 3 9 3C6.79086 3 5 4.79086 5 7C5 9.20914 6.79086 11 9 11Z" stroke="currentColor" stroke-width="2"/>
+           <div class="tab-pane fade show active" id="attendance">
+    <div class="content-card">
+        <div class="content-header">
+            <div>
+                <h3 class="content-title">Attendance Summary</h3>
+                <p class="content-subtitle">View attendance records for all students in this class</p>
+            </div>
+            <div class="content-actions">
+                <button class="btn-export">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 2.58579 20.4142C2.21071 20.0391 2 19.5304 2 19V15" stroke="currentColor" stroke-width="2"/>
+                        <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 15V3" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    Export Report
+                </button>
+            </div>
+        </div>
+        
+        <div class="search-filter-bar">
+            <input type="text" class="search-input" placeholder="Search students by name, email, or ID">
+            <select class="filter-select">
+                <option>All Students</option>
+                <option>High Attendance (>90%)</option>
+                <option>Medium Attendance (60-90%)</option>
+                <option>Low Attendance (<60%)</option>
+            </select>
+        </div>
+        
+        <div class="student-list">
+            {% for attendance, participation in student_stats %}
+            <div class="student-item">
+                <div class="student-avatar">
+                    {% if attendance.enrollment.student.first_name and attendance.enrollment.student.last_name %}
+                        {{ attendance.enrollment.student.first_name.0|upper }}{{ attendance.enrollment.student.last_name.0|upper }}
+                    {% elif attendance.enrollment.student.first_name %}
+                        {{ attendance.enrollment.student.first_name.0|upper }}{{ attendance.enrollment.student.first_name.1|upper|default:"" }}
+                    {% endif %}
+                </div>
+                
+                <div class="student-info">
+                    <h4 class="student-name">{{ attendance.enrollment.student.last_name}}</h4>
+                    <p class="student-email">{{ attendance.enrollment.student.email }}</p>
+                    <p class="student-id">ID: {{ attendance.enrollment.student.id|stringformat:"05d" }}</p>
+                </div>
+                
+                <div class="student-stats">
+                    <div class="attendance-stat">
+                        <div class="progress-ring">
+                            <svg>
+                                <circle class="bg" cx="30" cy="30" r="26"></circle>
+                                <circle class="progress" cx="30" cy="30" r="26"
+                                        stroke-dasharray="163.36"
+                                        stroke-dashoffset="{{ attendance.dashoffset }}"></circle>
                             </svg>
-                            <h4>No students enrolled</h4>
-                            <p>Add students to this class to start tracking attendance</p>
                         </div>
-                        {% endfor %}
+                        <p class="attendance-sessions">{{ attendance.present_count }}/{{ attendance.total_sessions }} sessions</p>
+                        <p class="attendance-percentage">{{ attendance.percentage|floatformat:0 }}% attendance</p>
+                    </div>
+                    
+                    <div class="attendance-stat">
+                        <div style="text-align: center; margin-bottom: 8px;">
+                            <span style="font-size: 24px; font-weight: 700; color: #6366f1;">{{ participation.total_points }}</span>
+                        </div>
+                        <p style="text-align: center; color: #64748b; font-size: 14px;">Total Points</p>
                     </div>
                 </div>
+                
+                <div class="attendance-actions">
+                    {% comment %} {% url 'student_attendance_report' class_id=class.id student_id=attendance.enrollment.student.id %} {% endcomment %}
+                    <a href="#" 
+                       class="attendance-btn btn-present" style="text-decoration: none;">
+                        View Details
+                    </a>
+                </div>
             </div>
+            {% empty %}
+            <div class="empty-state">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21" stroke="currentColor" stroke-width="2"/>
+                    <path d="M9 11C11.2091 11 13 9.20914 13 7C13 4.79086 11.2091 3 9 3C6.79086 3 5 4.79086 5 7C5 9.20914 6.79086 11 9 11Z" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <h4>No students enrolled</h4>
+                <p>Add students to this class to view attendance reports</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Update Participation Tab to show detailed breakdown -->
+<div class="tab-pane fade" id="participation">
+    <div class="content-card">
+        <div class="content-header">
+            <div>
+                <h3 class="content-title">Participation Summary</h3>
+                <p class="content-subtitle">Detailed breakdown of student participation points</p>
+            </div>
+            <div class="content-actions">
+                <button class="btn-export">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 2.58579 20.4142C2.21071 20.0391 2 19.5304 2 19V15" stroke="currentColor" stroke-width="2"/>
+                        <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 15V3" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    Export Report
+                </button>
+            </div>
+        </div>
+        
+        <div class="search-filter-bar">
+            <input type="text" class="search-input" placeholder="Search students by name, email, or ID">
+            <select class="filter-select">
+                <option>All Categories</option>
+                <option>Discussion</option>
+                <option>Quiz</option>
+                <option>Activity</option>
+                <option>Other</option>
+            </select>
+        </div>
+        
+        <div class="student-list">
+            {% for attendance, participation in student_stats %}
+            <div class="student-item">
+                <div class="student-avatar">
+                    {% if attendance.enrollment.student.first_name and attendance.enrollment.student.last_name %}
+                        {{ attendance.enrollment.student.first_name.0|upper }}{{ attendance.enrollment.student.last_name.0|upper }}
+                    {% elif attendance.enrollment.student.first_name %}
+                        {{ attendance.enrollment.student.first_name.0|upper }}{{ attendance.enrollment.student.first_name.1|upper|default:"" }}
+                    {% else %}
+                        {{ attendance.enrollment.student.username.0|upper }}{{ attendance.enrollment.student.username.1|upper|default:"U" }}
+                    {% endif %}
+                </div>
+                
+                <div class="student-info">
+                    <h4 class="student-name">{{ attendance.enrollment.student.last_name}}</h4>
+                    <p class="student-email">{{ attendance.enrollment.student.email }}</p>
+                    <p class="student-id">Total Points: {{ participation.total_points }}</p>
+                </div>
+                
+                <div class="student-stats" style="flex: 2; gap: 16px;">
+                    <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                        <div class="participation-category">
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                <div style="width: 12px; height: 12px; border-radius: 3px; background: #3B82F6;"></div>
+                                <span style="font-weight: 500; color: #64748b;">Discussion</span>
+                            </div>
+                            <span style="font-weight: 700; font-size: 18px;">{{ participation.category_points.discussion|default:0 }}</span>
+                        </div>
+                        
+                        <div class="participation-category">
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                <div style="width: 12px; height: 12px; border-radius: 3px; background: #10B981;"></div>
+                                <span style="font-weight: 500; color: #64748b;">Quiz</span>
+                            </div>
+                            <span style="font-weight: 700; font-size: 18px;">{{ participation.category_points.quiz|default:0 }}</span>
+                        </div>
+                        
+                        <div class="participation-category">
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                <div style="width: 12px; height: 12px; border-radius: 3px; background: #F59E0B;"></div>
+                                <span style="font-weight: 500; color: #64748b;">Activity</span>
+                            </div>
+                            <span style="font-weight: 700; font-size: 18px;">{{ participation.category_points.activity|default:0 }}</span>
+                        </div>
+                        
+                        <div class="participation-category">
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                <div style="width: 12px; height: 12px; border-radius: 3px; background: #64748B;"></div>
+                                <span style="font-weight: 500; color: #64748b;">Other</span>
+                            </div>
+                            <span style="font-weight: 700; font-size: 18px;">{{ participation.category_points.other|default:0 }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="attendance-actions">
+                    {% comment %} {% url 'student_participation_report' class_id=class.id student_id=attendance.enrollment.student.id %} {% endcomment %}
+                    <a href="#" 
+                       class="attendance-btn btn-present" style="text-decoration: none;">
+                        View Details
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21" stroke="currentColor" stroke-width="2"/>
+                    <path d="M9 11C11.2091 11 13 9.20914 13 7C13 4.79086 11.2091 3 9 3C6.79086 3 5 4.79086 5 7C5 9.20914 6.79086 11 9 11Z" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <h4>No students enrolled</h4>
+                <p>Add students to this class to view participation reports</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
             
             <!-- Other tabs content (placeholder) -->
             <div class="tab-pane fade" id="participation">
