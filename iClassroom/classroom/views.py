@@ -1088,3 +1088,118 @@ def take_attendance(request, session_id):
     }
     
     return render(request, 'classroom/teacher/take_attendance.html', context)
+
+@login_required
+def student_participation_report(request, class_id, student_id):
+    # Get the class and verify teacher owns it
+    class_obj = get_object_or_404(Class, id=class_id, teacher=request.user)
+    
+    # Get the student and verify they're enrolled
+    student = get_object_or_404(User, id=student_id, user_type='student')
+    enrollment = get_object_or_404(
+        Enrollment, 
+        class_instance=class_obj, 
+        student=student,
+        status='active'
+    )
+    
+    # Get all participation records for this student in this class
+    participations = Participation.objects.filter(
+        student=student,
+        session__class_instance=class_obj
+    ).select_related('session', 'category').order_by('-session__session_date')
+    
+    # Get category totals
+    categories = ParticipationCategory.objects.filter(
+        class_instance=class_obj
+    )
+    
+    category_totals = []
+    for category in categories:
+        total = participations.filter(category=category).aggregate(
+            total=Sum('points')
+        )['total'] or 0
+        category_totals.append({
+            'category': category,
+            'total_points': total
+        })
+    
+    # Calculate overall total
+    total_points = sum(item['total_points'] for item in category_totals)
+    
+    context = {
+        'class': class_obj,
+        'student': student,
+        'enrollment': enrollment,
+        'participations': participations,
+        'category_totals': category_totals,
+        'total_points': total_points,
+    }
+    
+    return render(request, 'classroom/teacher/student_participation_report.html', context)
+
+@login_required
+def student_attendance_report(request, class_id, student_id):
+    # Get the class and verify teacher owns it
+    class_obj = get_object_or_404(Class, id=class_id, teacher=request.user)
+    
+    # Get the student and verify they're enrolled
+    student = get_object_or_404(User, id=student_id, user_type='student')
+    enrollment = get_object_or_404(
+        Enrollment, 
+        class_instance=class_obj, 
+        student=student,
+        status='active'
+    )
+    
+    # Get all completed sessions for this class
+    sessions = ClassSession.objects.filter(
+        class_instance=class_obj,
+        status='completed'
+    ).order_by('-session_date')
+    
+    # Get attendance records for this student
+    attendance_records = {
+        record.session_id: record 
+        for record in Attendance.objects.filter(
+            student=student,
+            session__in=sessions
+        )
+    }
+    
+    # Calculate attendance stats
+    present_count = sum(
+        1 for session in sessions 
+        if attendance_records.get(session.id) and 
+        attendance_records[session.id].status == 'present'
+    )
+    absent_count = sum(
+        1 for session in sessions 
+        if attendance_records.get(session.id) and 
+        attendance_records[session.id].status == 'absent'
+    )
+    late_count = sum(
+        1 for session in sessions 
+        if attendance_records.get(session.id) and 
+        attendance_records[session.id].status == 'late'
+    )
+    
+    total_sessions = sessions.count()
+    attendance_percentage = 0
+    if total_sessions > 0:
+        attendance_percentage = round((present_count / total_sessions) * 100, 1)
+    
+    context = {
+        'class': class_obj,
+        'student': student,
+        'enrollment': enrollment,
+        'sessions': sessions,
+        'attendance_records': attendance_records,
+        'present_count': present_count,
+        'absent_count': absent_count,
+        'late_count': late_count,
+        'total_sessions': total_sessions,
+        'attendance_percentage': attendance_percentage,
+    }
+    
+    return render(request, 'classroom/teacher/student_attendance_report.html', context)

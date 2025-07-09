@@ -703,7 +703,7 @@
                 
                 <div class="attendance-actions">
                     {% comment %} {% url 'student_attendance_report' class_id=class.id student_id=attendance.enrollment.student.id %} {% endcomment %}
-                    <a href="#" 
+                    <a href="{% url 'student_attendance_report' class_id=class.id student_id=attendance.enrollment.student.id %}" 
                        class="attendance-btn btn-present" style="text-decoration: none;">
                         View Details
                     </a>
@@ -811,8 +811,8 @@
                 
                 <div class="attendance-actions">
                     {% comment %} {% url 'student_participation_report' class_id=class.id student_id=attendance.enrollment.student.id %} {% endcomment %}
-                    <a href="#" 
-                       class="attendance-btn btn-present" style="text-decoration: none;">
+                    <a href="{% url 'student_participation_report' class_id=class.id student_id=attendance.enrollment.student.id %}" 
+                    class="attendance-btn btn-present" style="text-decoration: none;">
                         View Details
                     </a>
                 </div>
@@ -831,20 +831,7 @@
     </div>
 </div>
             
-            <!-- Other tabs content (placeholder) -->
-            <div class="tab-pane fade" id="participation">
-                <div class="content-card">
-                    <div class="content-header">
-                        <div>
-                            <h3 class="content-title">Student Participation</h3>
-                            <p class="content-subtitle">Track student engagement and participation scores</p>
-                        </div>
-                    </div>
-                    <div class="empty-state">
-                        <p>Participation tracking coming soon...</p>
-                    </div>
-                </div>
-            </div>
+            
             
             <div class="tab-pane fade" id="analytics">
                 <div class="content-card">
@@ -876,7 +863,7 @@
         </div>
     </div>
     
-    <script src="{% static 'classroom/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Search functionality
         document.querySelector('.search-input').addEventListener('input', function(e) {
