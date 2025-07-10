@@ -517,6 +517,161 @@
                 justify-content: space-between;
                 margin-right: 0;
             }
+            /* Add to your existing CSS */
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding: 20px;
+}
+
+.analytics-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.analytics-card h4 {
+    margin-top: 0;
+    color: #374151;
+}
+
+.chart-container {
+    position: relative;
+    height: 250px;
+    width: 100%;
+}
+
+.top-performers {
+    margin-top: 20px;
+}
+
+.performer {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.performer .rank {
+    font-weight: bold;
+    width: 30px;
+    color: #64748b;
+}
+
+.performer .name {
+    flex: 1;
+}
+
+.performer .points {
+    font-weight: bold;
+    color: #6366f1;
+}
+
+.report-options {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.report-type, .date-range {
+    margin-bottom: 15px;
+}
+
+.date-inputs {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.date-inputs span {
+    color: #64748b;
+}
+
+.report-actions {
+    display: flex;
+    gap: 10px;
+    align-self: flex-end;
+}
+
+.btn-preview, .btn-generate {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.report-preview {
+    border-top: 1px solid #e5e7eb;
+    padding: 20px;
+}
+
+.preview-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.report-meta {
+    color: #64748b;
+    font-size: 14px;
+}
+
+.preview-content {
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f9fafb;
+    border-radius: 8px;
+}
+/* Add to your existing CSS */
+.preview-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.preview-table th, .preview-table td {
+    padding: 10px;
+    border: 1px solid #e5e7eb;
+    text-align: left;
+}
+
+.preview-table th {
+    background-color: #f9fafb;
+    font-weight: 600;
+}
+
+.preview-table tr:nth-child(even) {
+    background-color: #f9fafb;
+}
+
+.btn-generate {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #10B981;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+}
+
+.btn-generate:hover {
+    background-color: #059669;
+    color: white;
+}
+@media (max-width: 992px) {
+    .analytics-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .report-options {
+        grid-template-columns: 1fr;
+    }
+}
         }
     </style>
 </head>
@@ -831,39 +986,155 @@
     </div>
 </div>
             
-            
-            
-            <div class="tab-pane fade" id="analytics">
-                <div class="content-card">
-                    <div class="content-header">
-                        <div>
-                            <h3 class="content-title">Analytics</h3>
-                            <p class="content-subtitle">View detailed analytics and insights</p>
-                        </div>
-                    </div>
-                    <div class="empty-state">
-                        <p>Analytics dashboard coming soon...</p>
-                    </div>
+   <!-- Analytics Tab -->
+<div class="tab-pane fade" id="analytics">
+    <div class="content-card">
+        <div class="content-header">
+            <div>
+                <h3 class="content-title">Class Analytics</h3>
+                <p class="content-subtitle">Visual insights into class performance</p>
+            </div>
+            <div class="content-actions">
+                <button class="btn-export">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 2.58579 20.4142C2.21071 20.0391 2 19.5304 2 19V15" stroke="currentColor" stroke-width="2"/>
+                        <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 15V3" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    Export Data
+                </button>
+            </div>
+        </div>
+        
+        <div class="analytics-grid">
+            <!-- Attendance Trend -->
+            <div class="analytics-card">
+                <h4>Attendance Trend (Last 5 Weeks)</h4>
+                <div class="chart-container">
+                    <canvas id="attendanceChart"></canvas>
                 </div>
             </div>
             
-            <div class="tab-pane fade" id="reports">
-                <div class="content-card">
-                    <div class="content-header">
-                        <div>
-                            <h3 class="content-title">Reports</h3>
-                            <p class="content-subtitle">Generate and download reports</p>
-                        </div>
+            <!-- Participation Trend -->
+            <div class="analytics-card">
+                <h4>Participation Points Trend</h4>
+                <div class="chart-container">
+                    <canvas id="participationChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Category Distribution -->
+            <div class="analytics-card">
+                <h4>Participation by Category</h4>
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Top Performers -->
+            <div class="analytics-card">
+                <h4>Top 5 Students</h4>
+                <div class="top-performers">
+                    {% for student in student_stats|slice:":5" %}
+                    <div class="performer">
+                        <span class="rank">{{ forloop.counter }}</span>
+                        <span class="name">{{ student.0.enrollment.student.first_name }} {{ student.0.enrollment.student.last_name }}</span>
+                        <span class="points">{{ student.1.total_points }} pts</span>
                     </div>
-                    <div class="empty-state">
-                        <p>Reports section coming soon...</p>
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
     </div>
+</div>
+
+<!-- Reports Tab -->
+<div class="tab-pane fade" id="reports">
+    <div class="content-card">
+        <div class="content-header">
+            <div>
+                <h3 class="content-title">Generate Reports</h3>
+                <p class="content-subtitle">Create and download detailed reports</p>
+            </div>
+        </div>
+        
+        <div class="report-options">
+            <div class="report-type">
+                <h4>Report Type</h4>
+                <select class="form-select" id="reportType">
+                    <option value="attendance">Attendance Report</option>
+                    <option value="participation">Participation Report</option>
+                    <option value="combined">Combined Report</option>
+                </select>
+            </div>
+            
+            <div class="date-range">
+                <h4>Date Range</h4>
+                <div class="date-inputs">
+                    <input type="date" class="form-control" id="startDate">
+                    <span>to</span>
+                    <input type="date" class="form-control" id="endDate">
+                </div>
+            </div>
+            
+            <div class="report-actions">
+                <a href="{% url 'generate_report' class_id=class.id %}" 
+                   class="btn btn-generate" id="excelDownload">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2"/>
+                        <path d="M14 2V8H20" stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 18V12" stroke="currentColor" stroke-width="2"/>
+                        <path d="M9 15H15" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    Download Excel
+                </a>
+            </div>
+        </div>
+        
+        <div class="report-preview">
+            <div class="preview-header">
+                <h4>Report Preview</h4>
+                <span class="report-meta">Select options to preview report</span>
+            </div>
+            <div class="preview-content">
+                <div class="table-responsive">
+                    <table class="preview-table">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Present</th>
+                                <th>Absent</th>
+                                <th>Late</th>
+                                <th>Attendance %</th>
+                                <th>Points</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for attendance, participation in student_stats|slice:":5" %}
+                            <tr>
+                                <td>{{ attendance.enrollment.student.first_name }} {{ attendance.enrollment.student.last_name }}</td>
+                                <td>{{ attendance.present_count }}</td>
+                                <td>{{ attendance.absent_count }}</td>
+                                <td>{{ attendance.late_count }}</td>
+                                <td>{{ attendance.percentage|floatformat:1 }}%</td>
+                                <td>{{ participation.total_points }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6">No data available</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+    </div>
+</div>
+        </div>
+    </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         // Search functionality
         document.querySelector('.search-input').addEventListener('input', function(e) {
@@ -902,6 +1173,115 @@
                 }, 150);
             });
         });
+        // Attendance Trend Chart
+    const attendanceCtx = document.getElementById('attendanceChart').getContext('2d');
+    new Chart(attendanceCtx, {
+        type: 'line',
+        data: {
+            labels: [{% for item in attendance_trend %}'{{ item.week }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Present Students',
+                data: [{% for item in attendance_trend %}{{ item.present }}{% if not forloop.last %},{% endif %}{% endfor %}],
+                borderColor: '#10B981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                tension: 0.3,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Number of Students'
+                    }
+                }
+            }
+        }
+    });
+
+    // Participation Trend Chart
+    const participationCtx = document.getElementById('participationChart').getContext('2d');
+    new Chart(participationCtx, {
+        type: 'bar',
+        data: {
+            labels: [{% for item in participation_trend %}'{{ item.week }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Participation Points',
+                data: [{% for item in participation_trend %}{{ item.points }}{% if not forloop.last %},{% endif %}{% endfor %}],
+                backgroundColor: '#6366F1'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Points Awarded'
+                    }
+                }
+            }
+        }
+    });
+
+    // Category Distribution Chart
+    const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+    new Chart(categoryCtx, {
+        type: 'doughnut',
+        data: {
+            labels: [{% for item in category_distribution %}'{{ item.category__name }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+            datasets: [{
+                data: [{% for item in category_distribution %}{{ item.total_points }}{% if not forloop.last %},{% endif %}{% endfor %}],
+                backgroundColor: [
+                    '#3B82F6', '#10B981', '#F59E0B', '#64748B', '#8B5CF6'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'right',
+                }
+            }
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+    // Set default dates
+    const today = new Date().toISOString().split('T')[0];
+    const monthAgo = new Date();
+    monthAgo.setMonth(monthAgo.getMonth() - 1);
+    const monthAgoStr = monthAgo.toISOString().split('T')[0];
+    
+    document.getElementById('startDate').value = monthAgoStr;
+    document.getElementById('endDate').value = today;
+    
+    // Update Excel download link with parameters
+    document.getElementById('reportType').addEventListener('change', updateDownloadLink);
+    document.getElementById('startDate').addEventListener('change', updateDownloadLink);
+    document.getElementById('endDate').addEventListener('change', updateDownloadLink);
+    
+    function updateDownloadLink() {
+        const reportType = document.getElementById('reportType').value;
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        
+        const link = document.getElementById('excelDownload');
+        link.href = `{% url 'generate_report' class_id=class.id %}?type=${reportType}&start=${startDate}&end=${endDate}`;
+        
+        // Update preview meta
+        document.querySelector('.report-meta').textContent = 
+            `${reportType.charAt(0).toUpperCase() + reportType.slice(1)} Report • ${startDate} to ${endDate}`;
+    }
+    
+    // Initialize
+    updateDownloadLink();
+});
     </script>
 </body>
 </html>

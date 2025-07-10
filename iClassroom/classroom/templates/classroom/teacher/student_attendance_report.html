@@ -10,8 +10,8 @@
         <div class="header-content">
             <div class="title-section">
                 <h1>Attendance Report</h1>
-                <p class="student-name">{{ student.get_full_name }}</p>
-                <p class="course-info">{{ class.course.name }} • {{ class.course.code }}</p>
+                <p class="student-name">{{ student.first_name }} {{ student.last_name }}</p>
+                <p class="course-info">{{ class.course_name }}</p>
             </div>
             <button class="print-btn" onclick="window.print()">
                 Print Report
@@ -54,46 +54,28 @@
     <!-- Detailed Records -->
     <div class="records-section">
         <h3>Session Details</h3>
-        {% if sessions %}
+        {% if session_status %}
         <div class="table-container">
             <table class="attendance-table">
                 <thead>
                     <tr>
                         <th>Date</th>
-                        <th>Session</th>
+                        <th>Topic</th>
                         <th>Status</th>
-                        <th>Marked By</th>
-                        <th>Time</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for session in sessions %}
+                    {% for session in session_status %}
                     <tr>
-                        <td class="date-cell">{{ session.session_date|date:"M d, Y" }}</td>
-                        <td class="session-cell">{{ session.title|default:"Class Session" }}</td>
+                        <td class="date-cell">{{ session.date|date:"M d, Y" }}</td>
+                        <td class="session-cell">{{ session.topic }}</td>
                         <td class="status-cell">
-                            {% if session.id in attendance_records %}
-                                {% with record=attendance_records.session.id %}
-                                <span class="status-badge {{ record.status }}">
-                                    {{ record.get_status_display }}
-                                </span>
-                                {% endwith %}
+                            {% if session.status == 'present' %}
+                                <span class="status-badge present">Present</span>
+                            {% elif session.status == 'late' %}
+                                <span class="status-badge late">Late</span>
                             {% else %}
-                                <span class="status-badge not-recorded">Not Recorded</span>
-                            {% endif %}
-                        </td>
-                        <td class="teacher-cell">
-                            {% if session.id in attendance_records %}
-                                {{ attendance_records.session.id.marked_by.get_full_name }}
-                            {% else %}
-                                —
-                            {% endif %}
-                        </td>
-                        <td class="time-cell">
-                            {% if session.id in attendance_records %}
-                                {{ attendance_records.session.id.marked_at|time }}
-                            {% else %}
-                                —
+                                <span class="status-badge absent">Absent</span>
                             {% endif %}
                         </td>
                     </tr>

@@ -41,6 +41,8 @@ urlpatterns = [
     path('class/<uuid:class_id>/student/<uuid:student_id>/attendance-report/',
          views.student_attendance_report,
          name='student_attendance_report'),
+    
+    path('class/<uuid:class_id>/generate-report/', views.generate_excel_report, name='generate_report'),
     # Settings URLs
     # path('settings/', views.settings_view, name='settings'),
     # path('settings/update/', views.settings_update, name='settings_update'),

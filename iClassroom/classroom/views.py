@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
@@ -33,6 +34,9 @@ from django.views.generic import ListView, CreateView, UpdateView
 from django.http import JsonResponse
 from django.urls import reverse_lazy
 from collections import defaultdict 
+from openpyxl import Workbook
+from openpyxl.styles import Font, Alignment
+import io
 logger = logging.getLogger(__name__)
 
 def login_view(request):
@@ -461,6 +465,45 @@ def class_detail(request, class_id):
         Q(user=request.user) & 
         (Q(related_class=class_obj) | Q(notification_type='class'))
     ).order_by('-created_at')[:10]
+    # Analytics Data
+    attendance_trend = []
+    participation_trend = []
+    for i in range(4, -1, -1):
+        date = timezone.now() - timedelta(weeks=i)
+        week_start = date - timedelta(days=date.weekday())
+        week_end = week_start + timedelta(days=6)
+        
+        # Weekly attendance
+        weekly_sessions = ClassSession.objects.filter(
+            class_instance=class_obj,
+            session_date__range=[week_start, week_end]
+        )
+        present_count = Attendance.objects.filter(
+            session__in=weekly_sessions,
+            status='present'
+        ).count()
+        attendance_trend.append({
+            'week': week_start.strftime("%b %d"),
+            'present': present_count,
+            'total': weekly_sessions.count()
+        })
+        
+        # Weekly participation
+        weekly_points = Participation.objects.filter(
+            session__in=weekly_sessions
+        ).aggregate(total=Sum('points'))['total'] or 0
+        participation_trend.append({
+            'week': week_start.strftime("%b %d"),
+            'points': weekly_points
+        })
+    
+    # Participation by category
+    category_distribution = Participation.objects.filter(
+        session__class_instance=class_obj
+    ).values('category__name').annotate(
+        total_points=Sum('points')
+    ).order_by('-total_points')
+    
     
     context = {
         'class': class_obj,
@@ -472,6 +515,10 @@ def class_detail(request, class_id):
         'avg_attendance': avg_attendance,
         'avg_participation': avg_participation,
         'total_students': total_students,
+        'attendance_trend': attendance_trend,
+        'participation_trend': participation_trend,
+        'category_distribution': category_distribution,
+        'report_types': ['Attendance', 'Participation', 'Combined', 'Student Performance']
     }
     
     return render(request, 'classroom/class_detail.html', context)
@@ -1140,66 +1187,174 @@ def student_participation_report(request, class_id, student_id):
 
 @login_required
 def student_attendance_report(request, class_id, student_id):
-    # Get the class and verify teacher owns it
+    # Get class and verify ownership
     class_obj = get_object_or_404(Class, id=class_id, teacher=request.user)
-    
-    # Get the student and verify they're enrolled
     student = get_object_or_404(User, id=student_id, user_type='student')
-    enrollment = get_object_or_404(
-        Enrollment, 
-        class_instance=class_obj, 
-        student=student,
-        status='active'
-    )
     
-    # Get all completed sessions for this class
+    # Get all completed sessions
     sessions = ClassSession.objects.filter(
         class_instance=class_obj,
         status='completed'
     ).order_by('-session_date')
     
-    # Get attendance records for this student
-    attendance_records = {
-        record.session_id: record 
-        for record in Attendance.objects.filter(
-            student=student,
-            session__in=sessions
-        )
-    }
-    
-    # Calculate attendance stats
-    present_count = sum(
-        1 for session in sessions 
-        if attendance_records.get(session.id) and 
-        attendance_records[session.id].status == 'present'
-    )
-    absent_count = sum(
-        1 for session in sessions 
-        if attendance_records.get(session.id) and 
-        attendance_records[session.id].status == 'absent'
-    )
-    late_count = sum(
-        1 for session in sessions 
-        if attendance_records.get(session.id) and 
-        attendance_records[session.id].status == 'late'
+    # Get attendance records in one query
+    attendance_records = Attendance.objects.filter(
+        student=student,
+        session__in=sessions
     )
     
+    # Calculate statistics
+    present_count = attendance_records.filter(status='present').count()
+    late_count = attendance_records.filter(status='late').count()
+    absent_count = sessions.count() - present_count - late_count
     total_sessions = sessions.count()
+    
     attendance_percentage = 0
     if total_sessions > 0:
         attendance_percentage = round((present_count / total_sessions) * 100, 1)
     
+    # Prepare session data
+    session_status = []
+    for session in sessions:
+        record = attendance_records.filter(session=session).first()
+        session_status.append({
+            'date': session.session_date,
+            'topic': session.topic or "Class Session",
+            'status': record.status if record else 'absent'
+        })
+    
     context = {
         'class': class_obj,
         'student': student,
-        'enrollment': enrollment,
-        'sessions': sessions,
-        'attendance_records': attendance_records,
+        'student_name': f"{student.first_name} {student.last_name}",
+        'class_name': class_obj.course_name,
+        'session_status': session_status,
         'present_count': present_count,
         'absent_count': absent_count,
         'late_count': late_count,
         'total_sessions': total_sessions,
         'attendance_percentage': attendance_percentage,
     }
-    
     return render(request, 'classroom/teacher/student_attendance_report.html', context)
+
+@login_required
+def generate_excel_report(request, class_id):
+    class_obj = get_object_or_404(Class, id=class_id, teacher=request.user)
+    report_type = request.GET.get('type', 'attendance')
+    start_date = request.GET.get('start')
+    end_date = request.GET.get('end')
+    
+    # Filter data based on parameters
+    sessions = ClassSession.objects.filter(
+        class_instance=class_obj,
+        status='completed'
+    )
+    
+    if start_date and end_date:
+        sessions = sessions.filter(
+            session_date__range=[start_date, end_date]
+        )
+    
+    # Create Excel workbook
+    output = io.BytesIO()
+    workbook = Workbook()
+    
+    # Attendance Sheet
+    if report_type in ['attendance', 'combined']:
+        attendance_sheet = workbook.active
+        attendance_sheet.title = "Attendance"
+        
+        # Add headers
+        headers = ["Student Name", "Present", "Absent", "Late", "Attendance %"]
+        for col_num, header in enumerate(headers, 1):
+            cell = attendance_sheet.cell(row=1, column=col_num)
+            cell.value = header
+            cell.font = Font(bold=True)
+        
+        # Add data
+        row_num = 2
+        for enrollment in Enrollment.objects.filter(class_instance=class_obj, status='active'):
+            student = enrollment.student
+            attendance_records = Attendance.objects.filter(
+                student=student,
+                session__in=sessions
+            )
+            
+            present = attendance_records.filter(status='present').count()
+            absent = attendance_records.filter(status='absent').count()
+            late = attendance_records.filter(status='late').count()
+            total = present + absent + late
+            percentage = (present / total * 100) if total > 0 else 0
+            
+            attendance_sheet.cell(row=row_num, column=1, value=f"{student.first_name} {student.last_name}")
+            attendance_sheet.cell(row=row_num, column=2, value=present)
+            attendance_sheet.cell(row=row_num, column=3, value=absent)
+            attendance_sheet.cell(row=row_num, column=4, value=late)
+            attendance_sheet.cell(row=row_num, column=5, value=percentage/100).number_format = '0.00%'
+            row_num += 1
+    
+    # Participation Sheet
+    if report_type in ['participation', 'combined']:
+        participation_sheet = workbook.create_sheet("Participation")
+        
+        # Add headers
+        headers = ["Student Name", "Discussion", "Quiz", "Activity", "Other", "Total Points"]
+        for col_num, header in enumerate(headers, 1):
+            cell = participation_sheet.cell(row=1, column=col_num)
+            cell.value = header
+            cell.font = Font(bold=True)
+        
+        # Add data
+        row_num = 2
+        for enrollment in Enrollment.objects.filter(class_instance=class_obj, status='active'):
+            student = enrollment.student
+            participation = Participation.objects.filter(
+                student=student,
+                session__in=sessions
+            )
+            
+            categories = {
+                'discussion': 0,
+                'quiz': 0,
+                'activity': 0,
+                'other': 0
+            }
+            
+            for record in participation:
+                cat_name = record.category.name.lower()
+                if cat_name in categories:
+                    categories[cat_name] += record.points
+            
+            participation_sheet.cell(row=row_num, column=1, value=f"{student.first_name} {student.last_name}")
+            participation_sheet.cell(row=row_num, column=2, value=categories['discussion'])
+            participation_sheet.cell(row=row_num, column=3, value=categories['quiz'])
+            participation_sheet.cell(row=row_num, column=4, value=categories['activity'])
+            participation_sheet.cell(row=row_num, column=5, value=categories['other'])
+            participation_sheet.cell(row=row_num, column=6, value=sum(categories.values()))
+            row_num += 1
+    
+    # Auto-adjust column widths
+    for sheet in workbook:
+        for column in sheet.columns:
+            max_length = 0
+            column_letter = column[0].column_letter
+            for cell in column:
+                try:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(str(cell.value))
+                except:
+                    pass
+            adjusted_width = (max_length + 2) * 1.2
+            sheet.column_dimensions[column_letter].width = adjusted_width
+    
+    workbook.save(output)
+    output.seek(0)
+    
+    # Create response
+    response = HttpResponse(
+        output,
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    filename = f"class_{class_id}_{report_type}_report.xlsx"
+    response['Content-Disposition'] = f'attachment; filename={filename}'
+    return response
