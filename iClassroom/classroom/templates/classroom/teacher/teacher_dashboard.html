@@ -214,54 +214,8 @@
                                 </span>
                             </div>
                             </div>
-                            <div class="progress-bars">
-                                <div class="progress-item">
-                                    <div class="progress-header">
-                                        <span>Attendance</span>
-                                        <span>
-                                            {% if class.attendance_percentage > 0 %}
-                                                {{ class.attendance_percentage }}%
-                                            {% else %}
-                                                No data
-                                            {% endif %}
-                                        </span>
-                                    </div>
-                                     <div class="progress-bar">
-                                        <div class="progress-fill" 
-                                            style="width: {% if class.attendance_percentage > 0 %}{{ class.attendance_percentage }}%{% else %}0%{% endif %};
-                                                    background-color: {% if class.attendance_percentage >= 80 %}#10B981
-                                                                    {% elif class.attendance_percentage >= 50 %}#F59E0B
-                                                                    {% else %}#EF4444{% endif %};">
-                                        </div>
-                                    </div>
-                                    <div class="progress-note">
-                                        Based on {{ class.enrollment_count }} students across all sessions
-                                    </div>
-                                </div>
-                                 <div class="progress-item">
-                                    <div class="progress-header">
-                                        <span>Participation</span>
-                                        <span>
-                                            {% if class.participation_count > 0 %}
-                                                {{ class.participation_average }}%
-                                            {% else %}
-                                                No data
-                                            {% endif %}
-                                        </span>
-                                    </div>
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" 
-                                            style="width: {% if class.participation_count > 0 %}{{ class.participation_average }}%{% else %}0%{% endif %};
-                                                    background-color: {% if class.participation_average >= 80 %}#10B981
-                                                                    {% elif class.participation_average >= 50 %}#F59E0B
-                                                                    {% else %}#EF4444{% endif %};">
-                                        </div>
-                                    </div>
-                                    <div class="progress-note">
-                                        Average from {{ class.participation_count }} evaluations
-                                    </div>
-                                </div>
-                            </div>
+                           
+                            
                             <a href="{% url 'class_detail' class.object.id %}" class="view-details-btn">View Class Details</a>
                         </div>
                         {% endfor %}
