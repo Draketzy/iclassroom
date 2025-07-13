@@ -215,8 +215,9 @@
                             </div>
                             </div>
                            
-                            
-                            <a href="{% url 'class_detail' class.object.id %}" class="view-details-btn">View Class Details</a>
+                           <div class="text-center mt-3 mb-1">
+                            <a href="{% url 'class_detail' class.object.id %}" class="view-details-btn text-decoration-none px-md-5">View Class Details</a>
+                            </div>
                         </div>
                         {% endfor %}
                     {% else %}
