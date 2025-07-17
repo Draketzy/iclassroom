@@ -1,4 +1,4 @@
-<!-- Profile Sidebar Component -->
+<!-- Profile Dropdown Component -->
 {% load static %}
 <head>
     <link rel="stylesheet" href="{% static 'classroom/css/profile_icon.css' %}">
@@ -10,8 +10,9 @@
             font-family: 'Poppins', sans-serif;
         }
         
-        .profile-sidebar-container {
+        .profile-dropdown-container {
             position: relative;
+            display: inline-block;
         }
         
         /* Profile Icon Button */
@@ -42,76 +43,50 @@
             text-transform: uppercase;
         }
         
-        /* Sidebar Styles */
-        .profile-sidebar {
-            position: fixed;
-            top: 0;
-            right: -400px;
-            width: 400px;
-            height: 100vh;
-            background: white;
-            box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-            transition: right 0.3s ease;
-            overflow-y: auto;
-        }
-        
-        .profile-sidebar.active {
+        /* Dropdown Menu */
+        .profile-dropdown {
+            position: absolute;
             right: 0;
+            top: 50px;
+            width: 280px;
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
         }
         
-        .profile-sidebar-content {
-            padding: 0;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
+        .profile-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .profile-dropdown-content {
+            padding: 0.5rem 0;
         }
         
         /* Header Section */
-        .profile-sidebar-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding-left: 1.5rem;
-            padding-right: 2rem;
-            position: relative;
+        .profile-dropdown-header {
+            padding: 1rem;
+            border-bottom: 1px solid #f3f4f6;
         }
         
-        .profile-close-btn {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: white;
-        }
-        
-        .profile-close-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: scale(1.1);
-        }
-        
-        /* User Info Section */
         .profile-user-info {
             display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
+            gap: 0.75rem;
+            align-items: center;
         }
         
         .profile-avatar {
-            width: 60px;
-            height: 60px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
-            margin-top: -25px;
             overflow: hidden;
             border: 2px solid rgba(255, 255, 255, 0.3);
         }
@@ -119,101 +94,94 @@
         .profile-initial {
             color: white;
             font-weight: 600;
-            font-size: 20px;
+            font-size: 16px;
             text-transform: uppercase;
         }
         
         .profile-details {
             flex: 1;
+            overflow: hidden;
         }
         
         .profile-name {
             margin: 0;
-            font-size: 1.25rem;
+            font-size: 0.9375rem;
             font-weight: 600;
-            color: white;
+            color: #111827;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .profile-email {
-            margin: 0.25rem 0;
-            font-size: 0.875rem;
-            color: rgba(255, 255, 255, 0.8);
+            margin: 0.15rem 0 0 0;
+            font-size: 0.75rem;
+            color: #6b7280;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .profile-role {
             display: inline-block;
-            padding: 0.25rem 0.75rem;
+            padding: 0.15rem 0.5rem;
             border-radius: 20px;
-            font-size: 0.75rem;
+            font-size: 0.6875rem;
             font-weight: 500;
-            margin-top: 0.5rem;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-        }
-        
-        .profile-id {
-            margin: 0.25rem 0 0 0;
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.7);
+            margin-top: 0.25rem;
+            background: #f3f4f6;
+            color: #374151;
         }
         
         /* Menu Section */
         .profile-menu-section {
-            flex: 1;
-            padding: 1rem;
+            padding: 0.5rem 0;
+        }
+        
+        .menu-title {
+            color: #9ca3af;
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.25rem 1rem;
+            margin-top: 0.25rem;
+            text-transform: uppercase;
         }
         
         .profile-menu {
             display: flex;
             flex-direction: column;
-            gap: 0.1rem;
         }
         
         .profile-menu-item {
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            padding: 1rem;
+            padding: 0.75rem 1rem;
             text-decoration: none;
             color: #374151;
-            border-radius: 0.5rem;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border: none;
-            background: none;
-            width: 100%;
-            text-align: left;
             font-size: 0.875rem;
+            transition: all 0.2s ease;
         }
         
         .profile-menu-item:hover {
-            background: #f3f4f6;
+            background: #f9fafb;
             color: #667eea;
-            transform: translateX(4px);
         }
         
         .profile-menu-item svg {
-            width: 18px;
-            height: 18px;
-            opacity: 0.7;
+            width: 16px;
+            height: 16px;
+            opacity: 0.8;
         }
         
         .profile-menu-item:hover svg {
             opacity: 1;
         }
         
-        /* Divider */
-        .profile-divider {
-            height: 1px;
-            background: #e5e7eb;
-            margin: 1rem 0;
-        }
-        
         /* Logout Section */
         .profile-logout-section {
-            padding: 1rem;
-            border-top: 1px solid #e5e7eb;
-            background: #f9fafb;
+            padding: 0.5rem 0;
+            border-top: 1px solid #f3f4f6;
         }
         
         .profile-logout-form {
@@ -224,68 +192,48 @@
             display: flex;
             align-items: center;
             gap: 0.75rem;
+            width: 100%;
+            padding: 0.75rem 1rem;
             background: none;
             border: none;
             color: #dc2626;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-            text-align: left;
             font-size: 0.875rem;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
         
         .profile-logout-btn:hover {
             background: #fef2f2;
-            transform: translateX(4px);
         }
         
         .profile-logout-btn svg {
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
         }
         
-        /* Backdrop */
-        .profile-sidebar-backdrop {
+        /* Backdrop (optional - if you want to dim the rest of the page) */
+        .profile-dropdown-backdrop {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.1);
             z-index: 999;
             opacity: 0;
             visibility: hidden;
             transition: all 0.3s ease;
         }
         
-        .profile-sidebar-backdrop.active {
+        .profile-dropdown-backdrop.active {
             opacity: 1;
             visibility: visible;
-        }
-        
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .profile-sidebar {
-                width: 100vw;
-                right: -100vw;
-            }
-            
-            .profile-sidebar.active {
-                right: 0;
-            }
-        }
-        .menu-title{
-            color: #60616298;
-            margin-bottom: -1rem;
-            padding-left: 1rem;
-            font-size: 0.9rem;
-            padding-top: 1.5rem;
         }
     </style>
 </head>
 
-<div class="profile-sidebar-container">
+<div class="profile-dropdown-container">
     <!-- Profile Icon Button -->
     <div class="user-profile" id="profileIcon">
         {% if user.avatar_url %}
@@ -295,19 +243,11 @@
         {% endif %}
     </div>
 
-    <!-- Profile Sidebar -->
-    <div class="profile-sidebar" id="profileSidebar">
-        <div class="profile-sidebar-content">
+    <!-- Dropdown Menu -->
+    <div class="profile-dropdown" id="profileDropdown">
+        <div class="profile-dropdown-content">
             <!-- Header Section -->
-            <div class="profile-sidebar-header">
-                <button class="profile-close-btn" id="closeSidebar">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </button>
-                
-                <!-- User Info Section -->
+            <div class="profile-dropdown-header">
                 <div class="profile-user-info">
                     <div class="profile-avatar">
                         {% if user.avatar_url %}
@@ -320,18 +260,17 @@
                         <h3 class="profile-name">{{ user.first_name }} {{ user.last_name }}</h3>
                         <p class="profile-email">{{ user.email }}</p>
                         {% if user.user_type == 'teacher' %}
-                            <span class="profile-role teacher">Teacher</span>
+                            <span class="profile-role">Teacher</span>
                         {% else %}
-                            <span class="profile-role student">Student</span>
-                            <p class="profile-id">ID: {{ user.student_id|default:"12345" }}</p>
+                            <span class="profile-role">Student</span>
                         {% endif %}
                     </div>
                 </div>
             </div>
 
             <!-- Menu Section -->
-             <div class="menu-title fw-medium mx-3">Personal</div>
             <div class="profile-menu-section">
+                <div class="menu-title">Personal</div>
                 <div class="profile-menu">
                     <a href="{% url 'profile' %}" class="profile-menu-item">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -379,53 +318,42 @@
         </div>
     </div>
 
-    <!-- Sidebar Backdrop -->
-    <div class="profile-sidebar-backdrop" id="profileBackdrop"></div>
+    <!-- Optional Backdrop -->
+    <div class="profile-dropdown-backdrop" id="profileBackdrop"></div>
 </div>
 
 <script>
-
-     src="{% static 'classroom/js/bootstrap.bundle.min.js' %}">
-
 document.addEventListener('DOMContentLoaded', function() {
     const profileIcon = document.getElementById('profileIcon');
-    const profileSidebar = document.getElementById('profileSidebar');
+    const profileDropdown = document.getElementById('profileDropdown');
     const profileBackdrop = document.getElementById('profileBackdrop');
-    const closeSidebar = document.getElementById('closeSidebar');
-
-    // Open sidebar
-    function openSidebar() {
-        profileSidebar.classList.add('active');
-        profileBackdrop.classList.add('active');
-        document.body.style.overflow = 'hidden';
+    
+    // Toggle dropdown
+    function toggleDropdown() {
+        profileDropdown.classList.toggle('active');
+        profileBackdrop.classList.toggle('active');
     }
-
-    // Close sidebar
-    function closeSidebarFunc() {
-        profileSidebar.classList.remove('active');
-        profileBackdrop.classList.remove('active');
-        document.body.style.overflow = '';
+    
+    // Close dropdown when clicking outside
+    function closeDropdown() {
+            profileDropdown.classList.remove('active');
+            profileBackdrop.classList.remove('active');       
     }
-
+    
     // Event listeners
     profileIcon.addEventListener('click', function(e) {
         e.stopPropagation();
-        openSidebar();
+        toggleDropdown();
     });
-
-    closeSidebar.addEventListener('click', closeSidebarFunc);
-    profileBackdrop.addEventListener('click', closeSidebarFunc);
-
-    // Close sidebar on escape key
+    
+    document.addEventListener('click', closeDropdown);
+    
+    // Close on escape key
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && profileSidebar.classList.contains('active')) {
-            closeSidebarFunc();
+        if (e.key === 'Escape') {
+            profileDropdown.classList.remove('active');
+            profileBackdrop.classList.remove('active');
         }
-    });
-
-    // Prevent sidebar from closing when clicking inside
-    profileSidebar.addEventListener('click', function(e) {
-        e.stopPropagation();
     });
 });
 </script>
