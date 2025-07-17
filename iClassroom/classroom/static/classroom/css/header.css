@@ -19,10 +19,13 @@ body {
 .header {
     background: white;
     border-bottom: 1px solid #e5e7eb;
-    padding: 5px 32px;
+    padding: 1px 32px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position:sticky;
+    width: 100%;
+    top: 0px;
 }
 
 .header-left .logo {
@@ -35,7 +38,7 @@ body {
 }
 
 .title{
-    padding-top: 20px;
+    padding-top: 16px;
 }
 .brand-name {
     font-size: 20px;
