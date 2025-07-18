@@ -17,15 +17,13 @@ body {
 
 /* Header Styles */
 .header {
-    background: white;
-    border-bottom: 1px solid #e5e7eb;
-    padding: 1px 32px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position:sticky;
-    width: 100%;
-    top: 0px;
+    background: #f6faff;
+    padding: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
 }
 
 .header-left .logo {
