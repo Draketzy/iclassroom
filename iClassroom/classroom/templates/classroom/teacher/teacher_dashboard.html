@@ -7,10 +7,10 @@
 <div class="container">
     <!-- Page Header -->
     <div class="flex items-center justify-between mb-8">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-900">Dashboard</h1>
-            <p class="text-gray-600 mt-1">Welcome back, Professor {{ user.first_name }}! Here's what's happening in your classes today.</p>
-        </div>
+        <div class="dashboard-header">
+                <h2>Dashboard</h2>
+                <p>Welcome back, Professor {{ user.first_name }}</p>
+            </div>
         <div class="flex gap-4">
             <button class="btn btn-secondary" id="exportBtn">
                 <i class="fas fa-download"></i>
