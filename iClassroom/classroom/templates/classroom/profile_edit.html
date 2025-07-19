@@ -1,13 +1,7 @@
+{% extends 'classroom/layouts/base_layout.html' %}
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iClassroom - Edit Profile</title>
-    <link rel="stylesheet" href="{% static 'classroom/css/css/bootstrap.min.css' %}">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+{% block extra_css %}
     <style>
         * {
             font-family: 'Poppins', sans-serif;
@@ -290,13 +284,9 @@
             font-weight: 600;
         }
     </style>
-</head>
 
-<body>
-    <div class="min-vh-100">
-        <!-- Header -->
-        {% include 'classroom/header.html' %}
-
+{% endblock %}
+{%block content %}
         <!-- Main Content -->
         <main class="d-flex align-items-center justify-content-center py-5" style="min-height: calc(100vh - 80px);">
             <div class="container-custom w-100">
@@ -475,8 +465,8 @@
     </div>
 
     {% include 'classroom/components/avatar_modal.html' %}
-    <script src="{% static 'classroom/js/bootstrap.bundle.min.js' %}"></script>
-    
+ {% endblock %}
+ {% block extra_js %}   
     <script>
         // Form validation and enhancement
         document.addEventListener('DOMContentLoaded', function() {
@@ -588,5 +578,4 @@
             }
         }
     </script>
-</body>
-</html>
+{% endblock %}
