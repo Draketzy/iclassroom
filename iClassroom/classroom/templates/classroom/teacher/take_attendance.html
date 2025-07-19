@@ -646,11 +646,11 @@
             <a href="{% url 'session_list' class_id=session.class_instance.id %}" class="back-link">
                 ← Back to Sessions
             </a>
-            <div class="session-time">{{ session_time }}</div>
             <div class="session-details">
                 {{ class_obj.course_name }} - {{ class_obj.section }}
                 {% if session.topic %} • {{ session.topic }}{% endif %}
             </div>
+            <div class="session-time">{{ session_time }}</div>
         </div>
 
         <!-- Tab Navigation -->
