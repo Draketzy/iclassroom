@@ -1,11 +1,6 @@
+{%extends 'classroom/layouts/base_layout.html'%}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ class_obj.course_name }} - Attendance & Participation</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+{%block extra_css%}
     <style>
         * {
             margin: 0;
@@ -635,9 +630,8 @@
             }
         }
     </style>
-</head>
-<body>
-    {% include 'classroom/header.html' %}
+{%endblock%}
+ {%block content%}
     
     <div class="container">
         {% csrf_token %}
@@ -825,7 +819,8 @@
         </div>
         <button id="save-btn" class="save-btn">Save All Data</button>
     </div>
-
+    {%endblock%}
+    {%block extra_js%}
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         const attendanceData = {};
@@ -1091,5 +1086,4 @@
         updateParticipationAverage();
     });
     </script>
-</body>
-</html>
+    {%endblock%}
