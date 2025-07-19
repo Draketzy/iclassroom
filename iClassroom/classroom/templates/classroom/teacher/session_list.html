@@ -1,12 +1,144 @@
+{% extends 'classroom/layouts/base_layout.html' %}
 {% load tz %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sessions - {{ class_obj.course_name }}</title>
-    <style>
+
+{% block content %}    
+    <div class="container">
+        <!-- Header -->
+        <div class="header-session">
+            <a href="{% url 'teacher_dashboard' %}" class="back-link">
+                ← Back to Dashboard
+            </a>
+            <div class="header-content">
+                <div class="title-section">
+                    <h1>Class Sessions</h1>
+                    <p class="course-info">{{ class_obj.course_name }} - {{ class_obj.section }}</p>
+                </div>
+                <button class="create-btn" onclick="openModal()">
+                    + New Session
+                </button>
+            </div>
+        </div>
+
+        <!-- Sessions -->
+        <div class="session-list">
+            {% for session in object_list %}
+            <div class="session-item {% if session.status == 'in_progress' %}active{% endif %}">
+                <div class="session-header">
+                    <div>
+                        <div class="session-title">{{ session.topic|default:"Class Session" }}</div>
+                        <div class="session-date">{{ session.session_date|date:"F j, Y" }}</div>
+                    </div>
+                    <span class="status-badge {{ session.status }}">
+                        {{ session.get_status_display }}
+                    </span>
+                </div>
+
+                <div class="session-details">
+                    <div class="detail-item">
+                        <span>🕐</span>
+                        <span>{{ session.start_time|time:"g:i A" }} - {{ session.end_time|time:"g:i A" }}</span>
+                    </div>
+                    {% if session.status == 'in_progress' %}
+                    <div class="detail-item">
+                        <span>⏱️</span>
+                        <span class="countdown" data-end="{{ session.get_end_datetime|date:'c' }}">Calculating...</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if session.notes %}
+                <div class="session-notes">
+                    📝 {{ session.notes }}
+                </div>
+                {% endif %}
+
+                {% if session.status == 'in_progress' %}
+                <div class="countdown-alert">
+                    ⚠️ Session is currently active
+                </div>
+                {% endif %}
+
+                <div class="session-actions">
+                    {% if session.status == 'scheduled' %}
+                        <a href="{% url 'start_session' session_id=session.id %}" class="btn btn-start">
+                            ▶️ Start Session
+                        </a>
+                    {% elif session.status == 'in_progress' %}
+                        <a href="{% url 'take_attendance' session_id=session.id %}" class="btn btn-attendance">
+                            ✅ Take Attendance
+                        </a>
+                        <a href="{% url 'complete_session' session_id=session.id %}" class="btn btn-complete">
+                            🏁 Complete Session
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <div class="empty-icon">📅</div>
+                <h3>No Sessions Yet</h3>
+                <p>Create your first session to start managing your class</p>
+                <button class="btn btn-primary" onclick="openModal()">
+                    Create First Session
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Create Session Modal -->
+    <div id="sessionModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            
+            <div class="modal-header">
+                <h2>Create New Session</h2>
+                <p>Schedule a new class session</p>
+            </div>
+
+            <form id="sessionForm" method="post" action="{% url 'create_session' class_id=class_obj.id %}">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <div id="alerts"></div>
+
+                    <div class="form-group">
+                        <label for="session_date">Date</label>
+                        <input type="date" id="session_date" name="session_date" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="start_time">Start Time</label>
+                        <input type="time" id="start_time" name="start_time" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="end_time">End Time</label>
+                        <input type="time" id="end_time" name="end_time" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="topic">Topic (Optional)</label>
+                        <input type="text" id="topic" name="topic" class="form-control" placeholder="What will you cover in this session?">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notes">Notes (Optional)</label>
+                        <textarea id="notes" name="notes" class="form-control" rows="3" placeholder="Any additional notes or reminders"></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Session</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_css%}
+<style>
         * {
             margin: 0;
             padding: 0;
@@ -418,144 +550,10 @@
             }
         }
     </style>
-</head>
-<body>
-    {% include 'classroom/header.html' %}
-    
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <a href="{% url 'teacher_dashboard' %}" class="back-link">
-                ← Back to Dashboard
-            </a>
-            <div class="header-content">
-                <div class="title-section">
-                    <h1>Class Sessions</h1>
-                    <p class="course-info">{{ class_obj.course_name }} - {{ class_obj.section }}</p>
-                </div>
-                <button class="create-btn" onclick="openModal()">
-                    + New Session
-                </button>
-            </div>
-        </div>
+    {% endblock %}
 
-        <!-- Sessions -->
-        <div class="session-list">
-            {% for session in object_list %}
-            <div class="session-item {% if session.status == 'in_progress' %}active{% endif %}">
-                <div class="session-header">
-                    <div>
-                        <div class="session-title">{{ session.topic|default:"Class Session" }}</div>
-                        <div class="session-date">{{ session.session_date|date:"F j, Y" }}</div>
-                    </div>
-                    <span class="status-badge {{ session.status }}">
-                        {{ session.get_status_display }}
-                    </span>
-                </div>
-
-                <div class="session-details">
-                    <div class="detail-item">
-                        <span>🕐</span>
-                        <span>{{ session.start_time|time:"g:i A" }} - {{ session.end_time|time:"g:i A" }}</span>
-                    </div>
-                    {% if session.status == 'in_progress' %}
-                    <div class="detail-item">
-                        <span>⏱️</span>
-                        <span class="countdown" data-end="{{ session.get_end_datetime|date:'c' }}">Calculating...</span>
-                    </div>
-                    {% endif %}
-                </div>
-
-                {% if session.notes %}
-                <div class="session-notes">
-                    📝 {{ session.notes }}
-                </div>
-                {% endif %}
-
-                {% if session.status == 'in_progress' %}
-                <div class="countdown-alert">
-                    ⚠️ Session is currently active
-                </div>
-                {% endif %}
-
-                <div class="session-actions">
-                    {% if session.status == 'scheduled' %}
-                        <a href="{% url 'start_session' session_id=session.id %}" class="btn btn-start">
-                            ▶️ Start Session
-                        </a>
-                    {% elif session.status == 'in_progress' %}
-                        <a href="{% url 'take_attendance' session_id=session.id %}" class="btn btn-attendance">
-                            ✅ Take Attendance
-                        </a>
-                        <a href="{% url 'complete_session' session_id=session.id %}" class="btn btn-complete">
-                            🏁 Complete Session
-                        </a>
-                    {% endif %}
-                </div>
-            </div>
-            {% empty %}
-            <div class="empty-state">
-                <div class="empty-icon">📅</div>
-                <h3>No Sessions Yet</h3>
-                <p>Create your first session to start managing your class</p>
-                <button class="btn btn-primary" onclick="openModal()">
-                    Create First Session
-                </button>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-
-    <!-- Create Session Modal -->
-    <div id="sessionModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal()">&times;</button>
-            
-            <div class="modal-header">
-                <h2>Create New Session</h2>
-                <p>Schedule a new class session</p>
-            </div>
-
-            <form id="sessionForm" method="post" action="{% url 'create_session' class_id=class_obj.id %}">
-                <div class="modal-body">
-                    {% csrf_token %}
-                    <div id="alerts"></div>
-
-                    <div class="form-group">
-                        <label for="session_date">Date</label>
-                        <input type="date" id="session_date" name="session_date" class="form-control" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="start_time">Start Time</label>
-                        <input type="time" id="start_time" name="start_time" class="form-control" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="end_time">End Time</label>
-                        <input type="time" id="end_time" name="end_time" class="form-control" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="topic">Topic (Optional)</label>
-                        <input type="text" id="topic" name="topic" class="form-control" placeholder="What will you cover in this session?">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="notes">Notes (Optional)</label>
-                        <textarea id="notes" name="notes" class="form-control" rows="3" placeholder="Any additional notes or reminders"></textarea>
-                    </div>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Create Session</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <script>
+    {% block extra_js %}
+<script>
         // Modal functions
         function openModal() {
             document.getElementById('sessionModal').classList.add('show');
@@ -647,5 +645,4 @@
         updateCountdowns();
         setInterval(updateCountdowns, 60000);
     </script>
-</body>
-</html>
+    {% endblock %}
