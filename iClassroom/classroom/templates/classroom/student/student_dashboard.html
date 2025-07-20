@@ -1,17 +1,768 @@
+{% extends 'classroom/layouts/student_base_layout.html' %}
 
 
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iClassroom - Student Dashboard</title>
-    <link rel="stylesheet" href="{% static 'classroom/css/student_dashboard.css' %}">
-    <link rel="stylesheet" href="{% static 'classroom/css/css/bootstrap.min.css' %}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
+
+{% block content %}    
+<div class="dashboard-container">
+    <!-- Header -->
+    <!-- Main Content -->
+    <main class="student-content">
+        <div class="dashboard-header">
+            <h2>Welcome back, {{ user.first_name }} {{ user.last_name }}</h2>
+            <p>Student ID: {{ user.student_id|default:"12345" }}</p>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-content">
+                    <div class="stat-info">
+                        <div class="stat-number">{{ total_classes }}</div>
+                        <h3>Enrolled Classes</h3>
+                    </div>
+                    <div class="stat-icon student-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 14L21 9L12 4L3 9L12 14Z" stroke="#6366f1" stroke-width="2"/>
+                            <path d="M12 14L18.16 10.16C18.16 10.16 18.16 13.16 18.16 16.16C18.16 17.16 15.31 18.16 12 18.16C8.69 18.16 5.84 17.16 5.84 16.16C5.84 13.16 5.84 10.16 5.84 10.16L12 14Z" stroke="#6366f1" stroke-width="2"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-content">
+                    <div class="stat-info">
+                        <div class="stat-number">{{ overall_attendance_percentage }}%</div>
+                        <h3>Overall Attendance</h3>
+                    </div>
+                    <div class="stat-icon student-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#6366f1" stroke-width="2"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-content">
+                    <div class="stat-info">
+                        <div class="stat-number">{{ overall_participation_score }}%</div>
+                        <h3>Participation Score</h3>
+                    </div>
+                    <div class="stat-icon student-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="#6366f1" stroke-width="2"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-content">
+                    <div class="stat-info">
+                        <div class="stat-number">{{ classes_today }}</div>
+                        <h3>Classes Today</h3>
+                    </div>
+                    <div class="stat-icon student-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 2V5M16 2V5M3.5 9.09H20.5M21 8.5V17C21 18.1046 20.1046 19 19 19H5C3.89543 19 3 18.1046 3 17V8.5C3 7.39543 3.89543 6.5 5 6.5H19C20.1046 6.5 21 7.39543 21 8.5Z" stroke="#6366f1" stroke-width="2"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Grid -->
+        <div class="content-grid">
+            <!-- My Classes Section -->
+            <div class="classes-section">
+                <div class="section-header">
+                    <div>
+                        <h3>My Classes</h3>
+                        <p>Your enrolled courses and attendance status</p>
+                    </div>
+                    <button type="button" class="join-class-btn" data-bs-toggle="modal" data-bs-target="#joinClassModal">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Join Class
+                    </button>
+                </div>
+
+                {% if not attendance_stats %}
+                    <div class="no-classes-message">
+                        <div class="empty-state">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 14L21 9L12 4L3 9L12 14Z" stroke="#9ca3af" stroke-width="1.5"/>
+                                <path d="M12 14L18.16 10.16C18.16 10.16 18.16 13.16 18.16 16.16C18.16 17.16 15.31 18.16 12 18.16C8.69 18.16 5.84 17.16 5.84 16.16C5.84 13.16 5.84 10.16 5.84 10.16L12 14Z" stroke="#9ca3af" stroke-width="1.5"/>
+                            </svg>
+                            <h4>No Classes Yet</h4>
+                            <p>Join a class using the "Join Class" button above to get started</p>
+                        </div>
+                    </div>
+                {% else %}
+                    {% for stat in attendance_stats %}
+                    <div class="student-class-card">
+                        <div class="class-header">
+                                <div class="class-info">
+                                <h4>{{ stat.class.course_name }}</h4>
+                                <p>{{ stat.class.section }} • {{ stat.class.teacher.first_name }} {{ stat.class.teacher.last_name }}</p>
+                                <p>{{ stat.class.schedule }} (PH Time)</p>
+                            </div>
+                            {% if stat.current_session %}
+                                <span class="session-badge" style="background-color: #10B981;">In Session (PH Time)</span>
+                            {% elif stat.next_session %}
+                                <span class="session-badge" style="background-color: #3B82F6;">
+                                    Scheduled: {{ stat.next_session.session_date|date:"M j" }} {{ stat.next_session.start_time|time:"g:i A" }} PH
+                                </span>
+                            {% endif %}
+                        </div>
+                        <div class="progress-bars">
+                            <div class="progress-item">
+                                <div class="progress-header">
+                                    <span>Attendance</span>
+                                    <span>
+                                        {% if stat.total_sessions > 0 %}
+                                            {{ stat.attendance_percentage }}%
+                                        {% else %}
+                                            No data
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" 
+                                        style="width: {% if stat.total_sessions > 0 %}{{ stat.attendance_percentage }}%{% else %}0%{% endif %};
+                                                background-color: {% if stat.attendance_percentage >= 80 %}#10B981
+                                                                {% elif stat.attendance_percentage >= 50 %}#F59E0B
+                                                                {% else %}#EF4444{% endif %};">
+                                    </div>
+                                </div>
+                                <div class="progress-note">
+                                    {{ stat.present_count }} of {{ stat.total_sessions }} sessions
+                                </div>
+                            </div>
+                            <div class="progress-item">
+                                <div class="progress-header">
+                                    <span>Participation</span>
+                                    <span>
+                                        {% if stat.participation_points > 0 %}
+                                            {{ stat.participation_score }}%
+                                        {% else %}
+                                            No data
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" 
+                                        style="width: {% if stat.participation_points > 0 %}{{ stat.participation_score }}%{% else %}0%{% endif %};
+                                                background-color: {% if stat.participation_score >= 80 %}#10B981
+                                                                {% elif stat.participation_score >= 50 %}#F59E0B
+                                                                {% else %}#EF4444{% endif %};">
+                                    </div>
+                                </div>
+                                <div class="progress-note">
+                                    {{ stat.participation_points }} total points
+                                </div>
+                            </div>
+                        </div>
+                        <div class="class-actions">
+                            {% if stat.next_session %}
+                                <span class="next-class">
+                                    Next: {{ stat.next_session.session_date|date:"D M d" }} {{ stat.next_session.start_time|time:"g:i A" }} PH
+                                </span>
+                            {% else %}
+                                <span class="next-class">No upcoming sessions</span>
+                            {% endif %}
+                            {% if stat.current_session %}
+                                <button class="check-in-btn">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="white" stroke-width="2"/>
+                                    </svg>
+                                    Check In
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <!-- Activity Section -->
+            <div class="activity">
+                <!-- Recent Activities -->
+                <div class="activities-section">
+                    <div class="section-header">
+                        <h3>Recent Activities</h3>
+                        <p>Your latest attendance and participation updates</p>
+                    </div>
+                    <div class="activities-list">
+                        {% if not recent_activities %}
+                            <div class="empty-state small">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="#9ca3af" stroke-width="1.5"/>
+                                </svg>
+                                <p>No recent activities</p>
+                            </div>
+                        {% else %}
+                            {% for activity in recent_activities %}
+                            <div class="activity-item">
+                                <div class="activity-dot success"></div>
+                                <div class="activity-content">
+                                    {% if activity.type == 'attendance' %}
+                                        <p>Marked {{ activity.activity.get_status_display|lower }} in {{ activity.activity.session.class_instance.course_name }}</p>
+                                    {% else %}
+                                        <p>Awarded {{ activity.activity.points }} participation points in {{ activity.activity.session.class_instance.course_name }}</p>
+                                    {% endif %}
+                                    <span class="activity-time">{{ activity.time|timesince }} ago</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <h3>Quick Actions</h3>
+                    <div class="action-buttons">
+                        <button class="action-btn primary">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 7V17C3 18.1046 3.89543 19 5 19H19C20.1046 19 21 18.1046 21 17V7C21 5.89543 20.1046 5 19 5H5C3.89543 5 3 5.89543 3 7Z" stroke="white" stroke-width="2"/>
+                                <path d="M8 9L10 11L16 5" stroke="white" stroke-width="2"/>
+                            </svg>
+                            Scan QR Code
+                        </button>
+                        <button class="action-btn secondary">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M8 2V5M16 2V5M3.5 9.09H20.5M21 8.5V17C21 18.1046 20.1046 19 19 19H5C3.89543 19 3 18.1046 3 17V8.5C3 7.39543 3.89543 6.5 5 6.5H19C20.1046 6.5 21 7.39543 21 8.5Z" stroke="#6366f1" stroke-width="2"/>
+                            </svg>
+                            View Schedule
+                        </button>
+                        <button class="action-btn secondary">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="#6366f1" stroke-width="2"/>
+                            </svg>
+                            View Progress
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Join Class Modal -->
+<div class="modal fade" id="joinClassModal" tabindex="-1" aria-labelledby="joinClassModalLabel" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modern-modal">
+            <div class="modal-header modern-header">
+                <div class="modal-title-wrapper">
+                    <div class="modal-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h5 class="modal-title" id="joinClassModalLabel">Join a Class</h5>
+                        <p class="modal-subtitle">Enter the class ID provided by your teacher</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close modern-close" data-bs-dismiss="modal" aria-label="Close">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <form method="post" action="{% url 'enroll_in_class' %}" id="joinClassForm">
+                {% csrf_token %}
+                <div class="modal-body modern-body">
+                    <!-- Alert Messages -->
+                    <div id="modalMessages" style="display: none;"></div>
+                    
+                    <div class="form-group">
+                        <label for="class_id" class="form-label">
+                            Class ID <span class="required">*</span>
+                        </label>
+                        <input type="text" 
+                                class="modern-input" 
+                                id="class_id" 
+                                name="class_id"
+                                placeholder="Paste the class ID here (e.g., CLS123456)" 
+                                required>
+                        <div class="input-help">
+                            Ask your teacher for the class ID. It usually starts with letters followed by numbers.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer modern-footer">
+                    <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-join">
+                        <span class="btn-text">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Join Class
+                        </span>
+                        <span class="btn-loading" style="display: none;">
+                            <svg class="spinner" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
+                                    <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
+                                    <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
+                                </circle>
+                            </svg>
+                            Joining...
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
         /* Modern Modal Styles */
+        * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f8fafc;
+    color: #1f2937;
+    line-height: 1.6;
+}
+
+.dashboard-container {
+    min-height: 100vh;
+}
+
+/* Header Styles */
+.header {
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 16px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-left .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 2px;
+}
+
+.tagline {
+    font-size: 12px;
+    color: #6b7280;
+    font-weight: 400;
+}
+
+.user-profile {
+    width: 40px;
+    height: 40px;
+    background: #6366f1;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* Main Content */
+.student-content {
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.dashboard-header {
+    margin-bottom: 32px;
+}
+
+.dashboard-header h2 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 8px;
+}
+
+.dashboard-header p {
+    color: #6b7280;
+    font-size: 16px;
+}
+
+/* Statistics Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    border: 1px solid #e5e7eb;
+    transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.stat-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.stat-number {
+    font-size: 36px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 4px;
+}
+
+.stat-card h3 {
+    font-size: 14px;
+    font-weight: 500;
+    color: #6b7280;
+    margin-bottom: 8px;
+}
+
+.student-icon {
+    width: 48px;
+    height: 48px;
+    background: #eef2ff;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Content Grid */
+.content-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 32px;
+}
+
+/* Classes Section */
+.classes-section {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    border: 1px solid #e5e7eb;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+}
+
+.section-header h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 4px;
+}
+
+.section-header p {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+/* Student Class Card */
+.student-class-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+}
+
+.class-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.class-info h4 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 4px;
+}
+
+.class-info p {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 2px;
+}
+
+.session-badge {
+    background: #10b981;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.session-badge.scheduled {
+    background: #6b7280;
+}
+
+/* Progress Bars */
+.progress-bars {
+    margin-bottom: 20px;
+}
+
+.progress-item {
+    margin-bottom: 12px;
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+
+.progress-header span:first-child {
+    color: #6b7280;
+}
+
+.progress-header span:last-child {
+    color: #1f2937;
+    font-weight: 500;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #f3f4f6;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: #6366f1;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+/* Class Actions */
+.class-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.next-class {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.check-in-btn {
+    background: #6366f1;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.check-in-btn:hover {
+    background: #5856eb;
+}
+
+/* activity */
+.activity {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Activities Section */
+.activities-section {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    border: 1px solid #e5e7eb;
+    margin-bottom: 24px;
+}
+
+.activities-list {
+    space-y: 16px;
+}
+
+.activity-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-dot {
+    width: 8px;
+    height: 8px;
+    background: #6366f1;
+    border-radius: 50%;
+    margin-top: 6px;
+    flex-shrink: 0;
+}
+
+.activity-dot.success {
+    background: #10b981;
+}
+
+.activity-content p {
+    font-size: 14px;
+    color: #1f2937;
+    margin-bottom: 2px;
+}
+
+.activity-time {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+/* Quick Actions */
+.quick-actions {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    border: 1px solid #e5e7eb;
+}
+
+.quick-actions h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 16px;
+}
+
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    text-align: left;
+}
+
+.action-btn.primary {
+    background: #6366f1;
+    color: white;
+}
+
+.action-btn.primary:hover {
+    background: #5856eb;
+}
+
+.action-btn.secondary {
+    background: #f3f4f6;
+    color: #374151;
+    border: 1px solid #e5e7eb;
+}
+
+.action-btn.secondary:hover {
+    background: #e5e7eb;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .activity {
+        grid-row: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .student-content {
+        padding: 16px;
+    }
+    
+    .header {
+        padding: 12px 16px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .dashboard-header h2 {
+        font-size: 24px;
+    }
+    
+    .brand-name {
+        font-size: 18px;
+    }
+    
+    .tagline {
+        font-size: 11px;
+    }
+}
         .modern-modal {
             border: none;
             border-radius: 20px;
@@ -298,326 +1049,8 @@
             display: none;
         }
     </style>
-</head>
-<body>
-    <div class="dashboard-container">
-        <!-- Header -->
-        <!-- Main Content -->
-        <main class="main-content">
-            <div class="dashboard-header">
-                <h2>Welcome back, {{ user.first_name }} {{ user.last_name }}</h2>
-                <p>Student ID: {{ user.student_id|default:"12345" }}</p>
-            </div>
-
-            <!-- Statistics Cards -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-content">
-                        <div class="stat-info">
-                            <div class="stat-number">{{ total_classes }}</div>
-                            <h3>Enrolled Classes</h3>
-                        </div>
-                        <div class="stat-icon student-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 14L21 9L12 4L3 9L12 14Z" stroke="#6366f1" stroke-width="2"/>
-                                <path d="M12 14L18.16 10.16C18.16 10.16 18.16 13.16 18.16 16.16C18.16 17.16 15.31 18.16 12 18.16C8.69 18.16 5.84 17.16 5.84 16.16C5.84 13.16 5.84 10.16 5.84 10.16L12 14Z" stroke="#6366f1" stroke-width="2"/>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-content">
-                        <div class="stat-info">
-                            <div class="stat-number">{{ overall_attendance_percentage }}%</div>
-                            <h3>Overall Attendance</h3>
-                        </div>
-                        <div class="stat-icon student-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#6366f1" stroke-width="2"/>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-content">
-                        <div class="stat-info">
-                            <div class="stat-number">{{ overall_participation_score }}%</div>
-                            <h3>Participation Score</h3>
-                        </div>
-                        <div class="stat-icon student-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="#6366f1" stroke-width="2"/>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-content">
-                        <div class="stat-info">
-                            <div class="stat-number">{{ classes_today }}</div>
-                            <h3>Classes Today</h3>
-                        </div>
-                        <div class="stat-icon student-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M8 2V5M16 2V5M3.5 9.09H20.5M21 8.5V17C21 18.1046 20.1046 19 19 19H5C3.89543 19 3 18.1046 3 17V8.5C3 7.39543 3.89543 6.5 5 6.5H19C20.1046 6.5 21 7.39543 21 8.5Z" stroke="#6366f1" stroke-width="2"/>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Content Grid -->
-            <div class="content-grid">
-                <!-- My Classes Section -->
-                <div class="classes-section">
-                    <div class="section-header">
-                        <div>
-                            <h3>My Classes</h3>
-                            <p>Your enrolled courses and attendance status</p>
-                        </div>
-                        <button type="button" class="join-class-btn" data-bs-toggle="modal" data-bs-target="#joinClassModal">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            Join Class
-                        </button>
-                    </div>
-
-                    {% if not attendance_stats %}
-                        <div class="no-classes-message">
-                            <div class="empty-state">
-                                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 14L21 9L12 4L3 9L12 14Z" stroke="#9ca3af" stroke-width="1.5"/>
-                                    <path d="M12 14L18.16 10.16C18.16 10.16 18.16 13.16 18.16 16.16C18.16 17.16 15.31 18.16 12 18.16C8.69 18.16 5.84 17.16 5.84 16.16C5.84 13.16 5.84 10.16 5.84 10.16L12 14Z" stroke="#9ca3af" stroke-width="1.5"/>
-                                </svg>
-                                <h4>No Classes Yet</h4>
-                                <p>Join a class using the "Join Class" button above to get started</p>
-                            </div>
-                        </div>
-                    {% else %}
-                        {% for stat in attendance_stats %}
-                        <div class="student-class-card">
-                            <div class="class-header">
-                                 <div class="class-info">
-                                    <h4>{{ stat.class.course_name }}</h4>
-                                    <p>{{ stat.class.section }} • {{ stat.class.teacher.first_name }} {{ stat.class.teacher.last_name }}</p>
-                                    <p>{{ stat.class.schedule }} (PH Time)</p>
-                                </div>
-                                {% if stat.current_session %}
-                                    <span class="session-badge" style="background-color: #10B981;">In Session (PH Time)</span>
-                                {% elif stat.next_session %}
-                                    <span class="session-badge" style="background-color: #3B82F6;">
-                                        Scheduled: {{ stat.next_session.session_date|date:"M j" }} {{ stat.next_session.start_time|time:"g:i A" }} PH
-                                    </span>
-                                {% endif %}
-                            </div>
-                            <div class="progress-bars">
-                                <div class="progress-item">
-                                    <div class="progress-header">
-                                        <span>Attendance</span>
-                                        <span>
-                                            {% if stat.total_sessions > 0 %}
-                                                {{ stat.attendance_percentage }}%
-                                            {% else %}
-                                                No data
-                                            {% endif %}
-                                        </span>
-                                    </div>
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" 
-                                            style="width: {% if stat.total_sessions > 0 %}{{ stat.attendance_percentage }}%{% else %}0%{% endif %};
-                                                    background-color: {% if stat.attendance_percentage >= 80 %}#10B981
-                                                                    {% elif stat.attendance_percentage >= 50 %}#F59E0B
-                                                                    {% else %}#EF4444{% endif %};">
-                                        </div>
-                                    </div>
-                                    <div class="progress-note">
-                                        {{ stat.present_count }} of {{ stat.total_sessions }} sessions
-                                    </div>
-                                </div>
-                                <div class="progress-item">
-                                    <div class="progress-header">
-                                        <span>Participation</span>
-                                        <span>
-                                            {% if stat.participation_points > 0 %}
-                                                {{ stat.participation_score }}%
-                                            {% else %}
-                                                No data
-                                            {% endif %}
-                                        </span>
-                                    </div>
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" 
-                                            style="width: {% if stat.participation_points > 0 %}{{ stat.participation_score }}%{% else %}0%{% endif %};
-                                                    background-color: {% if stat.participation_score >= 80 %}#10B981
-                                                                    {% elif stat.participation_score >= 50 %}#F59E0B
-                                                                    {% else %}#EF4444{% endif %};">
-                                        </div>
-                                    </div>
-                                    <div class="progress-note">
-                                        {{ stat.participation_points }} total points
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="class-actions">
-                                {% if stat.next_session %}
-                                    <span class="next-class">
-                                        Next: {{ stat.next_session.session_date|date:"D M d" }} {{ stat.next_session.start_time|time:"g:i A" }} PH
-                                    </span>
-                                {% else %}
-                                    <span class="next-class">No upcoming sessions</span>
-                                {% endif %}
-                                {% if stat.current_session %}
-                                    <button class="check-in-btn">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="white" stroke-width="2"/>
-                                        </svg>
-                                        Check In
-                                    </button>
-                                {% endif %}
-                            </div>
-                        </div>
-                        {% endfor %}
-                    {% endif %}
-                </div>
-
-                <!-- Sidebar -->
-                <div class="sidebar">
-                    <!-- Recent Activities -->
-                    <div class="activities-section">
-                        <div class="section-header">
-                            <h3>Recent Activities</h3>
-                            <p>Your latest attendance and participation updates</p>
-                        </div>
-                        <div class="activities-list">
-                            {% if not recent_activities %}
-                                <div class="empty-state small">
-                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="#9ca3af" stroke-width="1.5"/>
-                                    </svg>
-                                    <p>No recent activities</p>
-                                </div>
-                            {% else %}
-                                {% for activity in recent_activities %}
-                                <div class="activity-item">
-                                    <div class="activity-dot success"></div>
-                                    <div class="activity-content">
-                                        {% if activity.type == 'attendance' %}
-                                            <p>Marked {{ activity.activity.get_status_display|lower }} in {{ activity.activity.session.class_instance.course_name }}</p>
-                                        {% else %}
-                                            <p>Awarded {{ activity.activity.points }} participation points in {{ activity.activity.session.class_instance.course_name }}</p>
-                                        {% endif %}
-                                        <span class="activity-time">{{ activity.time|timesince }} ago</span>
-                                    </div>
-                                </div>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <!-- Quick Actions -->
-                    <div class="quick-actions">
-                        <h3>Quick Actions</h3>
-                        <div class="action-buttons">
-                            <button class="action-btn primary">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M3 7V17C3 18.1046 3.89543 19 5 19H19C20.1046 19 21 18.1046 21 17V7C21 5.89543 20.1046 5 19 5H5C3.89543 5 3 5.89543 3 7Z" stroke="white" stroke-width="2"/>
-                                    <path d="M8 9L10 11L16 5" stroke="white" stroke-width="2"/>
-                                </svg>
-                                Scan QR Code
-                            </button>
-                            <button class="action-btn secondary">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M8 2V5M16 2V5M3.5 9.09H20.5M21 8.5V17C21 18.1046 20.1046 19 19 19H5C3.89543 19 3 18.1046 3 17V8.5C3 7.39543 3.89543 6.5 5 6.5H19C20.1046 6.5 21 7.39543 21 8.5Z" stroke="#6366f1" stroke-width="2"/>
-                                </svg>
-                                View Schedule
-                            </button>
-                            <button class="action-btn secondary">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="#6366f1" stroke-width="2"/>
-                                </svg>
-                                View Progress
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- Join Class Modal -->
-    <div class="modal fade" id="joinClassModal" tabindex="-1" aria-labelledby="joinClassModalLabel" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content modern-modal">
-                <div class="modal-header modern-header">
-                    <div class="modal-title-wrapper">
-                        <div class="modal-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <h5 class="modal-title" id="joinClassModalLabel">Join a Class</h5>
-                            <p class="modal-subtitle">Enter the class ID provided by your teacher</p>
-                        </div>
-                    </div>
-                    <button type="button" class="btn-close modern-close" data-bs-dismiss="modal" aria-label="Close">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </button>
-                </div>
-                
-                <form method="post" action="{% url 'enroll_in_class' %}" id="joinClassForm">
-                    {% csrf_token %}
-                    <div class="modal-body modern-body">
-                        <!-- Alert Messages -->
-                        <div id="modalMessages" style="display: none;"></div>
-                        
-                        <div class="form-group">
-                            <label for="class_id" class="form-label">
-                                Class ID <span class="required">*</span>
-                            </label>
-                            <input type="text" 
-                                   class="modern-input" 
-                                   id="class_id" 
-                                   name="class_id"
-                                   placeholder="Paste the class ID here (e.g., CLS123456)" 
-                                   required>
-                            <div class="input-help">
-                                Ask your teacher for the class ID. It usually starts with letters followed by numbers.
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="modal-footer modern-footer">
-                        <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-join">
-                            <span class="btn-text">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                                Join Class
-                            </span>
-                            <span class="btn-loading" style="display: none;">
-                                <svg class="spinner" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
-                                        <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
-                                        <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
-                                    </circle>
-                                </svg>
-                                Joining...
-                            </span>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
+{% endblock %}
+    {% block extra_js %}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -805,7 +1238,7 @@
                 ${message}
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             `;
-            document.querySelector('.main-content').insertBefore(alertDiv, document.querySelector('.dashboard-header'));
+            document.querySelector('.student-content').insertBefore(alertDiv, document.querySelector('.dashboard-header'));
         }
 
         // Copy Class ID functionality for any elements that might need it
@@ -822,5 +1255,5 @@
             });
         });
     </script>
-</body>
-</html>
+
+{% endblock %}
