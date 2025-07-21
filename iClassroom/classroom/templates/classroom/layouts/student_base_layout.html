@@ -128,7 +128,22 @@
             display: grid;
             gap: 1.5rem;
         }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #64748b;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 16px;
+            transition: color 0.2s;
+        }
         
+        .back-btn:hover {
+            color: #334155;
+            text-decoration: none;
+        }
         .grid-cols-1 { grid-template-columns: repeat(1, 1fr); }
         .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
         .grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
