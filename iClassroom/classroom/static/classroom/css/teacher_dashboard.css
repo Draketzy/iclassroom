@@ -310,9 +310,7 @@ body {
     border: 1px solid #e5e7eb;
 }
 
-.activities-list {
-    space-y: 16px;
-}
+
 
 .activity-item {
     display: flex;
