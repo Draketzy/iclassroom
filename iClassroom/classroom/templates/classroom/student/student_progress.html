@@ -54,9 +54,9 @@
   </div>
   <div class="tablist-container">
       <div class="tablist-header">
-        <button class="w3-bar-item w3-button" onclick="openTab('class-performance')">Class Performance</button>
-        <button class="w3-bar-item w3-button" onclick="openTab('recent-activity')">Recent Activity</button>
-        <button class="w3-bar-item w3-button" onclick="openTab('achievements')">Achievements</button>
+        <button onclick="openTab('class-performance')" class="active">Class Performance</button>
+        <button onclick="openTab('recent-activity')">Recent Activity</button>
+        <button onclick="openTab('achievements')">Achievements</button>
       </div>
 
        <div id="class-performance" class="tab-progress">
@@ -140,26 +140,39 @@
     margin-top: 24px;
 } */
  .tablist-header {
-    display: flex;
-    gap: 12px;
-    background-color:#f3f3f3;
-    margin-bottom: 16px;
-    justify-content:center;
-    align-items: center;
-    padding: 6px;
-    border-radius: 8px;
- }
-.tablist-header button{
-    padding: 12px;
-    background: #ffffff;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 16px;
-    color: #1f2937;
-    width: 100%;
-    justify-content:center;
-    align-items: center;
+  display: flex;
+  gap: 12px;
+  background-color: #f6f6f6;
+  margin-bottom: 16px;
+  justify-content: center;
+  align-items: center;
+  padding: 6px;
+  border-radius: 8px;
+}
+
+.tablist-header button {
+  padding: 6px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #5b5b5b;
+  width: 100%;
+  background-color: #f6f6f6;
+  transition: background-color 0.3s, color 0.3s; /* Smooth transition */
+}
+
+.tablist-header button:focus {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+/* Active tab style */
+.tablist-header button.active {
+  background-color: #ffffff;
+  font-weight: 500;
+  color: #000000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Add subtle shadow */
 }
 </style>
 {% endblock %}
@@ -167,12 +180,21 @@
 {% block extra_js %}
 <script>
 function openTab(tabName) {
-  var i;
-  var x = document.getElementsByClassName("tab-progress");
-  for (i = 0; i < x.length; i++) {
-    x[i].style.display = "none";  
+  // Hide all tab content
+  var tabContents = document.getElementsByClassName("tab-progress");
+  for (var i = 0; i < tabContents.length; i++) {
+    tabContents[i].style.display = "none";
   }
-  document.getElementById(tabName).style.display = "block";  
+
+  // Remove 'active' class from all buttons
+  var tabButtons = document.querySelectorAll(".tablist-header button");
+  for (var i = 0; i < tabButtons.length; i++) {
+    tabButtons[i].classList.remove("active");
+  }
+
+  // Show the selected tab content and mark button as active
+  document.getElementById(tabName).style.display = "block";
+  event.currentTarget.classList.add("active"); // Highlight clicked button
 }
 </script>
 {% endblock %}
