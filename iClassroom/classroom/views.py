@@ -701,6 +701,10 @@ def enroll_in_class(request):
             print(f"Enrollment error: {e}")
             
     return redirect('student_dashboard')
+@login_required
+def student_progress(request):
+    return render(request, 'classroom/student/student_progress.html')
+
 def logout_view(request):
     logout(request)
     return redirect('login')

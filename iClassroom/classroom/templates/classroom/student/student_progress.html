@@ -1,0 +1,34 @@
+{%extends 'classroom/layouts/student_base_layout.html'%}
+{%load static%}
+{% block content %}
+<div class="progress-container">
+  <div class="progress-header">
+    <h1>Academic Progress</h1>
+    <p>Track your attendance, participation, and achievements</p>
+  </div>
+</div>
+{%endblock%}
+
+{% block extra_css %}
+<style>
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.progress-container {
+    padding: 0 12px;
+    margin-top:8px;
+}
+.progress-header h1{
+    font-size: 32px;
+    font-weight: bold;
+    color: #1f2937;
+}
+.progress-header p{
+    font-size: 16px;
+    color: #212529;
+    margin-bottom: 2rem;
+}
+</style>
+{% endblock %}

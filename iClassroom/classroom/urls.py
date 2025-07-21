@@ -10,8 +10,11 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('teacher/dashboard/', views.teacher_dashboard, name='teacher_dashboard'),
     path('teacher/class/<uuid:class_id>/', views.class_detail, name='class_detail'),
+
+    # student urls
     path('student/dashboard/', views.student_dashboard, name='student_dashboard'),
     path('enroll/', views.enroll_in_class, name='enroll_in_class'),
+    path('student/progress/', views.student_progress, name='student_progress'),
 
     # Forgot password URLs
     path('forgot-password/', views.forgot_password, name='forgot_password'),
