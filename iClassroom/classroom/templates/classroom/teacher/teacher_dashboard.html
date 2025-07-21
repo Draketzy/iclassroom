@@ -8,7 +8,7 @@
     <!-- Page Header -->
     <div class="flex items-center justify-between mb-8">
         <div class="dashboard-header mt-2">
-                <h2>Dashboard</h2>
+                <h2 class="font-bold">Dashboard</h2>
                 <p>Welcome back, Professor {{ user.first_name }}</p>
             </div>
         <div class="flex gap-4">
@@ -16,7 +16,7 @@
                 <i class="fas fa-download"></i>
                 Export Report
             </button>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createClassModal" id="addClassBtn">
+            <button type="button" class="join-class-btn" data-bs-toggle="modal" data-bs-target="#createClassModal" id="addClassBtn">
                 <i class="fas fa-plus"></i>
                 Add Class
             </button>
@@ -116,7 +116,7 @@
                         <h3 class="card-title pt-2">My Classes</h3>
                         <p class="text-sm text-gray-600 mt-1">Manage your active classes</p>
                     </div>
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createClassModal">
+                    <button type="button" class="join-class-btn" data-bs-toggle="modal" data-bs-target="#createClassModal">
                         <i class="fas fa-plus"></i>
                         Add Class
                     </button>
@@ -190,7 +190,7 @@
                             </div>
                             
                             <div class="text-center">
-                                <a href="{% url 'class_detail' class.object.id %}" class="btn btn-primary w-full">
+                                <a href="{% url 'class_detail' class.object.id %}" class="join-class-btn w-full">
                                     View Class Details
                                 </a>
                             </div>
@@ -203,7 +203,7 @@
                             <i class="fas fa-book text-gray-400 text-4xl mb-4"></i>
                             <h4 class="text-lg font-semibold text-gray-900 mb-2">You don't have any classes yet</h4>
                             <p class="text-gray-600 mb-4">Get started by creating your first class</p>
-                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createClassModal">
+                            <button type="button" class="join-class-btn" data-bs-toggle="modal" data-bs-target="#createClassModal">
                                 Create Class
                             </button>
                         </div>
@@ -502,6 +502,26 @@
     display: flex;
     gap: 0.75rem;
     justify-content: flex-end;
+}
+.join-class-btn
+{
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+.join-class-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    color: white;
 }
 
 .btn-cancel {
