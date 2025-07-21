@@ -17,21 +17,9 @@
                 <h3 class="nav-section-title">Main</h3>
                 <ul class="nav-list">
                     <li class="nav-item">
-                        <a href="#" class="nav-link active" title="Dashboard">
+                        <a href="{% url 'teacher_dashboard' %}" class="nav-link active" title="Dashboard">
                             <i class="fas fa-tachometer-alt nav-icon"></i>
                             <span class="nav-text">Dashboard</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link" title="Attendance">
-                            <i class="fas fa-calendar-check nav-icon"></i>
-                            <span class="nav-text">Attendance</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link" title="Participation">
-                            <i class="fas fa-chart-line nav-icon"></i>
-                            <span class="nav-text">Participation</span>
                         </a>
                     </li>
                 </ul>
@@ -40,10 +28,11 @@
             <div class="nav-section">
                 <h3 class="nav-section-title">Classes</h3>
                 <ul class="nav-list">
+                    {% for class in classes_with_stats %}
                     <li class="nav-item">
-                        <a href="#" class="nav-link" title="Mathematics">
+                        <a href="{% url 'class_detail' class.object.id %}" class="nav-link" title="Mathematics">
                             <i class="fas fa-book nav-icon"></i>
-                            <span class="nav-text">Mathematics</span>
+                            <span class="nav-text">{{ class.object.course_name }}</span>
                             <span class="status-dot active"></span>
                         </a>
                     </li>
@@ -62,6 +51,7 @@
                         </a>
                     </li>
                 </ul>
+                {% endfor %}
             </div>
             
             <div class="nav-section">
