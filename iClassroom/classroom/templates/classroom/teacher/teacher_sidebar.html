@@ -1,14 +1,17 @@
 {% load static %}
 <!-- teacher_sidebar.html -->
+
+{% block content %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'classroom/css/teacher_sidebar.css' %}">
+    <title>Document</title>
 </head>
 <body>
-  <div> 
+    
     <!-- Sidebar Component -->
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-content">
@@ -36,8 +39,8 @@
                             <span class="status-dot active"></span>
                         </a>
                     </li>
-                </ul>
                 {% endfor %}
+                </ul>
             </div>
             
             <div class="nav-section">
@@ -78,369 +81,11 @@
         </nav>
     </div>
 </aside>
+</body>
+</html>
+{% endblock %}
 
-<style>
-.sidebar {
-    position: fixed;
-    left: 0;
-    top: 85px;
-    bottom: 0;
-    width: 280px;
-    background: #f6faff;
-    border-right: 1px solid #e5e7eb;
-    transition: width 0.3s ease;
-    z-index: 999;
-    overflow: hidden;
-}
-
-.sidebar.collapsed {
-    width: 70px;
-}
-
-.sidebar-content {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.sidebar-nav {
-    flex: 1;
-    padding: 1.5rem 0;
-    overflow-y: auto;
-    overflow-x: hidden;
-}
-
-.sidebar-nav::-webkit-scrollbar {
-    width: 4px;
-}
-
-.sidebar-nav::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.sidebar-nav::-webkit-scrollbar-thumb {
-    background: #d1d5db;
-    border-radius: 2px;
-}
-
-.nav-section {
-    margin-bottom: 2rem;
-}
-
-.nav-section-title {
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    color: #6b7280;
-    margin: 0 0 1rem 1.5rem;
-    letter-spacing: 0.05em;
-    transition: opacity 0.3s ease, margin 0.3s ease;
-    white-space: nowrap;
-}
-
-.sidebar.collapsed .nav-section-title {
-    opacity: 0;
-    margin-left: 0;
-    margin-right: 0;
-    height: 0;
-    margin-bottom: 0.5rem;
-}
-
-.nav-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-.nav-item {
-    margin-bottom: 0.25rem;
-    position: relative;
-}
-
-.nav-link {
-    display: flex;
-    align-items: center;
-    padding: 0.75rem 1.5rem;
-    color: #374151;
-    text-decoration: none;
-    transition: all 0.2s;
-    position: relative;
-    white-space: nowrap;
-    border-radius: 0 25px 25px 0;
-    margin-right: 1rem;
-}
-
-.sidebar.collapsed .nav-link {
-    padding: 0.75rem;
-    justify-content: center;
-    margin-right: 0;
-    border-radius: 0.5rem;
-    margin: 0.25rem 0.5rem;
-}
-
-.nav-link:hover {
-    background-color: #f0f6ff;
-    color: #4f46e5;
-}
-
-.nav-link.active {
-    background-color: #eef2ff;
-    color: #4f46e5;
-    border-right: 3px solid #4f46e5;
-}
-
-.sidebar.collapsed .nav-link.active {
-    border-right: none;
-    background-color: #4f46e5;
-    color: white;
-}
-
-.nav-icon {
-    width: 20px;
-    font-size: 1.1rem;
-    margin-right: 0.75rem;
-    flex-shrink: 0;
-    text-align: center;
-}
-
-.sidebar.collapsed .nav-icon {
-    margin-right: 0;
-}
-
-.nav-text {
-    flex: 1;
-    font-weight: 500;
-    transition: opacity 0.3s ease;
-}
-
-.sidebar.collapsed .nav-text {
-    opacity: 0;
-    width: 0;
-    overflow: hidden;
-}
-
-.nav-badge {
-    background: #ef4444;
-    color: white;
-    font-size: 0.75rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 1rem;
-    min-width: 1.5rem;
-    text-align: center;
-    transition: opacity 0.3s ease;
-}
-
-.sidebar.collapsed .nav-badge {
-    opacity: 0;
-    width: 0;
-    overflow: hidden;
-    padding: 0;
-    margin: 0;
-}
-
-.status-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #d1d5db;
-    margin-left: auto;
-    flex-shrink: 0;
-    transition: opacity 0.3s ease;
-}
-
-.sidebar.collapsed .status-dot {
-    opacity: 0;
-    width: 0;
-    overflow: hidden;
-}
-
-.status-dot.active {
-    background: #10b981;
-    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
-}
-
-.sidebar-footer {
-    padding: 1.5rem;
-    border-top: 1px solid #e5e7eb;
-    transition: padding 0.3s ease;
-}
-
-.sidebar.collapsed .sidebar-footer {
-    padding: 1rem 0.5rem;
-}
-
-.upgrade-card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 1rem;
-    padding: 1.5rem;
-    color: white;
-    text-align: center;
-    transition: all 0.3s ease;
-    overflow: hidden;
-}
-
-.sidebar.collapsed .upgrade-card {
-    padding: 1rem 0.5rem;
-    border-radius: 0.5rem;
-}
-
-.upgrade-icon {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-    color: #fbbf24;
-    transition: all 0.3s ease;
-}
-
-.sidebar.collapsed .upgrade-icon {
-    font-size: 1.5rem;
-    margin-bottom: 0;
-}
-
-.upgrade-content {
-    transition: opacity 0.3s ease;
-}
-
-.sidebar.collapsed .upgrade-content {
-    opacity: 0;
-    height: 0;
-    overflow: hidden;
-}
-
-.upgrade-content h4 {
-    margin: 0 0 0.5rem 0;
-    font-size: 1.1rem;
-    font-weight: 600;
-    transition: opacity 0.3s ease;
-}
-
-.upgrade-content p {
-    margin: 0 0 1rem 0;
-    font-size: 0.875rem;
-    opacity: 0.9;
-    line-height: 1.4;
-    transition: opacity 0.3s ease;
-}
-
-.upgrade-btn {
-    background: rgba(255,255,255,0.2);
-    border: 1px solid rgba(255,255,255,0.3);
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-    backdrop-filter: blur(10px);
-}
-
-.upgrade-btn:hover {
-    background: rgba(255,255,255,0.3);
-    transform: translateY(-1px);
-}
-
-/* Tooltip for collapsed state */
-.sidebar.collapsed .nav-item {
-    position: relative;
-}
-
-.sidebar.collapsed .nav-link::after {
-    content: attr(title);
-    position: absolute;
-    left: 100%;
-    top: 50%;
-    transform: translateY(-50%);
-    background: #1f2937;
-    color: white;
-    padding: 0.5rem 0.75rem;
-    border-radius: 0.375rem;
-    font-size: 0.875rem;
-    white-space: nowrap;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.2s;
-    z-index: 1000;
-    margin-left: 0.5rem;
-    pointer-events: none;
-}
-
-.sidebar.collapsed .nav-link::before {
-    content: '';
-    position: absolute;
-    left: 100%;
-    top: 50%;
-    transform: translateY(-50%);
-    border: 5px solid transparent;
-    border-right-color: #1f2937;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.2s;
-    z-index: 1000;
-    margin-left: 0.25rem;
-}
-
-.sidebar.collapsed .nav-link:hover::after,
-.sidebar.collapsed .nav-link:hover::before {
-    opacity: 1;
-    visibility: visible;
-}
-
-/* Main content adjustment */
-.sidebar-collapsed .main-content {
-    margin-left: 70px;
-}
-
-@media (max-width: 768px) {
-    .sidebar {
-        transform: translateX(-280px);
-        width: 280px;
-    }
-    
-    .sidebar.show {
-        transform: translateX(0);
-    }
-    
-    .sidebar.collapsed {
-        width: 280px;
-        transform: translateX(-280px);
-    }
-    
-    .sidebar.collapsed.show {
-        transform: translateX(0);
-    }
-    
-    .sidebar-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0,0,0,0.5);
-        z-index: 998;
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.3s;
-    }
-    
-    .sidebar-overlay.show {
-        opacity: 1;
-        visibility: visible;
-    }
-    
-    .main-content {
-        margin-left: 0 !important;
-    }
-}
-
-/* Smooth transitions for all elements */
-* {
-    transition-property: opacity, width, height, margin, padding, transform;
-    transition-duration: 0.3s;
-    transition-timing-function: ease;
-}
-</style>
-
+{% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const sidebar = document.getElementById('sidebar');
@@ -497,6 +142,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-  </div>
-</body>
-</html>
+
+{% endblock %}
