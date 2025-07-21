@@ -52,24 +52,24 @@
       </div>
     </div>
   </div>
-  <div class="tablist">
-      <div class="w3-bar w3-black">
-        <button class="w3-bar-item w3-button" onclick="openCity('London')">Class Performance</button>
-        <button class="w3-bar-item w3-button" onclick="openCity('Paris')">Paris</button>
-        <button class="w3-bar-item w3-button" onclick="openCity('Tokyo')">Tokyo</button>
+  <div class="tablist-container">
+      <div class="tablist-header">
+        <button class="w3-bar-item w3-button" onclick="openTab('class-performance')">Class Performance</button>
+        <button class="w3-bar-item w3-button" onclick="openTab('recent-activity')">Recent Activity</button>
+        <button class="w3-bar-item w3-button" onclick="openTab('achievements')">Achievements</button>
       </div>
 
-       <div id="London" class="w3-container city">
+       <div id="class-performance" class="tab-progress">
       <h2>London</h2>
       <p>London is the capital city of England.</p>
       </div>
 
-      <div id="Paris" class="w3-container city" style="display:none">
+      <div id="recent-activity" class="tab-progress" style="display:none">
         <h2>Paris</h2>
         <p>Paris is the capital of France.</p> 
       </div>
 
-      <div id="Tokyo" class="w3-container city" style="display:none">
+      <div id="achievements" class="tab-progress" style="display:none">
         <h2>Tokyo</h2>
         <p>Tokyo is the capital of Japan.</p>
       </div>
@@ -136,18 +136,39 @@
     color: #6b7280;
     margin-bottom: 8px;
 }
+/* .tablist-container {
+    margin-top: 24px;
+} */
+ .tablist-header {
+    display: flex;
+    gap: 12px;
+    background-color:#f3f3f3;
+    margin-bottom: 16px;
+    justify-content: space-between;
+    padding: 6px;
+ }
+.tablist-header button{
+    padding: 12px 7rem;
+    background: #ffffff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    color: #1f2937;
+    margin-right: 8px;
+}
 </style>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-function openCity(cityName) {
+function openTab(tabName) {
   var i;
-  var x = document.getElementsByClassName("city");
+  var x = document.getElementsByClassName("tab-progress");
   for (i = 0; i < x.length; i++) {
     x[i].style.display = "none";  
   }
-  document.getElementById(cityName).style.display = "block";  
+  document.getElementById(tabName).style.display = "block";  
 }
 </script>
 {% endblock %}
