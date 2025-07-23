@@ -1,5 +1,7 @@
 {%extends 'classroom/layouts/base_layout.html'%}
+{% load b64encode %}
 {% load static %}
+
 {%block extra_css%}
     <style>
         * {
@@ -684,7 +686,10 @@
                     <path d="M21 16H16V21" stroke="currentColor" stroke-width="2"/>
                     <path d="M21 21L16 16" stroke="currentColor" stroke-width="2"/>
                 </svg>
-                QR Attendance
+                <a href="{% url 'qr_attendance' session.id %}" class="qr-btn">
+                    <svg width="16" height="16" ...>...</svg>
+                    QR Attendance
+                </a>
             </button>
         </div>
         <!-- Tab Navigation -->

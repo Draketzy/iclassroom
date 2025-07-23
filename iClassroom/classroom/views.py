@@ -28,7 +28,7 @@ import json
 from datetime import datetime, timedelta
 from django.db import models
 from django.db.models import Count, Avg, Sum, F,FloatField,Q
-from .models import Class, Notification, ClassSession, Enrollment, Attendance, Participation, ParticipationCategory
+from .models import Class, Notification, ClassSession, Enrollment, Attendance, Participation, ParticipationCategory, QRCode
 from .forms import ClassForm ,SessionForm
 from django.views.generic import ListView, CreateView, UpdateView
 from django.http import JsonResponse
@@ -37,6 +37,7 @@ from collections import defaultdict
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment
 import io
+import qrcode
 logger = logging.getLogger(__name__)
 
 def login_view(request):
@@ -1362,3 +1363,69 @@ def generate_excel_report(request, class_id):
     filename = f"class_{class_id}_{report_type}_report.xlsx"
     response['Content-Disposition'] = f'attachment; filename={filename}'
     return response
+
+@login_required
+def qr_attendance(request, session_id):
+    session = get_object_or_404(ClassSession, id=session_id)
+    # Set expiry to session end time
+    expiry = session.get_end_datetime()
+    now = timezone.now()
+
+    # Generate or get QRCode object
+    qr_obj, created = QRCode.objects.get_or_create(
+        session=session,
+        defaults={
+            'code': str(session.id),  # You can use a more secure random code if needed
+            'expires_at': expiry,
+            'is_active': True,
+        }
+    )
+    # If already exists but expired, regenerate
+    if not created and qr_obj.expires_at < now:
+        qr_obj.code = str(session.id)
+        qr_obj.expires_at = expiry
+        qr_obj.is_active = True
+        qr_obj.scan_count = 0
+        qr_obj.save()
+
+    # The URL students will scan to mark attendance
+    qr_url = request.build_absolute_uri(
+        reverse('student_qr_attendance', args=[qr_obj.code])
+    )
+
+    # Generate QR code image
+    img = qrcode.make(qr_url)
+    buf = io.BytesIO()
+    img.save(buf, format='PNG')
+    image_stream = buf.getvalue()
+    buf.close()
+
+    # Render a template with the QR code
+    return render(request, 'classroom/teacher/qr_attendance.html', {
+        'session': session,
+        'qr_code': image_stream,
+        'qr_url': qr_url,
+        'expiry': expiry,
+    })
+
+from django.contrib import messages
+
+@login_required
+def student_qr_attendance(request, code):
+    qr_obj = get_object_or_404(QRCode, code=code, is_active=True)
+    session = qr_obj.session
+    now = timezone.now()
+    if now > qr_obj.expires_at:
+        messages.error(request, "QR code expired.")
+        return redirect('student_dashboard')
+
+    # Mark attendance for the student
+    Attendance.objects.update_or_create(
+        session=session,
+        student=request.user,
+        defaults={'status': Attendance.Status.PRESENT, 'marked_at': now}
+    )
+    qr_obj.scan_count += 1
+    qr_obj.save()
+    messages.success(request, "Attendance marked successfully!")
+    return redirect('student_dashboard')

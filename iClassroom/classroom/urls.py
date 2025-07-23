@@ -11,6 +11,9 @@ urlpatterns = [
     path('teacher/dashboard/', views.teacher_dashboard, name='teacher_dashboard'),
     path('teacher/class/<uuid:class_id>/', views.class_detail, name='class_detail'),
 
+    # qr urls
+    path('sessions/<uuid:session_id>/qr/', views.qr_attendance, name='qr_attendance'),
+    path('attendance/qr/<str:code>/', views.student_qr_attendance, name='student_qr_attendance'),
     # student urls
     path('student/dashboard/', views.student_dashboard, name='student_dashboard'),
     path('enroll/', views.enroll_in_class, name='enroll_in_class'),

@@ -1,0 +1,13 @@
+
+{% extends 'classroom/layouts/base_layout.html' %}
+{% load b64encode %}
+{% block content %}
+
+<div class="container" style="text-align:center;">
+    <h2>QR Attendance for {{ session.class_instance.course_name }} - {{ session.class_instance.section }}</h2>
+    <p>Session: {{ session.session_date }} {{ session.start_time }} - {{ session.end_time }}</p>
+    <p>QR code expires at: {{ expiry }}</p>
+    <img src="data:image/png;base64,{{ qr_code|b64encode }}" alt="QR Code" style="margin:20px 0; width:300px; height:300px;">
+    <p>Students: Scan this QR code to mark your attendance.</p>
+</div>
+{% endblock %}
