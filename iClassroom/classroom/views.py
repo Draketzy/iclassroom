@@ -704,8 +704,54 @@ def enroll_in_class(request):
     return redirect('student_dashboard')
 @login_required
 def student_progress(request):
-    return render(request, 'classroom/student/student_progress.html')
+    student = request.user
+    enrollments = Enrollment.objects.filter(student=student, status='active').select_related('class_instance')
+    attendance_stats = []
 
+    for enrollment in enrollments:
+        class_obj = enrollment.class_instance
+
+        # Attendance
+        completed_sessions = ClassSession.objects.filter(class_instance=class_obj, status='completed')
+        total_sessions = completed_sessions.count()
+        attended_sessions = Attendance.objects.filter(
+            session__in=completed_sessions,
+            student=student,
+            status='present'
+        ).count()
+        attendance_percentage = round((attended_sessions / total_sessions) * 100, 1) if total_sessions > 0 else 0
+
+        # Participation
+        participation_records = Participation.objects.filter(
+            session__class_instance=class_obj,
+            student=student
+        )
+        participation_points = participation_records.aggregate(total=Sum('points'))['total'] or 0
+        # You can set max_participation_points as needed, e.g. 200 or calculate from class rules
+        max_participation_points = 200
+        participation_percentage = round((participation_points / max_participation_points) * 100, 1) if max_participation_points > 0 else 0
+
+        # Grade (dummy logic, replace with your own)
+        grade = "A" if attendance_percentage >= 90 and participation_percentage >= 90 else "A-" if attendance_percentage >= 80 else "B"
+
+        attendance_stats.append({
+            'class': class_obj,
+            'attended_sessions': attended_sessions,
+            'total_sessions': total_sessions,
+            'attendance_percentage': attendance_percentage,
+            'participation_points': participation_points,
+            'max_participation_points': max_participation_points,
+            'participation_percentage': participation_percentage,
+            'grade': grade,
+            'teacher_name': f"{class_obj.teacher.first_name} {class_obj.teacher.last_name}",
+            'course_code': getattr(class_obj, 'course_code', ''),
+        })
+
+    context = {
+        'attendance_stats': attendance_stats,
+    }
+    return render(request, 'classroom/student/student_progress.html', context)
+@login_required
 def logout_view(request):
     logout(request)
     return redirect('login')
