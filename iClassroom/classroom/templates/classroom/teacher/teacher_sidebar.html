@@ -95,7 +95,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     navLinks.forEach(link => {
         link.addEventListener('click', function(e) {
-            e.preventDefault();
+            // Only prevent default for placeholder links (href="#" or no href)
+            const href = this.getAttribute('href');
+            if (!href || href === '#' || href === 'javascript:void(0)') {
+                e.preventDefault();
+            }
             
             // Remove active class from all links
             navLinks.forEach(l => l.classList.remove('active'));
@@ -103,33 +107,55 @@ document.addEventListener('DOMContentLoaded', function() {
             // Add active class to clicked link
             this.classList.add('active');
             
-            // Get the navigation text for routing
+            // Get the navigation text for debugging
             const navText = this.querySelector('.nav-text').textContent;
             console.log('Navigating to:', navText);
             
-            // Here you would typically handle routing
-            // For now, we'll just log the navigation
+            // For actual navigation links, let the browser handle the navigation naturally
+            // For placeholder links, you can add custom routing logic here
+            if (!href || href === '#' || href === 'javascript:void(0)') {
+                // Handle placeholder/custom routing here if needed
+                console.log('This is a placeholder link - add custom routing if needed');
+            }
         });
     });
+    
+    // Set active state based on current URL on page load
+    function setActiveNavLink() {
+        const currentPath = window.location.pathname;
+        navLinks.forEach(link => {
+            const linkPath = link.getAttribute('href');
+            if (linkPath && currentPath.includes(linkPath) && linkPath !== '#') {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
+            }
+        });
+    }
+    
+    // Set initial active state
+    setActiveNavLink();
     
     // Handle mobile sidebar toggle
     if (window.innerWidth <= 768) {
         const sidebarToggle = document.getElementById('sidebarToggle');
         
-        // Create overlay for mobile
-        const overlay = document.createElement('div');
-        overlay.className = 'sidebar-overlay';
-        document.body.appendChild(overlay);
-        
-        sidebarToggle.addEventListener('click', function() {
-            sidebar.classList.toggle('show');
-            overlay.classList.toggle('show');
-        });
-        
-        overlay.addEventListener('click', function() {
-            sidebar.classList.remove('show');
-            overlay.classList.remove('show');
-        });
+        if (sidebarToggle) {
+            // Create overlay for mobile
+            const overlay = document.createElement('div');
+            overlay.className = 'sidebar-overlay';
+            document.body.appendChild(overlay);
+            
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('show');
+                overlay.classList.toggle('show');
+            });
+            
+            overlay.addEventListener('click', function() {
+                sidebar.classList.remove('show');
+                overlay.classList.remove('show');
+            });
+        }
     }
     
     // Handle upgrade button click
