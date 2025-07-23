@@ -747,8 +747,36 @@ def student_progress(request):
             'course_code': getattr(class_obj, 'course_code', ''),
         })
 
+    # --- Add this block to fetch recent activities ---
+    manila_tz = pytz_timezone('Asia/Manila')
+    attendance_activities = Attendance.objects.filter(
+        student=student
+    ).select_related('session', 'session__class_instance').order_by('-marked_at')[:5]
+
+    participation_activities = Participation.objects.filter(
+        student=student
+    ).select_related('session', 'session__class_instance', 'category').order_by('-created_at')[:5]
+
+    recent_activities = []
+    for activity in attendance_activities:
+        recent_activities.append({
+            'type': 'attendance',
+            'activity': activity,
+            'time': activity.marked_at.astimezone(manila_tz)
+        })
+    for activity in participation_activities:
+        recent_activities.append({
+            'type': 'participation',
+            'activity': activity,
+            'time': activity.created_at.astimezone(manila_tz)
+        })
+    recent_activities.sort(key=lambda x: x['time'], reverse=True)
+    recent_activities = recent_activities[:5]
+    # -------------------------------------------------
+
     context = {
         'attendance_stats': attendance_stats,
+        'recent_activities': recent_activities,  # Add this line
     }
     return render(request, 'classroom/student/student_progress.html', context)
 @login_required

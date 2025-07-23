@@ -118,8 +118,39 @@
 </div>
 
       <div id="recent-activity" class="tab-progress" style="display:none">
-        <h2>Paris</h2>
-        <p>Paris is the capital of France.</p> 
+        <h2 style="display:none;">Recent Activity</h2>
+        <div class="activities-list">
+          {% if not recent_activities %}
+            <div class="empty-state small">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="#9ca3af" stroke-width="1.5"/>
+              </svg>
+              <p>No recent activities</p>
+            </div>
+          {% else %}
+            {% for activity in recent_activities %}
+              <div class="activity-item">
+                <div class="activity-dot success"></div>
+                <div class="activity-content">
+                  {% if activity.type == 'attendance' %}
+                    {% if activity.activity.status == 'present' %}
+                      <p>Attended <strong>{{ activity.activity.session.class_instance.course_name }}</strong> on {{ activity.activity.session.session_date|date:"M d, Y" }}</p>
+                    {% elif activity.activity.status == 'late' %}
+                      <p>Late for <strong>{{ activity.activity.session.class_instance.course_name }}</strong> on {{ activity.activity.session.session_date|date:"M d, Y" }}</p>
+                    {% elif activity.activity.status == 'absent' %}
+                      <p>Missed <strong>{{ activity.activity.session.class_instance.course_name }}</strong> on {{ activity.activity.session.session_date|date:"M d, Y" }}</p>
+                    {% else %}
+                      <p>Status: {{ activity.activity.get_status_display }} for <strong>{{ activity.activity.session.class_instance.course_name }}</strong> on {{ activity.activity.session.session_date|date:"M d, Y" }}</p>
+                    {% endif %}
+                  {% elif activity.type == 'participation' %}
+                    <p>Received <strong>{{ activity.activity.points }}</strong> point{{ activity.activity.points|pluralize }} for {{ activity.activity.category.name|lower }} in <strong>{{ activity.activity.session.class_instance.course_name }}</strong> ({{ activity.activity.session.session_date|date:"M d, Y" }})</p>
+                  {% endif %}
+                  <span class="activity-time">{{ activity.time|timesince }} ago</span>
+                </div>
+              </div>
+            {% endfor %}
+          {% endif %}
+        </div>
       </div>
 
       <div id="achievements" class="tab-progress" style="display:none">
@@ -271,6 +302,43 @@
   right: 12px;
   color: #fff;
   font-size: 13px;
+}
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  border-radius: 12px;
+  background: #f9fafb;
+  margin-top: 24px;
+}
+.empty-state svg {
+  margin-bottom: 12px;
+}
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  background: #f3f4f6;
+  margin-bottom: 12px;
+}
+.activity-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  position: relative;
+  top: 2px;
+}
+.activity-dot.success {
+  background: #22c55e;
+}
+.activity-content {
+  flex: 1;
+}
+.activity-time {
+  font-size: 12px;
+  color: #9ca3af;
+  margin-top: 4px;
 }
 </style>
 {% endblock %}
