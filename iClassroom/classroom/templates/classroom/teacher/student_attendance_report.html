@@ -1,9 +1,10 @@
+{% extends 'classroom/layouts/base_layout.html' %}
+
 {% load static %}
 {% block content %}
-  {% include 'classroom/header.html' %}
-<div class="container">
+<div class="attendance-report-container">
     
-    <div class="header">
+    <div class="attendance-report-header">
         <a href="{% url 'class_detail' class_id=class.id %}" class="back-link">
             ← Back to Class
         </a>
@@ -96,7 +97,9 @@
         Report generated on {% now "F j, Y" %}
     </div>
 </div>
+{% endblock %}
 
+{% block extra_css %}
 <style>
     * {
         margin: 0;
