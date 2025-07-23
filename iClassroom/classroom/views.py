@@ -1042,18 +1042,26 @@ class SessionCreateView(CreateView):
         return super().get(request, *args, **kwargs)
 @login_required
 def start_session(request, session_id):
+    import logging
+    logger = logging.getLogger(__name__)
+
     session = get_object_or_404(ClassSession, id=session_id)
-    print("Session status:", session.status)
-    print("Is past end time:", session.is_past_end_time())
-    print("Session end datetime:", session.get_end_datetime())
-    print("Now:", timezone.now())
+    logger.debug(f"Attempting to start session: {session.id}")
+    logger.debug(f"Session status: {session.status}")
+    logger.debug(f"Is past end time: {session.is_past_end_time()}")
+    logger.debug(f"Session end datetime: {session.get_end_datetime()}")
+    logger.debug(f"Now: {timezone.now()}")
+
     if session.status != 'scheduled':
+        logger.warning(f"Session {session.id} not in 'scheduled' status. Current status: {session.status}")
         messages.error(request, 'Only scheduled sessions can be started')
     elif session.is_past_end_time():
+        logger.warning(f"Session {session.id} end time has already passed.")
         messages.error(request, 'Cannot start session - end time has already passed')
     else:
         session.status = 'in_progress'
         session.save()
+        logger.info(f"Session {session.id} started successfully.")
         messages.success(request, 'Session started successfully!')
     return redirect('session_list', class_id=session.class_instance.id)
 
