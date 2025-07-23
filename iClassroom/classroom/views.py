@@ -1419,6 +1419,16 @@ def student_qr_attendance(request, code):
         messages.error(request, "QR code expired.")
         return redirect('student_dashboard')
 
+    # Check if attendance already exists for this user and session
+    attendance_exists = Attendance.objects.filter(
+        session=session,
+        student=request.user
+    ).exists()
+
+    if attendance_exists:
+        messages.warning(request, "You have already marked your attendance for this session.")
+        return redirect('student_dashboard')
+
     # Mark attendance for the student
     Attendance.objects.update_or_create(
         session=session,

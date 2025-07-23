@@ -4,10 +4,45 @@
 {% block content %}
 
 <div class="container" style="text-align:center;">
+  <div class="qr-header">
+    <a href="{% url 'teacher_dashboard' %}" class="back-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 12H5M12 19L5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Back to Dashboard
+    </a>
+  </div>
     <h2>QR Attendance for {{ session.class_instance.course_name }} - {{ session.class_instance.section }}</h2>
     <p>Session: {{ session.session_date }} {{ session.start_time }} - {{ session.end_time }}</p>
     <p>QR code expires at: {{ expiry }}</p>
     <img src="data:image/png;base64,{{ qr_code|b64encode }}" alt="QR Code" style="margin:20px 0; width:300px; height:300px;">
     <p>Students: Scan this QR code to mark your attendance.</p>
 </div>
+{% endblock %}
+
+{% block extra_css%}
+<style>
+  .qr-header {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      margin-bottom: 20px;
+  }
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #64748b;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    margin-bottom: 16px;
+    transition: color 0.2s;
+  }
+
+  .back-btn:hover {
+      color: #334155;
+      text-decoration: none;
+  }
+</style>
 {% endblock %}
