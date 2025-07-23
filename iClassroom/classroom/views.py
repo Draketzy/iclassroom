@@ -1043,6 +1043,10 @@ class SessionCreateView(CreateView):
 @login_required
 def start_session(request, session_id):
     session = get_object_or_404(ClassSession, id=session_id)
+    print("Session status:", session.status)
+    print("Is past end time:", session.is_past_end_time())
+    print("Session end datetime:", session.get_end_datetime())
+    print("Now:", timezone.now())
     if session.status != 'scheduled':
         messages.error(request, 'Only scheduled sessions can be started')
     elif session.is_past_end_time():
