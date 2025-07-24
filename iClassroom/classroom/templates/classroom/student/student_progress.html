@@ -13,51 +13,51 @@
     <p>Track your attendance, participation, and achievements</p>
   </div>
   <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-content">
-        <div class="stat-info">
-          <div class="stat-number">{{ attendance_percentage }}%</div>
-          <h3>Overall Attendance</h3>
-        </div>
-        <div class="bg-green-50 p-3 rounded-lg">
-         <i class="fas fa-user-check text-green-600 text-xl"></i>
-        </div>
+  <div class="stat-card">
+    <div class="stat-content">
+      <div class="stat-info">
+        <div class="stat-number">{{ overall_attendance_percentage }}%</div>
+        <h3>Overall Attendance</h3>
       </div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-content">
-        <div class="stat-info">
-          <div class="stat-number">{{ attendance_percentage }}%</div>
-          <h3>Overall Participation</h3>
-        </div>
-        <div class="bg-blue-50 p-3 rounded-lg">
-          <i class="fas fa-hand text-blue-600 text-xl"></i>
-        </div>
-      </div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-content">
-        <div class="stat-info">
-          <div class="stat-number">{{ attendance_percentage }}%</div>
-          <h3>Enrolled Class</h3>
-        </div>
-        <div class="bg-yellow-50 p-3 rounded-lg">
-          <i class="fas fa-book-open text-yellow-600 text-xl"></i>
-        </div>
-      </div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-content">
-        <div class="stat-info">
-          <div class="stat-number">{{ attendance_percentage }}%</div>
-          <h3>Achievements</h3>          
-        </div>
-        <div class="bg-red-50 p-3 rounded-lg">
-          <i class="fas fa-medal text-red-600 text-xl"></i>
-        </div>
+      <div class="bg-green-50 p-3 rounded-lg">
+        <i class="fas fa-user-check text-green-600 text-xl"></i>
       </div>
     </div>
   </div>
+  <div class="stat-card">
+    <div class="stat-content">
+      <div class="stat-info">
+        <div class="stat-number">{{ overall_participation_percentage }}%</div>
+        <h3>Overall Participation</h3>
+      </div>
+      <div class="bg-blue-50 p-3 rounded-lg">
+        <i class="fas fa-hand text-blue-600 text-xl"></i>
+      </div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-content">
+      <div class="stat-info">
+        <div class="stat-number">{{ total_classes }}</div>
+        <h3>Enrolled Classes</h3>
+      </div>
+      <div class="bg-yellow-50 p-3 rounded-lg">
+        <i class="fas fa-book-open text-yellow-600 text-xl"></i>
+      </div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-content">
+      <div class="stat-info">
+        <div class="stat-number">{{ achievements_count }}</div>
+        <h3>Achievements</h3>
+      </div>
+      <div class="bg-red-50 p-3 rounded-lg">
+        <i class="fas fa-medal text-red-600 text-xl"></i>
+      </div>
+    </div>
+  </div>
+</div>
   <div class="tablist-container">
       <div class="tablist-header">
         <button onclick="openTab('class-performance')" class="active">Class Performance</button>

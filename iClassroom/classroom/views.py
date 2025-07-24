@@ -708,36 +708,38 @@ def student_progress(request):
     enrollments = Enrollment.objects.filter(student=student, status='active').select_related('class_instance')
     attendance_stats = []
 
+    total_classes = enrollments.count()
+    total_attended_sessions = 0
+    total_sessions = 0
+    total_participation_points = 0
+    achievements_count = 0  # You can set logic for achievements
+
     for enrollment in enrollments:
         class_obj = enrollment.class_instance
 
-        # Attendance
         completed_sessions = ClassSession.objects.filter(class_instance=class_obj, status='completed')
-        total_sessions = completed_sessions.count()
-        attended_sessions = Attendance.objects.filter(
+        class_total_sessions = completed_sessions.count()
+        class_attended_sessions = Attendance.objects.filter(
             session__in=completed_sessions,
             student=student,
             status='present'
         ).count()
-        attendance_percentage = round((attended_sessions / total_sessions) * 100, 1) if total_sessions > 0 else 0
+        attendance_percentage = round((class_attended_sessions / class_total_sessions) * 100, 1) if class_total_sessions > 0 else 0
 
-        # Participation
         participation_records = Participation.objects.filter(
             session__class_instance=class_obj,
             student=student
         )
         participation_points = participation_records.aggregate(total=Sum('points'))['total'] or 0
-        # You can set max_participation_points as needed, e.g. 200 or calculate from class rules
         max_participation_points = 200
         participation_percentage = round((participation_points / max_participation_points) * 100, 1) if max_participation_points > 0 else 0
 
-        # Grade (dummy logic, replace with your own)
         grade = "A" if attendance_percentage >= 90 and participation_percentage >= 90 else "A-" if attendance_percentage >= 80 else "B"
 
         attendance_stats.append({
             'class': class_obj,
-            'attended_sessions': attended_sessions,
-            'total_sessions': total_sessions,
+            'attended_sessions': class_attended_sessions,
+            'total_sessions': class_total_sessions,
             'attendance_percentage': attendance_percentage,
             'participation_points': participation_points,
             'max_participation_points': max_participation_points,
@@ -747,7 +749,14 @@ def student_progress(request):
             'course_code': getattr(class_obj, 'course_code', ''),
         })
 
-    # --- Add this block to fetch recent activities ---
+        total_attended_sessions += class_attended_sessions
+        total_sessions += class_total_sessions
+        total_participation_points += participation_points
+
+    overall_attendance_percentage = round((total_attended_sessions / total_sessions) * 100, 1) if total_sessions > 0 else 0
+    overall_participation_percentage = round((total_participation_points / (total_classes * 200)) * 100, 1) if total_classes > 0 else 0
+
+    # --- Recent activities block ---
     manila_tz = pytz_timezone('Asia/Manila')
     attendance_activities = Attendance.objects.filter(
         student=student
@@ -776,7 +785,11 @@ def student_progress(request):
 
     context = {
         'attendance_stats': attendance_stats,
-        'recent_activities': recent_activities,  # Add this line
+        'recent_activities': recent_activities,
+        'overall_attendance_percentage': overall_attendance_percentage,
+        'overall_participation_percentage': overall_participation_percentage,
+        'total_classes': total_classes,
+        'achievements_count': achievements_count,
     }
     return render(request, 'classroom/student/student_progress.html', context)
 @login_required
