@@ -167,14 +167,27 @@
                             </div>
                         </div>
                         <div class="class-actions">
-                            {% if stat.next_session %}
-                                <span class="next-class">
-                                    Next: {{ stat.next_session.session_date|date:"D M d" }} {{ stat.next_session.start_time|time:"g:i A" }} PH
-                                </span>
-                            {% else %}
-                                <span class="next-class">No upcoming sessions</span>
-                            {% endif %}
-                        </div>
+                        {% if stat.next_session %}
+                            <span class="next-class">
+                                Next: {{ stat.next_session.session_date|date:"D M d" }} {{ stat.next_session.start_time|time:"g:i A" }} PH
+                            </span>
+                        {% else %}
+                            <span class="next-class">No upcoming sessions</span>
+                        {% endif %}
+
+                        <!-- Check In Button -->
+                        {% if stat.current_session %}
+                            <a href="{% url 'qr_attendance' session_id=stat.current_session.id %}" class="check-in-btn">
+                                <svg width="18" height="18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 3v12m0 0l-4-4m4 4l4-4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                Check In
+                            </a>
+                        {% else %}
+                            <button class="check-in-btn" disabled style="opacity:0.6; cursor:not-allowed;">
+                                <svg width="18" height="18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 3v12m0 0l-4-4m4 4l4-4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                Check In
+                            </button>
+                        {% endif %}
+                    </div>
                     </div>
                     {% endfor %}
                 {% endif %}
