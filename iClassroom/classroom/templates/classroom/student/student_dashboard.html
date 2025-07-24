@@ -174,10 +174,6 @@
                             {% else %}
                                 <span class="next-class">No upcoming sessions</span>
                             {% endif %}
-                            <!-- Add View Details Button -->
-                            <a href="{% url 'student_class_detail' class_id=stat.class.id %}" class="btn btn-secondary" style="margin-left: 12px;">
-                                View Class Details
-                            </a>
                         </div>
                     </div>
                     {% endfor %}
@@ -323,7 +319,7 @@
     <div class="modal-content modern-modal">
       <div class="modal-header modern-header">
         <h5 class="modal-title" id="qrScannerModalLabel">Scan QR Code</h5>
-        <button type="button" class="btn-close modern-close1" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close modern-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body modern-body">
         <div id="qr-reader" style="width: 100%"></div>
@@ -1146,7 +1142,7 @@ body {
                         }
                         throw new Error('Network response was not ok');
                     })
-                    .then data => {
+                    .then(data => {
                         // Check if the response contains success indicators
                         if (data.includes('successfully') || data.includes('enrolled')) {
                             // Close modal properly
