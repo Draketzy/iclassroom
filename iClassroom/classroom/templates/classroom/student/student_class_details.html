@@ -1,30 +1,107 @@
-{% extends 'classroom/layouts/student_base_layout.html'%}
+{% extends 'classroom/layouts/student_base_layout.html' %}
 {% load static %}
-{% block content %}
 
+{% block content %}
 <div class="student-class-container">
+  <!-- Header Section -->
   <div class="class-details-header">
-    <h1>{{ class_instance.course_name }} - {{ class_instance.section }}</h1>
-    <p>Teacher: {{ class_instance.teacher.first_name }} {{ class_instance.teacher.last_name }}</p>
-    <p>Room: {{ class_instance.room }}</p>
-    <p>Schedule: {{ class_instance.schedule }}</p>
-    <p>Semester: {{ class_instance.get_semester_display }}</p>
-    <p>Status: {% if class_instance.is_active %}Active{% else %}Archived{% endif %}</p>
+    <div class="header-content">
+      <div class="class-title-section">
+        <h1 class="class-title">{{ class_instance.course_name }}</h1>
+        <span class="section-badge">{{ class_instance.section }}</span>
+        <span class="status-badge {% if class_instance.is_active %}status-active{% else %}status-archived{% endif %}">
+          {% if class_instance.is_active %}Active{% else %}Archived{% endif %}
+        </span>
+      </div>
+      
+      <div class="class-info-grid">
+        <div class="info-item">
+          <i class="icon-teacher"></i>
+          <div class="info-content">
+            <span class="info-label">Teacher</span>
+            <span class="info-value">{{ class_instance.teacher.first_name }} {{ class_instance.teacher.last_name }}</span>
+          </div>
+        </div>
+        
+        <div class="info-item">
+          <i class="icon-room"></i>
+          <div class="info-content">
+            <span class="info-label">Room</span>
+            <span class="info-value">{{ class_instance.room }}</span>
+          </div>
+        </div>
+        
+        <div class="info-item">
+          <i class="icon-schedule"></i>
+          <div class="info-content">
+            <span class="info-label">Schedule</span>
+            <span class="info-value">{{ class_instance.schedule }}</span>
+          </div>
+        </div>
+        
+        <div class="info-item">
+          <i class="icon-semester"></i>
+          <div class="info-content">
+            <span class="info-label">Semester</span>
+            <span class="info-value">{{ class_instance.get_semester_display }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="class-stats">
-    <h3>Statistics</h3>
-    <ul>
-      <li>Attendance: {{ attendance_percentage }}% ({{ attended_sessions }}/{{ total_sessions }} sessions)</li>
-      <li>Participation Points: {{ participation_points }} ({{ participation_percentage }}%)</li>
-    </ul>
+
+  <!-- Statistics Section -->
+  <div class="class-stats-section">
+    <h3 class="stats-title">Your Performance</h3>
+    
+    <div class="stats-grid">
+      <div class="stat-card attendance-card">
+        <div class="stat-header">
+          <i class="icon-attendance"></i>
+          <span class="stat-label">Attendance</span>
+        </div>
+        <div class="stat-content">
+          <div class="stat-percentage">{{ attendance_percentage }}%</div>
+          <div class="stat-details">{{ attended_sessions }}/{{ total_sessions }} sessions</div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: {{ attendance_percentage }}%"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="stat-card participation-card">
+        <div class="stat-header">
+          <i class="icon-participation"></i>
+          <span class="stat-label">Participation</span>
+        </div>
+        <div class="stat-content">
+          <div class="stat-percentage">{{ participation_percentage }}%</div>
+          <div class="stat-details">{{ participation_points }} points earned</div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: {{ participation_percentage }}%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
+
+  <!-- Action Buttons -->
   {% if enrollment and enrollment.status == 'active' %}
-  <form method="post" style="margin-top: 24px;">
-    {% csrf_token %}
-    <button type="submit" name="action" value="unenroll" class="btn btn-danger" onclick="return confirm('Are you sure you want to unenroll?');">Unenroll</button>
-    <button type="submit" name="action" value="archive" class="btn btn-secondary" onclick="return confirm('Archive this class?');">Archive Class</button>
-  </form>
+  <div class="action-section">
+    <form method="post" class="action-form">
+      {% csrf_token %}
+      <button type="submit" name="action" value="archive" class="btn btn-secondary" onclick="return confirm('Archive this class? You can still view it but won\'t receive notifications.');">
+        <i class="icon-archive"></i>
+        Archive Class
+      </button>
+      <button type="submit" name="action" value="unenroll" class="btn btn-danger" onclick="return confirm('Are you sure you want to unenroll? This action cannot be undone.');">
+        <i class="icon-unenroll"></i>
+        Unenroll from Class
+      </button>
+    </form>
+  </div>
   {% endif %}
 </div>
-
 {% endblock %}
+
+{}
