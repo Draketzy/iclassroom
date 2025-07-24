@@ -3,56 +3,55 @@
 
 {% block content %}
 <div class="student-class-container">
-  <!-- Header Section -->
+  <!-- Minimal Header Section -->
   <div class="class-details-header">
-    <div class="header-content">
+    <div class="header-main">
       <div class="class-title-section">
         <h1 class="class-title">{{ class_instance.course_name }}</h1>
-        <span class="section-badge">{{ class_instance.section }}</span>
-        <span class="status-badge {% if class_instance.is_active %}status-active{% else %}status-archived{% endif %}">
-          {% if class_instance.is_active %}Active{% else %}Archived{% endif %}
-        </span>
+        <div class="class-meta">
+          <span class="section-tag">{{ class_instance.section }}</span>
+          <span class="status-indicator {% if class_instance.is_active %}active{% else %}archived{% endif %}"></span>
+        </div>
       </div>
       
-      <div class="class-info-grid">
-        <div class="info-item">
-          <i class="icon-teacher"></i>
-          <div class="info-content">
-            <span class="info-label">Teacher</span>
-            <span class="info-value">{{ class_instance.teacher.first_name }} {{ class_instance.teacher.last_name }}</span>
-          </div>
-        </div>
-        
-        <div class="info-item">
-          <i class="icon-room"></i>
-          <div class="info-content">
-            <span class="info-label">Room</span>
-            <span class="info-value">{{ class_instance.room }}</span>
-          </div>
-        </div>
-        
-        <div class="info-item">
-          <i class="icon-schedule"></i>
-          <div class="info-content">
-            <span class="info-label">Schedule</span>
-            <span class="info-value">{{ class_instance.schedule }}</span>
-          </div>
-        </div>
-        
-        <div class="info-item">
-          <i class="icon-semester"></i>
-          <div class="info-content">
-            <span class="info-label">Semester</span>
-            <span class="info-value">{{ class_instance.get_semester_display }}</span>
+      {% if enrollment and enrollment.status == 'active' %}
+      <div class="header-actions">
+        <div class="dropdown-menu">
+          <button class="menu-trigger" onclick="toggleDropdown()">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </button>
+          <div class="dropdown-content" id="actionDropdown">
+            <form method="post" class="dropdown-form">
+              {% csrf_token %}
+              <button type="submit" name="action" value="archive" class="dropdown-item" onclick="return confirm('Archive this class? You can still view it but won\'t receive notifications.');">
+                <i class="icon-archive"></i>
+                <span>Archive Class</span>
+              </button>
+              <button type="submit" name="action" value="unenroll" class="dropdown-item danger" onclick="return confirm('Are you sure you want to unenroll? This action cannot be undone.');">
+                <i class="icon-unenroll"></i>
+                <span>Unenroll</span>
+              </button>
+            </form>
           </div>
         </div>
       </div>
+      {% endif %}
+    </div>
+    
+    <div class="class-info">
+      <span class="info-text">{{ class_instance.teacher.first_name }} {{ class_instance.teacher.last_name }}</span>
+      <span class="info-separator">•</span>
+      <span class="info-text">{{ class_instance.room }}</span>
+      <span class="info-separator">•</span>
+      <span class="info-text">{{ class_instance.schedule }}</span>
     </div>
   </div>
 
   <!-- Statistics Section -->
   <div class="class-stats-section">
-    <h3 class="stats-title">Your Performance</h3>
+    <h3 class="stats-title">Performance Overview</h3>
     
     <div class="stats-grid">
       <div class="stat-card attendance-card">
@@ -84,24 +83,420 @@
       </div>
     </div>
   </div>
-
-  <!-- Action Buttons -->
-  {% if enrollment and enrollment.status == 'active' %}
-  <div class="action-section">
-    <form method="post" class="action-form">
-      {% csrf_token %}
-      <button type="submit" name="action" value="archive" class="btn btn-secondary" onclick="return confirm('Archive this class? You can still view it but won\'t receive notifications.');">
-        <i class="icon-archive"></i>
-        Archive Class
-      </button>
-      <button type="submit" name="action" value="unenroll" class="btn btn-danger" onclick="return confirm('Are you sure you want to unenroll? This action cannot be undone.');">
-        <i class="icon-unenroll"></i>
-        Unenroll from Class
-      </button>
-    </form>
-  </div>
-  {% endif %}
 </div>
 {% endblock %}
 
-{}
+{% block extra_css %}
+<style>
+  /* Student Class Detail Styles */
+/* Student Class Detail Styles */
+.student-class-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: #f8fafc;
+  min-height: 100vh;
+}
+
+/* Minimal Header Section */
+.class-details-header {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.header-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.class-title-section {
+  flex: 1;
+}
+
+.class-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.2;
+}
+
+.class-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.section-tag {
+  background: #f3f4f6;
+  color: #6b7280;
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-indicator.active {
+  background: #10b981;
+}
+
+.status-indicator.archived {
+  background: #6b7280;
+}
+
+.class-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #6b7280;
+  font-size: 0.9rem;
+  flex-wrap: wrap;
+}
+
+.info-text {
+  color: #374151;
+}
+
+.info-separator {
+  color: #d1d5db;
+}
+
+/* Three Dot Menu */
+.header-actions {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: relative;
+  display: inline-block;
+}
+
+.menu-trigger {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  transition: background-color 0.2s ease;
+}
+
+.menu-trigger:hover {
+  background: #f3f4f6;
+}
+
+.dot {
+  width: 4px;
+  height: 4px;
+  background: #6b7280;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+
+.menu-trigger:hover .dot {
+  background: #374151;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background: white;
+  min-width: 180px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  z-index: 1000;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.dropdown-content.show {
+  display: block;
+  animation: dropdownFadeIn 0.2s ease;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #374151;
+  transition: background-color 0.2s ease;
+  width: 100%;
+}
+
+.dropdown-item:hover {
+  background: #f9fafb;
+}
+
+.dropdown-item.danger {
+  color: #dc2626;
+}
+
+.dropdown-item.danger:hover {
+  background: #fef2f2;
+}
+
+.dropdown-item i {
+  font-size: 1rem;
+}
+
+/* Icons */
+.icon-attendance::before { content: "✅"; font-size: 1.5rem; }
+.icon-participation::before { content: "🎯"; font-size: 1.5rem; }
+.icon-archive::before { content: "📦"; font-size: 1rem; }
+.icon-unenroll::before { content: "❌"; font-size: 1rem; }
+
+/* Statistics Section */
+.class-stats-section {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.stats-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 1.5rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.stat-card {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.attendance-card:hover {
+  border-color: #10b981;
+}
+
+.participation-card:hover {
+  border-color: #3b82f6;
+}
+
+.stat-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.stat-label {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.stat-content {
+  text-align: center;
+}
+
+.stat-percentage {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+}
+
+.stat-details {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 1rem;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.8s ease;
+}
+
+.attendance-card .progress-fill {
+  background: #10b981;
+}
+
+.participation-card .progress-fill {
+  background: #3b82f6;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .student-class-container {
+    padding: 1rem;
+  }
+  
+  .class-details-header {
+    padding: 1.5rem;
+  }
+  
+  .header-main {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .header-actions {
+    align-self: flex-end;
+  }
+  
+  .class-title {
+    font-size: 1.75rem;
+  }
+  
+  .class-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+  
+  .info-separator {
+    display: none;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .dropdown-content {
+    right: -1rem;
+    min-width: 160px;
+  }
+}
+
+@media (max-width: 480px) {
+  .class-title {
+    font-size: 1.5rem;
+  }
+  
+  .stat-percentage {
+    font-size: 2rem;
+  }
+  
+  .class-details-header {
+    padding: 1rem;
+  }
+  
+  .class-stats-section {
+    padding: 1.5rem;
+  }
+}
+
+/* Loading Animation for Progress Bars */
+@keyframes progressLoad {
+  0% { width: 0%; }
+  100% { width: var(--progress-width); }
+}
+
+.progress-fill {
+  animation: progressLoad 1.2s ease-out;
+}
+
+/* Focus States for Accessibility */
+.menu-trigger:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.dropdown-item:focus {
+  background: #f3f4f6;
+  outline: none;
+}
+
+/* Print Styles */
+@media print {
+  .header-actions {
+    display: none;
+  }
+  
+  .student-class-container {
+    background: white;
+    box-shadow: none;
+  }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleDropdown() {
+  const dropdown = document.getElementById('actionDropdown');
+  dropdown.classList.toggle('show');
+}
+
+// Close dropdown when clicking outside
+window.onclick = function(event) {
+  if (!event.target.matches('.menu-trigger') && !event.target.matches('.dot')) {
+    const dropdowns = document.getElementsByClassName('dropdown-content');
+    for (let i = 0; i < dropdowns.length; i++) {
+      const openDropdown = dropdowns[i];
+      if (openDropdown.classList.contains('show')) {
+        openDropdown.classList.remove('show');
+      }
+    }
+  }
+}
+</script>
+{% endblock %}
