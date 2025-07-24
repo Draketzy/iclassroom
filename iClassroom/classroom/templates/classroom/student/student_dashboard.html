@@ -174,6 +174,10 @@
                             {% else %}
                                 <span class="next-class">No upcoming sessions</span>
                             {% endif %}
+                            <!-- Add View Details Button -->
+                            <a href="{% url 'student_class_detail' class_id=stat.class.id %}" class="btn btn-secondary" style="margin-left: 12px;">
+                                View Class Details
+                            </a>
                         </div>
                     </div>
                     {% endfor %}
@@ -1142,7 +1146,7 @@ body {
                         }
                         throw new Error('Network response was not ok');
                     })
-                    .then(data => {
+                    .then data => {
                         // Check if the response contains success indicators
                         if (data.includes('successfully') || data.includes('enrolled')) {
                             // Close modal properly

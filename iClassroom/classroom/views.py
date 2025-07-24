@@ -1525,3 +1525,51 @@ def student_qr_attendance(request, code):
     qr_obj.save()
     messages.success(request, "Attendance marked successfully!")
     return redirect('student_dashboard')
+@login_required
+def student_class_detail(request, class_id):
+    student = request.user
+    class_instance = get_object_or_404(Class, id=class_id)
+    enrollment = Enrollment.objects.filter(student=student, class_instance=class_instance).first()
+
+    # Handle Unenroll and Archive actions
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'unenroll' and enrollment:
+            enrollment.status = 'dropped'
+            enrollment.save()
+            messages.success(request, 'You have unenrolled from this class.')
+            return redirect('student_dashboard')
+        elif action == 'archive' and enrollment:
+            class_instance.is_active = False
+            class_instance.save()
+            messages.success(request, 'Class archived.')
+            return redirect('student_dashboard')
+
+    # Statistics
+    completed_sessions = ClassSession.objects.filter(class_instance=class_instance, status='completed')
+    total_sessions = completed_sessions.count()
+    attended_sessions = Attendance.objects.filter(
+        session__in=completed_sessions,
+        student=student,
+        status='present'
+    ).count()
+    attendance_percentage = round((attended_sessions / total_sessions) * 100, 1) if total_sessions > 0 else 0
+
+    participation_records = Participation.objects.filter(
+        session__class_instance=class_instance,
+        student=student
+    )
+    participation_points = participation_records.aggregate(total=Sum('points'))['total'] or 0
+    max_participation_points = 200
+    participation_percentage = round((participation_points / max_participation_points) * 100, 1) if max_participation_points > 0 else 0
+
+    context = {
+        'class_instance': class_instance,
+        'enrollment': enrollment,
+        'attendance_percentage': attendance_percentage,
+        'attended_sessions': attended_sessions,
+        'total_sessions': total_sessions,
+        'participation_points': participation_points,
+        'participation_percentage': participation_percentage,
+    }
+    return render(request, 'classroom/student/student_class_details.html', context)

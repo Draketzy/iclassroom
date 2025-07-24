@@ -6,7 +6,26 @@
   <div class="class-details-header">
     <h1>{{ class_instance.course_name }} - {{ class_instance.section }}</h1>
     <p>Class Code: {{ class_instance.class_code }}</p>
+    <p>Teacher: {{ class_instance.teacher.first_name }} {{ class_instance.teacher.last_name }}</p>
+    <p>Room: {{ class_instance.room }}</p>
+    <p>Schedule: {{ class_instance.schedule }}</p>
+    <p>Semester: {{ class_instance.get_semester_display }}</p>
+    <p>Status: {% if class_instance.is_active %}Active{% else %}Archived{% endif %}</p>
   </div>
+  <div class="class-stats">
+    <h3>Statistics</h3>
+    <ul>
+      <li>Attendance: {{ attendance_percentage }}% ({{ attended_sessions }}/{{ total_sessions }} sessions)</li>
+      <li>Participation Points: {{ participation_points }} ({{ participation_percentage }}%)</li>
+    </ul>
+  </div>
+  {% if enrollment and enrollment.status == 'active' %}
+  <form method="post" style="margin-top: 24px;">
+    {% csrf_token %}
+    <button type="submit" name="action" value="unenroll" class="btn btn-danger" onclick="return confirm('Are you sure you want to unenroll?');">Unenroll</button>
+    <button type="submit" name="action" value="archive" class="btn btn-secondary" onclick="return confirm('Archive this class?');">Archive Class</button>
+  </form>
+  {% endif %}
 </div>
 
 {% endblock %}
