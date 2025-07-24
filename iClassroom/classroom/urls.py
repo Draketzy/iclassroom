@@ -18,6 +18,7 @@ urlpatterns = [
     path('student/dashboard/', views.student_dashboard, name='student_dashboard'),
     path('enroll/', views.enroll_in_class, name='enroll_in_class'),
     path('student/progress/', views.student_progress, name='student_progress'),
+    path('student/student_class_detail/<uuid:class_id>/', views.student_class_detail, name='student_class_detail'),
 
     # Forgot password URLs
     path('forgot-password/', views.forgot_password, name='forgot_password'),

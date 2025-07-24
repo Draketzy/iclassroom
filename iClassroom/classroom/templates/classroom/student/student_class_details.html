@@ -1,0 +1,12 @@
+{% extends 'classroom/layouts/student_base_layout.html'%}
+{% load static %}
+{% block content %}
+
+<div class="student-class-container">
+  <div class="class-details-header">
+    <h1>{{ class_instance.course_name }} - {{ class_instance.section }}</h1>
+    <p>Class Code: {{ class_instance.class_code }}</p>
+  </div>
+</div>
+
+{% endblock %}
