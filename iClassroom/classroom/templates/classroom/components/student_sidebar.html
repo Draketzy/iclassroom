@@ -20,7 +20,7 @@
                 <h3 class="nav-section-title">Main</h3>
                 <ul class="nav-list">
                     <li class="nav-item">
-                        <a href="{% url 'teacher_dashboard' %}" class="nav-link active" title="Dashboard">
+                        <a href="{% url 'student_dashboard' %}" class="nav-link active" title="Dashboard">
                             <i class="fas fa-tachometer-alt nav-icon"></i>
                             <span class="nav-text">Dashboard</span>
                         </a>
@@ -31,11 +31,11 @@
             <div class="nav-section">
                 <h3 class="nav-section-title">Classes</h3>
                 <ul class="nav-list">
-                    {% for class in classes_with_stats %}
+                    {% for stat in attendance_stats %}
                     <li class="nav-item">
-                        <a href="{% url 'class_detail' class.object.id %}" class="nav-link" title="Mathematics">
+                        <a href="{% url 'student_progress' %}?class_id={{ stat.class.id }}" class="nav-link" title="{{ stat.class.course_name }}">
                             <i class="fas fa-book nav-icon"></i>
-                            <span class="nav-text">{{ class.object.course_name }}</span>
+                            <span class="nav-text">{{ stat.class.course_name }}</span>
                         </a>
                     </li>
                 {% endfor %}
@@ -49,12 +49,6 @@
                         <a href="#" class="nav-link" title="Analytics">
                             <i class="fas fa-chart-bar nav-icon"></i>
                             <span class="nav-text">Analytics</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link" title="Export Data">
-                            <i class="fas fa-file-export nav-icon"></i>
-                            <span class="nav-text">Export Data</span>
                         </a>
                     </li>
                 </ul>
